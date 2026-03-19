@@ -1357,11 +1357,18 @@ footer {
 .support-drawer{
   position:absolute;top:0;right:0;height:100%;width:min(430px,100vw);background:#fff;
   box-shadow:-16px 0 42px rgba(11,30,51,.22);transform:translateX(100%);
-  transition:transform .28s ease;display:flex;flex-direction:column
+  transition:transform .28s ease,opacity .22s ease,bottom .28s ease,right .28s ease,width .28s ease,height .28s ease,border-radius .28s ease;
+  display:flex;flex-direction:column
 }
 .support-shell.open,.portal-shell.open{pointer-events:auto}
 .support-shell.open .support-backdrop,.portal-shell.open .portal-backdrop{opacity:1}
 .support-shell.open .support-drawer{transform:translateX(0)}
+.support-shell.guest-mode .support-backdrop{background:transparent}
+.support-shell.guest-mode .support-drawer{
+  top:auto;right:24px;bottom:96px;height:min(620px,calc(100vh - 132px));width:min(360px,calc(100vw - 24px));
+  border-radius:22px;overflow:hidden;box-shadow:0 24px 70px rgba(6,15,26,.28)
+}
+.support-shell.guest-mode.open .support-drawer{transform:none;opacity:1}
 .support-head,.portal-head{
   display:flex;align-items:center;gap:12px;padding:16px 18px;background:var(--navy);color:#fff;flex-shrink:0
 }
@@ -1385,6 +1392,10 @@ footer {
   display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s ease
 }
 .support-close:hover,.portal-close:hover{background:rgba(255,255,255,.18)}
+.support-shell.guest-mode .support-head{padding:14px 16px}
+.support-shell.guest-mode .support-head-title{font-size:14px}
+.support-shell.guest-mode .support-head-sub{font-size:11px}
+.support-shell.guest-mode .support-head-btn{display:none}
 .support-frame,.portal-frame{
   flex:1;width:100%;border:none;background:#fff
 }
@@ -1411,6 +1422,13 @@ footer {
 .support-guest-send{padding:11px 14px;border:none;border-radius:12px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}
 .support-guest-actions{display:flex;gap:8px;padding:0 16px 14px;background:#fff}
 .support-guest-actions .btn{flex:1;justify-content:center}
+.support-shell.guest-mode .support-guest-note{padding:12px 16px;font-size:11px}
+.support-shell.guest-mode .support-guest-msgs{padding:14px}
+.support-shell.guest-mode .support-guest-bubble{max-width:88%;font-size:12px;padding:9px 11px}
+.support-shell.guest-mode .support-guest-compose{padding:12px 14px}
+.support-shell.guest-mode .support-guest-compose textarea{min-height:62px;font-size:12px}
+.support-shell.guest-mode .support-guest-send{padding:10px 13px;font-size:12px}
+.support-shell.guest-mode .support-guest-actions{display:none}
 
 @media(max-width:1024px){
   .nav-links,.nav-cta{display:none!important}
@@ -1421,6 +1439,10 @@ footer {
   .section{padding:56px 0}
   .portal-modal{inset:0;border-radius:0}
   .support-drawer{width:100%}
+  .support-shell.guest-mode .support-backdrop{background:rgba(6,15,26,.46)}
+  .support-shell.guest-mode .support-drawer{
+    top:auto;right:12px;bottom:88px;width:calc(100vw - 24px);height:min(540px,calc(100vh - 116px));border-radius:18px
+  }
   .support-head,.portal-head{padding:14px}
   .support-head-actions .support-head-btn{display:none}
 }
@@ -1473,6 +1495,7 @@ footer {
       <a href="#home" onclick="nav('home','contacts')" style="color:rgba(255,255,255,.8);font-size:14px;font-weight:500">Контакты</a>
     </div>
     <div class="nav-cta" style="display:flex;align-items:center;gap:12px">
+      <button class="btn btn-ghost btn-sm" type="button" onclick="showChatLogin()"><i class="fas fa-user-lock"></i> Войти</button>
       <a href="tel:+74951234567" class="btn btn-outline btn-sm"><i class="fas fa-phone"></i> +7 (495) 123-45-67</a>
       <a href="#home" onclick="nav('home','calc-section')" class="btn btn-primary btn-sm">Консультация</a>
     </div>
@@ -1482,6 +1505,7 @@ footer {
   </div>
 </nav>
 <div class="mobile-menu" id="mobileMenuEl">
+  <a href="#home" onclick="showChatLogin();document.getElementById('mobileMenuEl').classList.remove('open')"><i class="fas fa-user-lock" style="color:var(--green);margin-right:7px"></i>Войти в кабинет</a>
   <a href="#home" onclick="nav('home')">Главная</a>
   <div style="padding:5px 0 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.35)">Услуги</div>
   <a href="#service-pc" onclick="nav('service-pc')" style="padding-left:10px"><i class="fas fa-desktop" style="color:var(--green);margin-right:7px"></i>Обслуживание ПК</a>
@@ -3885,8 +3909,8 @@ footer {
     <div class="support-head">
       <div class="support-head-mark">З</div>
       <div class="support-head-copy">
-        <div class="support-head-title">Кабинет поддержки</div>
-        <div class="support-head-sub">Авторизация, новые тикеты, статусы, история обращений и чат по заявкам</div>
+        <div class="support-head-title" id="supportHeadTitle">Онлайн-консультация</div>
+        <div class="support-head-sub" id="supportHeadSub">Короткие вопросы по услугам, подключению и формату поддержки</div>
       </div>
       <div class="support-head-actions">
         <button class="support-head-btn" type="button" onclick="openPortal()">Портал</button>
@@ -3902,7 +3926,6 @@ footer {
         <button class="support-guest-send" type="button" onclick="sendGuestSupportMessage()">Отправить</button>
       </div>
       <div class="support-guest-actions">
-        <button class="btn btn-ghost" type="button" onclick="showChatLogin()"><i class="fas fa-user-lock"></i> Войти в кабинет</button>
         <button class="btn btn-primary" type="button" onclick="openPortal()"><i class="fas fa-table-columns"></i> Полный портал</button>
       </div>
     </div>
@@ -4093,12 +4116,20 @@ function sendGuestSupportMessage(){
   });
 }
 function setSupportMode(mode){
+  var shell=document.getElementById('supportShell');
   var guest=document.getElementById('supportGuest');
   var frame=document.getElementById('supportChatFrame');
   var launch=document.querySelector('.support-launch');
+  var title=document.getElementById('supportHeadTitle');
+  var sub=document.getElementById('supportHeadSub');
+  if(shell)shell.classList.toggle('guest-mode',mode==='guest');
   if(guest)guest.classList.toggle('on',mode==='guest');
   if(frame)frame.style.display=mode==='portal'?'block':'none';
   if(launch)launch.style.display=mode==='portal'?'flex':'none';
+  if(title)title.textContent=mode==='guest'?'Онлайн-консультация':'Кабинет поддержки';
+  if(sub)sub.textContent=mode==='guest'
+    ?'Короткие вопросы по услугам, подключению и формату поддержки'
+    :'Авторизация, новые тикеты, статусы, история обращений и чат по заявкам';
 }
 function ensureChatFrame(mode,forceReload){
   var frame=document.getElementById('supportChatFrame');
