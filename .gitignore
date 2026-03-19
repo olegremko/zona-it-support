@@ -1,0 +1,9 @@
+node_modules/
+backend/node_modules/
+backend/data/
+backend/server.out.log
+backend/server.err.log
+backend/.env
+edge-profile/
+.DS_Store
+Thumbs.db

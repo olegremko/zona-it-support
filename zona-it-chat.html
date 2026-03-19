@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Зона ИТ — Поддержка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:transparent;font-family:'Inter',sans-serif;overflow:hidden}
+:root{--nv:#0B1E33;--gr:#00A86B;--gd:#008a57;--gw:rgba(0,168,107,.28);--bg:#F5F7FA;--bg2:#eef0f5;--wh:#fff;--tx:#1a2a3a;--mu:#607080;--bd:#dde3ec;--or:#FF7A1A;--rd:#e53935}
+button,input,textarea,select{font-family:'Inter',sans-serif;outline:none;border:none}
+button{cursor:pointer}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+#w{position:fixed;bottom:0;right:0;display:flex;flex-direction:column;align-items:flex-end;padding:0 18px 18px 0;gap:10px}
+.fab{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#00A86B,#00d4a0);display:flex;align-items:center;justify-content:center;color:#fff;font-size:21px;cursor:pointer;box-shadow:0 4px 18px var(--gw);transition:transform .2s;position:relative;flex-shrink:0}
+.fab:hover{transform:scale(1.07)}
+.win{display:none;flex-direction:column;width:340px;border-radius:16px;background:var(--wh);overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.16);border:1px solid var(--bd)}
+.win.open{display:flex;animation:su .22s ease}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.win.hg{height:400px}.win.ha{height:455px}.win.ht{height:530px}
+.hd{background:var(--nv);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative}
+.hd::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gr),#00d4a0)}
+.h-av{width:30px;height:30px;border-radius:50%;background:var(--gr);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+.h-nm{color:#fff;font-weight:700;font-size:13px}
+.h-st{color:var(--gr);font-size:11px;display:flex;align-items:center;gap:4px;margin-top:1px}
+.h-st::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gr);animation:pl 2s infinite;flex-shrink:0}
+@keyframes pl{0%,100%{box-shadow:0 0 0 0 rgba(0,168,107,.5)}60%{box-shadow:0 0 0 5px transparent}}
+.h-x{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.65);font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.h-x:hover{background:rgba(255,255,255,.2);color:#fff}
+.pn{display:none;flex-direction:column;flex:1;overflow:hidden}
+.pn.on{display:flex}
+/* Guest */
+.gms{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:7px;background:var(--bg)}
+.bm{align-self:flex-start;max-width:84%;background:var(--wh);border-radius:3px 11px 11px 11px;padding:9px 12px;font-size:13px;color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.07);line-height:1.5}
+.um{align-self:flex-end;max-width:84%;background:var(--nv);color:rgba(255,255,255,.92);border-radius:11px 3px 11px 11px;padding:9px 12px;font-size:13px;line-height:1.5}
+.qb-row{display:flex;flex-wrap:wrap;gap:5px;padding:9px 12px;border-top:1px solid var(--bd);background:var(--wh)}
+.qb{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--bd);background:var(--wh);color:var(--nv);cursor:pointer;white-space:nowrap;transition:all .15s}
+.qb:hover{background:var(--nv);color:#fff;border-color:var(--nv)}
+.lpr{margin:0 12px 12px;padding:10px 12px;background:rgba(0,168,107,.07);border:1px solid rgba(0,168,107,.2);border-radius:10px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:border-color .15s}
+.lpr:hover{border-color:var(--gr)}
+.lp-ic{width:28px;height:28px;border-radius:7px;background:var(--gr);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lp-t{font-size:12px;font-weight:700;color:var(--nv)}.lp-s{font-size:10px;color:var(--mu)}
+.g-ir{display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--bd);background:var(--wh)}
+.g-in{flex:1;padding:7px 12px;border-radius:18px;border:1px solid var(--bd);font-size:13px;transition:border-color .15s}
+.g-in:focus{border-color:var(--gr)}
+.g-sn{width:30px;height:30px;border-radius:50%;background:var(--gr);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;box-shadow:0 2px 8px var(--gw)}
+.g-sn:hover{background:var(--gd)}
+/* Auth */
+.aw{flex:1;overflow-y:auto;padding:16px 15px 12px;display:flex;flex-direction:column}
+.a-ic{font-size:24px;text-align:center;margin-bottom:6px}
+.a-tt{font-size:14px;font-weight:700;color:var(--nv);font-family:'Montserrat',sans-serif;text-align:center}
+.a-sb{font-size:11px;color:var(--mu);text-align:center;margin-top:2px;margin-bottom:12px}
+.a-tb{display:flex;gap:3px;background:var(--bg2);border-radius:8px;padding:3px;margin-bottom:13px}
+.at{flex:1;padding:7px;border-radius:6px;font-size:12px;font-weight:600;color:var(--mu);cursor:pointer;text-align:center;transition:all .15s}
+.at.on{background:var(--wh);color:var(--nv);box-shadow:0 1px 3px rgba(0,0,0,.09)}
+.af{margin-bottom:10px}
+.af label{display:block;font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.af input{width:100%;padding:9px 11px;border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--tx);transition:border-color .15s}
+.af input:focus{border-color:var(--gr)}
+.a-bt{width:100%;padding:11px;border-radius:50px;background:var(--gr);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px var(--gw);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.a-bt:hover{background:var(--gd);transform:translateY(-1px)}
+.a-er{font-size:12px;color:var(--rd);text-align:center;margin-top:8px;min-height:14px}
+.a-hn{font-size:11px;color:var(--mu);text-align:center;margin-top:10px;line-height:1.5}
+.a-hn span{color:var(--gr);cursor:pointer;font-weight:600}
+/* Ticket panel */
+.t-hd{padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.t-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--gr),#00d4a0);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.t-nm{font-size:12px;font-weight:700;color:var(--nv);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-co{font-size:10px;color:var(--mu);flex:1;min-width:0}
+.t-lo{font-size:11px;color:var(--mu);cursor:pointer;padding:2px 8px;border-radius:5px;border:1px solid var(--bd);transition:all .15s;white-space:nowrap;background:var(--wh)}
+.t-lo:hover{border-color:var(--rd);color:var(--rd)}
+.ttb{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--wh)}
+.tt{flex:1;padding:8px 4px;font-size:12px;font-weight:600;color:var(--mu);text-align:center;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px}
+.tt:hover{color:var(--nv)}.tt.on{color:var(--gr);border-bottom-color:var(--gr)}
+.tbg{background:var(--or);color:#fff;border-radius:8px;font-size:9px;font-weight:700;padding:1px 5px;min-width:14px;text-align:center}
+.tc{display:none;flex-direction:column;flex:1;overflow:hidden}.tc.on{display:flex}
+/* Ticket list */
+.tls{flex:1;overflow-y:auto}
+.tli{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
+.tli:hover{background:var(--bg)}
+.tli-ic{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px}
+.tli-b{flex:1;min-width:0}
+.tli-t{font-size:12px;font-weight:600;color:var(--nv);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tli-m{font-size:10px;color:var(--mu);margin-top:1px;display:flex;gap:5px}
+.sb{font-size:10px;font-weight:700;padding:2px 7px;border-radius:9px;white-space:nowrap}
+.s-op{background:rgba(255,152,0,.12);color:#e65100}
+.s-pr{background:rgba(156,39,176,.1);color:#7b1fa2}
+.s-dn{background:rgba(0,168,107,.12);color:var(--gr)}
+.s-cl{background:rgba(120,144,156,.12);color:#546e7a}
+.pl{padding:7px 12px;border-top:1px solid var(--bd);text-align:center;font-size:11px;color:var(--mu);background:var(--bg);flex-shrink:0}
+.pl a{color:var(--gr);font-weight:600;cursor:pointer}.pl a:hover{text-decoration:underline}
+/* New ticket form */
+.ntf{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:8px}
+.nfl{font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.nfi{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:7px;font-size:12px;color:var(--tx);transition:border-color .15s}
+.nfi:focus{border-color:var(--gr);outline:none}
+.nfi.er{border-color:var(--rd)}
+.nft{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:7px;font-size:12px;color:var(--tx);resize:none;min-height:64px;line-height:1.5;font-family:'Inter',sans-serif;transition:border-color .15s}
+.nft:focus{border-color:var(--gr);outline:none}
+.nft.er{border-color:var(--rd)}
+.pr{display:flex;gap:4px}
+.po{flex:1;padding:5px 3px;text-align:center;border-radius:6px;border:1px solid var(--bd);cursor:pointer;font-size:11px;font-weight:600;color:var(--mu);transition:all .15s}
+.po[data-v=low].on{border-color:#78909C;background:rgba(120,144,156,.1);color:#546e7a}
+.po[data-v=normal].on{border-color:#42A5F5;background:rgba(66,165,245,.1);color:#1565C0}
+.po[data-v=high].on{border-color:var(--or);background:rgba(255,122,26,.1);color:#e65100}
+.po[data-v=critical].on{border-color:var(--rd);background:rgba(229,57,53,.1);color:#c62828}
+.alb{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px dashed var(--bd);border-radius:7px;cursor:pointer;font-size:12px;color:var(--mu);transition:all .15s;background:transparent;width:100%}
+.alb:hover{border-color:var(--gr);color:var(--gr)}
+.fch{display:flex;flex-wrap:wrap;gap:4px}
+.fc{display:flex;align-items:center;gap:5px;background:rgba(0,168,107,.08);border:1px solid rgba(0,168,107,.2);border-radius:5px;padding:3px 7px;font-size:10px;color:var(--gr)}
+.fc .rm{cursor:pointer;color:var(--mu)}.fc .rm:hover{color:var(--rd)}
+.nt-s{width:calc(100% - 22px);margin:0 11px 11px;padding:10px;border-radius:50px;background:var(--gr);color:#fff;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px var(--gw);display:flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0}
+.nt-s:hover{background:var(--gd);transform:translateY(-1px)}
+/* Mini chat */
+.mc-hd{padding:8px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg)}
+.mc-bk{width:22px;height:22px;border-radius:5px;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--mu);transition:all .15s}
+.mc-bk:hover{border-color:var(--nv);color:var(--nv)}
+.mc-tl{font-size:11px;font-weight:700;color:var(--nv);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-ms{flex:1;overflow-y:auto;padding:10px 11px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.mc-b{align-self:flex-start;max-width:85%;background:var(--wh);border-radius:3px 10px 10px 10px;padding:7px 11px;font-size:12px;color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.06);line-height:1.5}
+.mc-u{align-self:flex-end;max-width:85%;background:var(--nv);color:rgba(255,255,255,.92);border-radius:10px 3px 10px 10px;padding:7px 11px;font-size:12px;line-height:1.5}
+.mc-s{align-self:center;font-size:10px;color:var(--mu);background:rgba(0,0,0,.04);border-radius:18px;padding:2px 10px;border:1px solid var(--bd)}
+.mc-n{font-size:10px;color:var(--gr);font-weight:600;margin-bottom:2px}
+.mc-r{display:flex;gap:5px;padding:7px 10px;border-top:1px solid var(--bd);background:var(--wh);flex-shrink:0;align-items:center}
+.mc-i{flex:1;padding:6px 10px;border-radius:16px;border:1px solid var(--bd);font-size:12px;transition:border-color .15s}
+.mc-i:focus{border-color:var(--gr);outline:none}
+.mc-s2{width:26px;height:26px;border-radius:50%;background:var(--gr);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.mc-s2:hover{background:var(--gd)}
+.mc-a{width:26px;height:26px;border-radius:50%;border:1px solid var(--bd);background:var(--bg2);color:var(--mu);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all .15s}
+.mc-a:hover{border-color:var(--gr);color:var(--gr)}
+#ntfi,#mcfi{display:none}
+html.embed body{background:var(--wh)}
+html.embed #w{position:relative;width:100%;height:100%;padding:0;gap:0;align-items:stretch}
+html.embed .fab{display:none}
+html.embed .win{display:flex;width:100%;height:100%!important;border-radius:0;border:none;box-shadow:none;animation:none}
+html.embed .h-x{display:none}
+</style>
+</head>
+<body>
+<div id="w">
+  <div class="win hg" id="win">
+    <div class="hd">
+      <div class="h-av" id="hAv"><i class="fas fa-robot"></i></div>
+      <div style="flex:1;min-width:0">
+        <div class="h-nm" id="hNm">Зона ИТ</div>
+        <div class="h-st" id="hSt">Онлайн</div>
+      </div>
+      <div class="h-x" onclick="closeW()"><i class="fas fa-times"></i></div>
+    </div>
+    <!-- Guest -->
+    <div class="pn on" id="pg">
+      <div class="gms" id="gMs"><div class="bm">Привет! Помогу найти информацию или создать заявку в поддержку.</div></div>
+      <div class="qb-row">
+        <button class="qb" onclick="qr('pc')">Компьютеры</button>
+        <button class="qb" onclick="qr('pr')">Тарифы</button>
+        <button class="qb" onclick="qr('en')">Инженер</button>
+        <button class="qb" onclick="sw('a')">Войти</button>
+      </div>
+      <div class="lpr" onclick="sw('a')">
+        <div class="lp-ic"><i class="fas fa-ticket-alt"></i></div>
+        <div><div class="lp-t">Личный кабинет</div><div class="lp-s">Войдите для создания тикетов</div></div>
+        <i class="fas fa-chevron-right" style="color:var(--gr);font-size:11px;margin-left:auto"></i>
+      </div>
+      <div class="g-ir">
+        <input class="g-in" id="gIn" placeholder="Ваш вопрос..." onkeypress="if(event.key==='Enter')gS()">
+        <button class="g-sn" onclick="gS()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+    <!-- Auth -->
+    <div class="pn" id="pa">
+      <div class="aw">
+        <div class="a-ic">🔐</div>
+        <div class="a-tt">Войти в кабинет</div>
+        <div class="a-sb">Для работы с тикетами и историей обращений</div>
+        <div class="a-tb">
+          <div class="at on" id="atL" onclick="aT('l')">Войти</div>
+          <div class="at" id="atR" onclick="aT('r')">Регистрация</div>
+        </div>
+        <div id="fL">
+          <div class="af"><label>Email</label><input type="email" id="lEm" placeholder="your@company.ru" value="demo@company.ru"></div>
+          <div class="af"><label>Пароль</label><input type="password" id="lPw" placeholder="..." value="demo1234" onkeypress="if(event.key==='Enter')dL()"></div>
+          <button class="a-bt" onclick="dL()"><i class="fas fa-sign-in-alt"></i>Войти</button>
+        </div>
+        <div id="fR" style="display:none">
+          <div class="af"><label>Имя *</label><input type="text" id="rNm" placeholder="Иван Иванов"></div>
+          <div class="af"><label>Компания</label><input type="text" id="rCo" placeholder="ООО Компания"></div>
+          <div class="af"><label>Email *</label><input type="email" id="rEm" placeholder="your@company.ru"></div>
+          <div class="af"><label>Пароль *</label><input type="password" id="rPw" placeholder="Минимум 6 символов" onkeypress="if(event.key==='Enter')dR()"></div>
+          <button class="a-bt" onclick="dR()"><i class="fas fa-user-plus"></i>Создать аккаунт</button>
+        </div>
+        <div class="a-er" id="aEr"></div>
+        <div class="a-hn">Демо: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b2d6d7dfddf2d1dddfc2d3dccb9cc0c7">[email&#160;protected]</a> / demo1234<br><span onclick="sw('g')">Вернуться</span></div>
+      </div>
+    </div>
+    <!-- Ticket -->
+    <div class="pn" id="pt">
+      <div class="t-hd">
+        <div class="t-av" id="tAv">ИИ</div>
+        <div style="flex:1;min-width:0">
+          <div class="t-nm" id="tNm">Пользователь</div>
+          <div class="t-co" id="tCo"></div>
+        </div>
+        <button class="t-lo" onclick="dLo()">Выйти</button>
+      </div>
+      <div class="ttb">
+        <div class="tt on" id="ttL" onclick="tT('l')"><i class="fas fa-list"></i>Тикеты<span class="tbg" id="ob" style="display:none">0</span></div>
+        <div class="tt" id="ttN" onclick="tT('n')"><i class="fas fa-plus"></i>Новый</div>
+      </div>
+      <div class="tc on" id="tcL"><div class="tls" id="tLs"></div><div class="pl"><a onclick="oP()">Открыть полный портал</a></div></div>
+      <div class="tc" id="tcN">
+        <div class="ntf">
+          <div><div class="nfl">Тема *</div><input class="nfi" id="ntS" placeholder="Кратко опишите проблему..."></div>
+          <div><div class="nfl">Категория</div>
+            <select class="nfi" id="ntC"><option value="">Выберите...</option>
+              <option>Рабочие станции и ПК</option><option>Серверы и инфраструктура</option>
+              <option>Сетевое оборудование</option><option>1С и корпоративное ПО</option>
+              <option>Информационная безопасность</option><option>Кассы и оборудование</option>
+              <option>Другое</option></select></div>
+          <div><div class="nfl">Описание *</div><textarea class="nft" id="ntD" placeholder="Подробно опишите проблему..."></textarea></div>
+          <div><div class="nfl">Приоритет</div>
+            <div class="pr">
+              <div class="po" data-v="low" onclick="sP(this)">Низкий</div>
+              <div class="po on" data-v="normal" onclick="sP(this)">Обычный</div>
+              <div class="po" data-v="high" onclick="sP(this)">Высокий</div>
+              <div class="po" data-v="critical" onclick="sP(this)">Крит.</div>
+            </div>
+          </div>
+          <div>
+            <label class="alb" for="ntfi"><i class="fas fa-paperclip"></i><span id="ntAL">Прикрепить файл</span></label>
+            <input type="file" id="ntfi" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.txt" onchange="ntF(this.files)">
+            <div class="fch" id="ntFC"></div>
+          </div>
+        </div>
+        <button class="nt-s" onclick="sT()"><i class="fas fa-paper-plane"></i>Создать тикет</button>
+      </div>
+      <div class="tc" id="tcC">
+        <div class="mc-hd">
+          <div class="mc-bk" onclick="tT('l')"><i class="fas fa-arrow-left"></i></div>
+          <div class="mc-tl" id="mcTl">Тикет</div>
+          <span class="sb" id="mcBg"></span>
+        </div>
+        <div class="mc-ms" id="mcMs"></div>
+        <div style="padding:4px 9px 0;display:flex;flex-wrap:wrap;gap:4px" id="mcAP"></div>
+        <input type="file" id="mcfi" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="mcF(this.files)">
+        <div class="mc-r">
+          <label class="mc-a" for="mcfi"><i class="fas fa-paperclip"></i></label>
+          <input class="mc-i" id="mcIn" placeholder="Сообщение..." onkeypress="if(event.key==='Enter')mcS()">
+          <button class="mc-s2" onclick="mcS()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fab" onclick="tog()"><i class="fas fa-comments" id="fI"></i></div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const PARAMS=new URLSearchParams(location.search);
+const EMBED=PARAMS.get('embed')==='1';
+const START_MODE=PARAMS.get('mode')||'';
+if(EMBED)document.documentElement.classList.add('embed');
+// ===============================================================
+//  ЗОНА ИТ — Shared Data Layer  (shared_db.js)
+//  Подключается на обе страницы: портал и виджет
+// ===============================================================
+
+const ZIT = (() => {
+  const API_BASE = (localStorage.getItem('zit_api_base') || '').trim() || 'http://localhost:4000';
+  const K = { token: 'zit_v2_token', user: 'zit_v2_user' };
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;'); }
+
+  function getToken(){ return localStorage.getItem(K.token) || ''; }
+  function setSession(token, user){
+    localStorage.setItem(K.token, token);
+    localStorage.setItem(K.user, JSON.stringify(user));
+  }
+  function clearSession(){
+    localStorage.removeItem(K.token);
+    localStorage.removeItem(K.user);
+  }
+  function getSession(){
+    try { return JSON.parse(localStorage.getItem(K.user) || 'null'); } catch(e){ return null; }
+  }
+
+  async function api(path, { method='GET', body, headers } = {}) {
+    const h = Object.assign({ 'Content-Type': 'application/json' }, headers || {});
+    const t = getToken();
+    if (t) h.Authorization = 'Bearer ' + t;
+    const res = await fetch(API_BASE + path, { method, headers:h, body: body===undefined?undefined:JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data && data.message) ? data.message : ('HTTP ' + res.status));
+    return data;
+  }
+
+  let ticketsCache = [];
+  let ticketsById = new Map();
+
+  function normalizeTicket(t){
+    return {
+      id: t.id,
+      number: t.number,
+      subject: t.subject,
+      description: t.description,
+      category: t.category,
+      priority: t.priority,
+      status: t.status,
+      createdAt: t.created_at,
+      updatedAt: t.updated_at,
+      messages: (t.messages || []).map(m => ({
+        id: m.id,
+        from: m.message_type === 'system' ? 'system' : 'user',
+        authorUserId: m.author_user_id || null,
+        authorName: m.author_name || (m.message_type === 'system' ? 'System' : 'User'),
+        text: m.body,
+        time: Date.parse(m.created_at),
+        files: []
+      }))
+    };
+  }
+
+  async function refreshTickets(){
+    const res = await api('/api/tickets');
+    ticketsCache = (res.tickets || []).map(normalizeTicket);
+    ticketsById = new Map(ticketsCache.map(t => [t.id, t]));
+    return ticketsCache;
+  }
+
+  async function getTicket(id){
+    const res = await api('/api/tickets/' + encodeURIComponent(id));
+    const t = normalizeTicket(res.ticket);
+    ticketsById.set(t.id, t);
+    const idx = ticketsCache.findIndex(x => x.id === t.id);
+    if (idx >= 0) ticketsCache[idx] = t;
+    else ticketsCache.push(t);
+    return t;
+  }
+
+  function relTime(ts){
+    if(!ts) return '';
+    const time = typeof ts === 'string' ? Date.parse(ts) : ts;
+    const d=Date.now()-time,m=60000,h=3600000,day=86400000;
+    if(d<m) return 'только что';
+    if(d<h) return Math.floor(d/m)+' мин назад';
+    if(d<day) return Math.floor(d/h)+' ч назад';
+    return new Date(time).toLocaleDateString('ru',{day:'numeric',month:'short'});
+  }
+  function fmtSize(b){
+    if(!b) return '';
+    if(b<1024) return b+' Б';
+    if(b<1048576) return Math.round(b/1024)+' КБ';
+    return (b/1048576).toFixed(1)+' МБ';
+  }
+
+  return {
+    esc,
+    async login(email, password){
+      if(!email||!password) return {ok:false, err:'Заполните все поля'};
+      try {
+        const res = await api('/api/auth/login', { method:'POST', body:{ email, password } });
+        const user = { id: res.user.id, email: res.user.email, name: res.user.fullName, company: res.user.companyName, role: res.user.role, permissions: res.user.permissions || [] };
+        setSession(res.token, user);
+        return { ok:true, user };
+      } catch(e){ return { ok:false, err: e.message || 'Ошибка входа' }; }
+    },
+    async register(name, company, email, password){
+      try {
+        const res = await api('/api/auth/register', { method:'POST', body:{ fullName:name, companyName:company||null, email, password } });
+        const user = { id: res.user.id, email: res.user.email, name: res.user.fullName, company: res.user.companyName, role: res.user.role, permissions: res.user.permissions || [] };
+        setSession(res.token, user);
+        return { ok:true, user };
+      } catch(e){ return { ok:false, err: e.message || 'Ошибка регистрации' }; }
+    },
+    getSession,
+    logout(){ clearSession(); },
+    async getTickets(){ if(!getToken()) return []; return await refreshTickets(); },
+    async createTicket(user, subject, category, priority, description){
+      try {
+        const res = await api('/api/tickets', { method:'POST', body:{ subject, description, category: category || null, priority: priority || 'normal' } });
+        const t = normalizeTicket(res.ticket);
+        ticketsCache.unshift(t);
+        ticketsById.set(t.id, t);
+        return { ok:true, ticket:t, id:t.id };
+      } catch(e){ return { ok:false, err: e.message || 'Не удалось создать тикет' }; }
+    },
+    async addMessage(ticketId, user, text){
+      try {
+        await api('/api/tickets/' + encodeURIComponent(ticketId) + '/messages', { method:'POST', body:{ body:text } });
+        const t = await getTicket(ticketId);
+        if(typeof window.onNewMessage==='function') window.onNewMessage(ticketId);
+        return { ok:true, ticket:t };
+      } catch(e){ return { ok:false, err: e.message || 'Не удалось отправить сообщение' }; }
+    },
+    async closeTicket(ticketId){
+      try {
+        await api('/api/tickets/' + encodeURIComponent(ticketId), { method:'PATCH', body:{ status:'closed' } });
+        const t = await getTicket(ticketId);
+        if(typeof window.onNewMessage==='function') window.onNewMessage(ticketId);
+        return { ok:true, ticket:t };
+      } catch(e){ return { ok:false, err: e.message || 'Не удалось закрыть тикет' }; }
+    },
+    peekTicket(id){ return ticketsById.get(id) || null; },
+    relTime, fmtSize,
+    STATUS_LABEL:{open:'Открыт',progress:'В работе',done:'Решён',closed:'Закрыт',new:'Новый'},
+    STATUS_COLOR:{open:'#FF9800',progress:'#9C27B0',done:'#00A86B',closed:'#78909C'},
+    STATUS_CSS:  {open:'s-open',progress:'s-progress',done:'s-done',closed:'s-closed'},
+    PRIO_LABEL:  {low:'Низкий',normal:'Обычный',high:'Высокий',critical:'Критичный'},
+  };
+})();
+
+
+var CU=null,cTid=null,pri='normal',ntFs=[],mcFs=[],wOpen=false;
+
+function tog(){if(EMBED){wOpen=true;document.getElementById('win').classList.add('open');CU=ZIT.getSession();sw(CU?'t':'g');try{parent.postMessage({type:'chatToggle',open:true},'*');}catch(e){}return;}wOpen=!wOpen;document.getElementById('win').classList.toggle('open',wOpen);document.getElementById('fI').className=wOpen?'fas fa-times':'fas fa-comments';if(wOpen){CU=ZIT.getSession();sw(CU?'t':'g');}try{parent.postMessage({type:'chatToggle',open:wOpen},'*');}catch(e){}}
+function closeW(){if(EMBED){try{parent.postMessage({type:'closeChat'},'*');}catch(e){}return;}wOpen=false;document.getElementById('win').classList.remove('open');document.getElementById('fI').className='fas fa-comments';}
+function oP(){if(EMBED&&window.parent!==window){try{parent.postMessage({type:'openPortal'},'*');}catch(e){}return;}window.open('zona-it-portal.html','_blank');}
+
+function sw(m){
+  CU=ZIT.getSession();
+  ['g','a','t'].forEach(function(p){document.getElementById('p'+p).classList.remove('on');});
+  document.getElementById('p'+m).classList.add('on');
+  var w=document.getElementById('win');
+  w.className='win open '+(m==='g'?'hg':m==='a'?'ha':'ht');
+  var cfg={g:['<i class="fas fa-robot"></i>','Зона ИТ Бот','Онлайн'],a:['<i class="fas fa-lock"></i>','Вход в кабинет','Портал клиента'],t:['<i class="fas fa-ticket-alt"></i>','Поддержка',CU?CU.name:'Кабинет']}[m];
+  document.getElementById('hAv').innerHTML=cfg[0];document.getElementById('hNm').textContent=cfg[1];document.getElementById('hSt').textContent=cfg[2];
+  if(m==='t')fTH();
+}
+
+var BOT={pc:'Обслуживаем ПК и оргтехнику. От 1500 р/ПК в месяц.',pr:'Базовый от 9900, Оптимальный от 24900, Профессиональный от 49900 р/мес.',en:'Войдите в кабинет и создайте тикет — ответим за 2 минуты!'};
+function aM(t,c){var co=document.getElementById('gMs'),d=document.createElement('div');d.className=c;d.textContent=t;co.appendChild(d);co.scrollTop=co.scrollHeight;}
+function qr(k){aM(BOT[k]||'Свяжемся в ближайшее время.','bm');}
+function gS(){var i=document.getElementById('gIn'),t=i.value.trim();if(!t)return;aM(t,'um');i.value='';setTimeout(function(){aM('Войдите в кабинет для создания официального тикета.','bm');},700);}
+
+function aT(t){['L','R'].forEach(function(x){document.getElementById('at'+x).classList.toggle('on',x===(t==='l'?'L':'R'));});document.getElementById('fL').style.display=t==='l'?'':'none';document.getElementById('fR').style.display=t==='r'?'':'none';document.getElementById('aEr').textContent='';}
+async function dL(){var r=await ZIT.login(document.getElementById('lEm').value.trim(),document.getElementById('lPw').value);if(!r.ok){document.getElementById('aEr').textContent=r.err;return;}CU=r.user;document.getElementById('aEr').textContent='';sw('t');}
+async function dR(){var r=await ZIT.register(document.getElementById('rNm').value.trim(),document.getElementById('rCo').value.trim(),document.getElementById('rEm').value.trim(),document.getElementById('rPw').value);if(!r.ok){document.getElementById('aEr').textContent=r.err;return;}CU=r.user;sw('t');}
+function dLo(){ZIT.logout();CU=null;sw('g');}
+
+function fTH(){if(!CU)return;var ini=CU.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();document.getElementById('tAv').textContent=ini;document.getElementById('tNm').textContent=CU.name;document.getElementById('tCo').textContent=CU.company||'';tT('l');}
+function tT(t){['l','n','c'].forEach(function(x){document.getElementById('tt'+(x==='l'?'L':'N'))&&document.getElementById('tt'+(x==='l'?'L':'N')).classList.toggle('on',x===t);document.getElementById('tc'+(x==='l'?'L':x==='n'?'N':'C')).classList.toggle('on',x===t);});if(t==='l')rL();}
+var SC={open:'s-op',progress:'s-pr',done:'s-dn',closed:'s-cl'};
+var SL={open:'Открыт',progress:'В работе',done:'Решён',closed:'Закрыт'};
+var SK={open:'#FF9800',progress:'#9C27B0',done:'#00A86B',closed:'#78909C'};
+async function rL(){var al=await ZIT.getTickets();var op=al.filter(function(t){return t.status==='open'||t.status==='progress';}).length;var bd=document.getElementById('ob');bd.textContent=op;bd.style.display=op?'':'none';var c=document.getElementById('tLs');if(!al.length){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">Тикетов нет.<br><span style="color:var(--gr);cursor:pointer;font-weight:600" onclick="tT(\\'n\\')">Создать</span></div>';return;}c.innerHTML=[].concat(al).reverse().map(function(t){return'<div class="tli" onclick="oT(\\''+t.id+'\\')"><div class="tli-ic" style="background:'+SK[t.status]+'18;color:'+SK[t.status]+'"><i class="fas fa-'+(t.status==='progress'?'spinner':t.status==='done'?'check-circle':t.status==='closed'?'lock':'clock')+'"></i></div><div class="tli-b"><div class="tli-t">#'+String(t.number||0).padStart(4,'0')+' '+ZIT.esc(t.subject)+'</div><div class="tli-m">'+ZIT.esc(t.category||'')+'</div></div><span class="sb '+(SC[t.status]||'s-cl')+'">'+SL[t.status]+'</span></div>';}).join('');}
+async function oT(id){var al=await ZIT.getTickets(),t=al.find(function(x){return x.id===id;});if(!t)return;cTid=id;mcFs=[];document.getElementById('mcTl').textContent='#'+String(t.number||0).padStart(4,'0')+' '+ZIT.esc(t.subject);var bg=document.getElementById('mcBg');bg.className='sb '+(SC[t.status]||'s-cl');bg.textContent=SL[t.status];rMc(t.messages||[]);['l','n'].forEach(function(x){document.getElementById('tt'+(x==='l'?'L':'N')).classList.remove('on');document.getElementById('tc'+(x==='l'?'L':'N')).classList.remove('on');});document.getElementById('tcC').classList.add('on');}
+function rMc(msgs){var c=document.getElementById('mcMs');c.innerHTML=msgs.map(function(m){if(m.from==='system')return'<div class="mc-s">'+ZIT.esc(m.text)+'</div>';var own=Boolean(CU&&m.authorUserId&&m.authorUserId===CU.id);var fh=(m.files||[]).map(function(f){if(/\.(jpg|jpeg|png|gif|webp)$/i.test(f.name)&&f.dataUrl)return'<img src="'+f.dataUrl+'" style="max-width:130px;border-radius:7px;margin-top:4px;display:block;cursor:pointer" onclick="window.open(this.src,&quot;_blank&quot;)">';return'<div style="font-size:10px;color:'+(own?'rgba(255,255,255,.7)':'var(--gr)')+';margin-top:3px">'+ZIT.esc(f.name||'')+'</div>';}).join('');return'<div>'+(!own?'<div class="mc-n">'+ZIT.esc(m.authorName||'Поддержка')+'</div>':'')+'<div class="'+(own?'mc-u':'mc-b')+'">'+ZIT.esc(m.text||'')+fh+'</div></div>';}).join('');c.scrollTop=c.scrollHeight;}
+async function mcS(){var inp=document.getElementById('mcIn'),t=inp.value.trim();if(!t&&!mcFs.length)return;var r=await ZIT.addMessage(cTid,CU,t);if(!r.ok)return;inp.value='';mcFs=[];document.getElementById('mcAP').innerHTML='';var tk=ZIT.peekTicket(cTid);if(!tk){var al=await ZIT.getTickets();tk=al.find(function(x){return x.id===cTid;});}if(tk)rMc(tk.messages);}
+function mcF(fl){Array.from(fl).forEach(function(f){if(f.size>50*1024*1024)return;var r=new FileReader();r.onload=function(e){mcFs.push({name:f.name,size:f.size,dataUrl:e.target.result});var c=document.getElementById('mcAP');c.innerHTML=mcFs.map(function(fi,i){return'<div class="fc"><i class="fas fa-paperclip"></i><span>'+ZIT.esc(fi.name)+'</span><span class="rm" onclick="mcFs.splice('+i+',1);mcF([])">x</span></div>';}).join('');};r.readAsDataURL(f);});}
+function sP(el){pri=el.dataset.v;document.querySelectorAll('.po').forEach(function(p){p.classList.remove('on');});el.classList.add('on');}
+function ntF(fl){Array.from(fl).forEach(function(f){if(f.size>50*1024*1024)return;var r=new FileReader();r.onload=function(e){ntFs.push({name:f.name,size:f.size,dataUrl:e.target.result});document.getElementById('ntAL').textContent=ntFs.length+' файл(ов)';rFC();};r.readAsDataURL(f);});}
+function rFC(){document.getElementById('ntFC').innerHTML=ntFs.map(function(f,i){return'<div class="fc"><i class="fas fa-paperclip"></i><span>'+ZIT.esc(f.name)+'</span><span class="rm" onclick="ntFs.splice('+i+',1);rFC()">x</span></div>';}).join('');}
+async function sT(){var s=document.getElementById('ntS'),d=document.getElementById('ntD');s.classList.remove('er');d.classList.remove('er');if(!s.value.trim()){s.classList.add('er');s.focus();return;}if(!d.value.trim()){d.classList.add('er');d.focus();return;}var r=await ZIT.createTicket(CU,s.value.trim(),document.getElementById('ntC').value,pri,d.value.trim());if(!r.ok)return;s.value='';d.value='';document.getElementById('ntC').value='';ntFs=[];document.getElementById('ntFC').innerHTML='';document.getElementById('ntAL').textContent='Прикрепить файл';pri='normal';document.querySelectorAll('.po').forEach(function(p){p.classList.remove('on');});document.querySelector('.po[data-v=normal]').classList.add('on');setTimeout(function(){oT(r.id);},800);tT('l');}
+window.onNewMessage=async function(id){if(cTid===id){var t=ZIT.peekTicket(id);if(!t){var al=await ZIT.getTickets();t=al.find(function(x){return x.id===id;});}if(t)rMc(t.messages);}};
+setInterval(async function(){
+  if(wOpen&&CU&&cTid){
+    var t=ZIT.peekTicket(cTid);
+    if(!t){try{var al=await ZIT.getTickets();t=al.find(function(x){return x.id===cTid;});}catch(e){t=null;}}
+    if(t)rMc(t.messages);
+  }
+},5000);
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='open'){if(!wOpen)tog();}
+  if(e.data&&e.data.type==='openLogin'){if(!wOpen)tog();sw('a');}
+});
+(function(){
+  var s=ZIT.getSession();
+  if(s&&s.id){CU=s;}
+  if(EMBED){
+    wOpen=true;
+    document.getElementById('win').classList.add('open');
+    if(CU&&CU.id)sw('t');
+    else if(START_MODE==='login')sw('a');
+    else sw('a');
+  }
+})();
+</script>
+</body>
+</html>
