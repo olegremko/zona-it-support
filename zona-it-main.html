@@ -158,6 +158,37 @@ nav.scrolled {
     linear-gradient(90deg, rgba(0,168,107,.7) 1px, transparent 1px);
   background-size: 60px 60px;
 }
+.hero-spark {
+  position: absolute;
+  width: 18px; height: 18px;
+  border-radius: 46% 54% 57% 43% / 42% 48% 52% 58%;
+  background:
+    radial-gradient(ellipse at 35% 35%, rgba(255,255,255,.92) 0%, rgba(170,255,225,.85) 18%, rgba(46,234,170,.58) 38%, rgba(0,168,107,.16) 62%, transparent 82%),
+    radial-gradient(ellipse at 68% 62%, rgba(119,255,217,.35) 0%, transparent 62%);
+  filter: blur(.2px);
+  box-shadow: 0 0 10px rgba(92,255,197,.72), 0 0 26px rgba(0,168,107,.28);
+  pointer-events: none;
+  z-index: 1;
+  opacity: .88;
+  transition: transform 3.8s cubic-bezier(.2,.82,.22,1), opacity 1.4s ease;
+}
+.hero-spark::before{
+  content:'';
+  position:absolute;
+  inset:-8px;
+  border-radius: 57% 43% 48% 52% / 45% 61% 39% 55%;
+  background: radial-gradient(ellipse at center, rgba(92,255,197,.14) 0%, rgba(92,255,197,.05) 36%, transparent 72%);
+  filter: blur(3px);
+}
+.hero-spark1{}
+.hero-spark2{
+  width: 16px; height: 16px;
+  border-radius: 40% 60% 49% 51% / 58% 38% 62% 42%;
+  background:
+    radial-gradient(ellipse at 38% 38%, rgba(255,248,206,.95) 0%, rgba(183,255,218,.78) 20%, rgba(30,227,164,.52) 42%, rgba(0,168,107,.14) 68%, transparent 84%),
+    radial-gradient(ellipse at 70% 60%, rgba(255,255,255,.2) 0%, transparent 62%);
+  box-shadow: 0 0 8px rgba(255,244,180,.48), 0 0 20px rgba(0,168,107,.24);
+}
 .hero-blob {
   position: absolute; width: 600px; height: 600px; border-radius: 50%;
   background: radial-gradient(circle, rgba(0,168,107,0.12) 0%, transparent 70%);
@@ -1476,6 +1507,8 @@ footer {
 <!-- HERO -->
 <section id="hero">
   <div class="hero-grid"></div>
+  <div class="hero-spark hero-spark1"></div>
+  <div class="hero-spark hero-spark2"></div>
   <div class="hero-blob"></div>
   <div class="hero-blob2"></div>
   <div class="container hero-content">
@@ -4358,7 +4391,41 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeServic
 });
 
 // ===== NAV DROPDOWN HOVER DELAY =====
+function initHeroSparks() {
+  var hero = document.getElementById('hero');
+  if (!hero) return;
+  var sparks = hero.querySelectorAll('.hero-spark');
+  if (!sparks.length) return;
+  var grid = 60;
+
+  function moveSpark(el, immediate) {
+    var rect = hero.getBoundingClientRect();
+    var cols = Math.max(3, Math.floor(rect.width / grid));
+    var rows = Math.max(3, Math.floor(rect.height / grid));
+    var col = Math.floor(Math.random() * cols);
+    var row = Math.floor(Math.random() * rows);
+    var x = col * grid + grid / 2 - el.offsetWidth / 2;
+    var y = row * grid + grid / 2 - el.offsetHeight / 2;
+    var scale = (0.92 + Math.random() * 0.18).toFixed(2);
+    var rotate = Math.round((Math.random() * 12) - 6);
+    el.style.opacity = immediate ? '.86' : String(0.74 + Math.random() * 0.14);
+    el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + scale + ') rotate(' + rotate + 'deg)';
+  }
+
+  sparks.forEach(function(el, idx) {
+    moveSpark(el, true);
+    setTimeout(function step() {
+      moveSpark(el, false);
+      setTimeout(step, 3400 + Math.random() * 2600 + idx * 380);
+    }, 1100 + idx * 340);
+  });
+
+  window.addEventListener('resize', function() {
+    sparks.forEach(function(el) { moveSpark(el, true); });
+  });
+}
 document.addEventListener('DOMContentLoaded', function() {
+  initHeroSparks();
   // Nav hover delay
   var ndTimers = {};
   document.querySelectorAll('.nav-item').forEach(function(item) {
