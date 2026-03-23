@@ -6,7 +6,7 @@
 - Server: single VPS
 - Reverse proxy: Caddy
 - Application: Docker Compose
-- Database: SQLite in Docker volume `*_zona_it_data`
+- Database: PostgreSQL in Docker volume `*_zona_it_pg_data`
 - Project root on server: `/opt/zona-it-support/current`
 - Backups directory on server: `/opt/zona-it-support/backups`
 
@@ -14,7 +14,7 @@
 
 ```sh
 cd /opt/zona-it-support/current
-docker compose -f docker-compose.production.yml ps
+docker compose --env-file .env.production -f docker-compose.postgres.production.yml ps
 ```
 
 ## Deploy Latest Version
@@ -25,7 +25,7 @@ cd /opt/zona-it-support/current
 ```
 
 This will:
-- create a SQLite backup
+- create a production backup
 - fetch the latest code from Git
 - reset to `origin/main`
 - rebuild and restart containers
@@ -67,15 +67,15 @@ ls -lah /opt/zona-it-support/backups
 
 ```sh
 cd /opt/zona-it-support/current
-docker compose -f docker-compose.production.yml logs -f app
-docker compose -f docker-compose.production.yml logs -f caddy
+docker compose --env-file .env.production -f docker-compose.postgres.production.yml logs -f app
+docker compose --env-file .env.production -f docker-compose.postgres.production.yml logs -f caddy
 ```
 
 ## Restart Services
 
 ```sh
 cd /opt/zona-it-support/current
-docker compose -f docker-compose.production.yml restart
+docker compose --env-file .env.production -f docker-compose.postgres.production.yml restart
 ```
 
 ## Release Tags
@@ -96,9 +96,8 @@ cd C:\Users\user\Desktop\codex
 
 ## Next Planned Infrastructure Step
 
-- migrate from SQLite to PostgreSQL
-- keep application containerized
-- keep reverse proxy and release flow unchanged
+- add a separate staging environment
+- keep release flow unchanged
 - later move app layer to Kubernetes without changing external domain setup
 
 ## PostgreSQL Cutover Files
@@ -107,6 +106,7 @@ cd C:\Users\user\Desktop\codex
 - [backup-postgres.sh](C:\Users\user\Desktop\codex\scripts\backup-postgres.sh)
 - [backup-production.sh](C:\Users\user\Desktop\codex\scripts\backup-production.sh)
 - [postgresql-cutover.md](C:\Users\user\Desktop\codex\backend\docs\postgresql-cutover.md)
+- [STAGING.md](C:\Users\user\Desktop\codex\STAGING.md)
 
 ## PostgreSQL Foundation
 

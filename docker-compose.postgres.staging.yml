@@ -1,0 +1,36 @@
+services:
+  postgres_staging:
+    image: postgres:16-alpine
+    container_name: zona-it-staging-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-zona_it_staging}
+      POSTGRES_USER: ${POSTGRES_USER:-zona_it_staging}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - zona_it_staging_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zona_it_staging} -d ${POSTGRES_DB:-zona_it_staging}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app_staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zona-it-staging-app
+    restart: unless-stopped
+    env_file:
+      - .env.staging
+    depends_on:
+      postgres_staging:
+        condition: service_healthy
+    volumes:
+      - zona_it_staging_data:/app/backend/data
+    ports:
+      - "4020:4000"
+
+volumes:
+  zona_it_staging_data:
+  zona_it_staging_pg_data:
