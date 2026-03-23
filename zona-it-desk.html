@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zona IT Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#07111d;--panel:#0d1a2b;--line:rgba(255,255,255,.08);--text:#f5f8fc;--muted:#9eb0c6;
+      --green:#00a86b;--green-soft:rgba(0,168,107,.18);--orange:#ffb347;--orange-soft:rgba(255,179,71,.18);
+      --red:#ff6b6b;--red-soft:rgba(255,107,107,.16);--blue:#7fc3ff;--shadow:0 28px 80px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:
+      radial-gradient(circle at top left, rgba(0,168,107,.14), transparent 28%),
+      radial-gradient(circle at top right, rgba(127,195,255,.12), transparent 26%),
+      linear-gradient(180deg,#06111c 0%,#081321 48%,#091624 100%);
+      color:var(--text);font-family:'Inter',sans-serif;height:100%}
+    button,input,textarea,select{font:inherit}
+    .auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .auth-card{width:min(460px,100%);background:rgba(12,23,38,.92);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:30px}
+    .brand{display:flex;align-items:center;gap:14px;margin-bottom:18px}.brand-mark{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#00a86b,#00d4a0);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px}
+    .brand-copy h1{margin:0;font-size:28px;font-family:'Montserrat',sans-serif}.brand-copy p{margin:6px 0 0;color:var(--muted);font-size:14px}
+    .auth-grid,.field,.history{display:grid;gap:14px}.field{gap:8px}.field label{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:#86a0bb;font-weight:700}
+    .input,.composer,.textarea{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);outline:none}
+    .input{height:54px;border-radius:16px;padding:0 16px}.textarea{min-height:120px;border-radius:18px;padding:14px 16px;resize:vertical}
+    .composer{min-height:56px;max-height:180px;resize:vertical;flex:1;border-radius:18px;padding:16px}
+    .input:focus,.textarea:focus,.composer:focus{border-color:rgba(0,168,107,.55);box-shadow:0 0 0 4px rgba(0,168,107,.14)}
+    .btn{height:52px;border:none;border-radius:16px;padding:0 20px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .18s, box-shadow .18s}
+    .btn:hover{transform:translateY(-1px)} .btn-primary{background:linear-gradient(135deg,#00a86b,#16c785);color:#fff;box-shadow:0 10px 24px rgba(0,168,107,.25)}
+    .btn-secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line)} .btn-ghost{background:transparent;color:var(--muted);border:1px dashed rgba(255,255,255,.12)}
+    .error{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.22);color:#ffd4d4;font-size:13px}.error.show{display:block}
+    .hidden{display:none!important}.desk-shell{display:flex;min-height:100vh;padding:24px;gap:20px}
+    .sidebar{width:320px;flex-shrink:0;background:rgba(10,19,31,.88);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+    .sidebar-head{padding:22px 22px 16px;border-bottom:1px solid var(--line)} .sidebar-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .sidebar-title h2{margin:0;font-size:20px;font-family:'Montserrat',sans-serif}.sidebar-sub{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
+    .user-chip{margin-top:16px;padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.14)}
+    .user-chip strong{display:block;font-size:15px}.user-chip span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .search-box{padding:16px 22px 14px;border-bottom:1px solid var(--line)} .ticket-list{padding:12px;display:grid;gap:10px;overflow:auto;min-height:0}
+    .ticket-card{background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:18px;padding:14px 14px 12px;cursor:pointer;transition:border-color .18s, background .18s}
+    .ticket-card:hover{background:rgba(255,255,255,.05);border-color:rgba(0,168,107,.2)} .ticket-card.active{background:linear-gradient(180deg,rgba(0,168,107,.14),rgba(127,195,255,.05));border-color:rgba(0,168,107,.34)}
+    .ticket-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.ticket-no{font-size:12px;color:#86a0bb;font-weight:700;letter-spacing:.8px}
+    .ticket-subject{font-weight:700;line-height:1.35}.ticket-preview{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .ticket-meta{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+    .pill.open{background:var(--orange-soft);color:#ffb347;border-color:rgba(255,179,71,.22)} .pill.progress{background:rgba(186,104,255,.16);color:#cf8eff;border-color:rgba(186,104,255,.24)}
+    .pill.done{background:var(--green-soft);color:#35d596;border-color:rgba(0,168,107,.24)} .pill.closed{background:rgba(255,255,255,.08);color:#c5d2e0;border-color:rgba(255,255,255,.1)}
+    .pill.low{background:rgba(127,195,255,.14);color:#9fd2ff;border-color:rgba(127,195,255,.2)} .pill.normal{background:rgba(255,255,255,.08);color:#c7d5e4;border-color:rgba(255,255,255,.1)}
+    .pill.high{background:var(--orange-soft);color:#ffb347;border-color:rgba(255,179,71,.22)} .pill.critical{background:var(--red-soft);color:#ff8787;border-color:rgba(255,107,107,.24)}
+    .empty{padding:24px;color:var(--muted);font-size:14px;line-height:1.6}.main{flex:1;min-width:0;background:rgba(10,19,31,.74);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+    .main-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .main-head-copy h2{margin:0;font-size:24px;font-family:'Montserrat',sans-serif}.main-head-copy p{margin:8px 0 0;color:var(--muted);font-size:13px}
+    .main-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.content{display:flex;min-height:0;flex:1}
+    .thread{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid var(--line)} .thread-stream{padding:20px 24px;display:grid;gap:14px;overflow:auto;min-height:0;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01)),radial-gradient(circle at top right, rgba(0,168,107,.08), transparent 22%)}
+    .bubble{max-width:min(78%,760px);padding:14px 16px;border-radius:20px;line-height:1.55;position:relative}
+    .bubble.me{margin-left:auto;background:linear-gradient(135deg,#00a86b,#1ac987);color:#fff;border-bottom-right-radius:8px;box-shadow:0 12px 28px rgba(0,168,107,.22)}
+    .bubble.other{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:8px} .bubble.system{max-width:100%;background:rgba(127,195,255,.08);border:1px dashed rgba(127,195,255,.22);color:#cfe5ff;font-size:13px}
+    .bubble-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:11px;color:rgba(255,255,255,.7);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+    .bubble.other .bubble-meta,.bubble.system .bubble-meta{color:#8fb0d3}.composer-row{padding:18px 20px;border-top:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;background:rgba(6,15,26,.62)}
+    .aside{width:320px;flex-shrink:0;padding:22px;display:grid;gap:14px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(127,195,255,.03))}
+    .aside-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:16px}.aside-card h3{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#8ea7c1}
+    .kv{display:grid;gap:10px}.kv-row{display:flex;justify-content:space-between;gap:10px;font-size:13px}.kv-row span:first-child{color:var(--muted)}
+    .history-item{padding:12px;border-radius:16px;background:rgba(255,255,255,.04);font-size:13px;line-height:1.45}.history-item strong{display:block;margin-bottom:6px}
+    .modal{position:fixed;inset:0;background:rgba(4,10,18,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.open{display:flex}
+    .modal-card{width:min(620px,100%);background:#0d1a2b;border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:24px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .modal-head h3{margin:0;font-family:'Montserrat',sans-serif;font-size:22px}.modal-grid{display:grid;gap:14px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+    @media (max-width:1220px){.aside{display:none}} @media (max-width:960px){.desk-shell{padding:14px;gap:14px}.sidebar{width:290px}.main-head{padding:18px}.thread-stream{padding:16px}}
+    @media (max-width:820px){.desk-shell{display:block;padding:0}.sidebar,.main{border-radius:0;border-left:none;border-right:none}.sidebar{width:100%;height:42vh}.main{height:58vh}.content{display:block}.thread{border-right:none;height:calc(58vh - 92px)}.aside{display:none}}
+  </style>
+</head>
+<body>
+  <div id="deskAuth" class="auth-shell">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-mark">З</div>
+        <div class="brand-copy">
+          <h1>Zona IT Desk</h1>
+          <p>Windows-клиент в формате чата: тикеты, переписка и быстрые обновления по задачам.</p>
+        </div>
+      </div>
+      <div class="auth-grid">
+        <div class="field"><label for="deskEmail">Email</label><input id="deskEmail" class="input" type="email" autocomplete="username" placeholder="name@company.ru"></div>
+        <div class="field"><label for="deskPassword">Пароль</label><input id="deskPassword" class="input" type="password" autocomplete="current-password" placeholder="Введите пароль"></div>
+        <button id="deskLoginBtn" class="btn btn-primary" type="button">Войти в Desk</button>
+      </div>
+      <div id="deskAuthError" class="error"></div>
+    </div>
+  </div>
+  <div id="deskApp" class="desk-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-title"><h2>Мои тикеты</h2><button id="deskNewTicketBtn" class="btn btn-primary" type="button" style="height:42px;padding:0 16px">Новый</button></div>
+        <div class="sidebar-sub">Легкий рабочий режим для клиентов: список заявок, переписка по задаче и быстрые обновления без полного портала.</div>
+        <div class="user-chip"><strong id="deskUserName">Пользователь</strong><span id="deskUserMeta">Компания</span></div>
+      </div>
+      <div class="search-box"><input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:48px"></div>
+      <div id="deskTicketList" class="ticket-list"></div>
+    </aside>
+    <section class="main">
+      <div class="main-head">
+        <div class="main-head-copy"><h2 id="deskThreadTitle">Выберите тикет</h2><p id="deskThreadMeta">Откройте заявку слева или создайте новую.</p></div>
+        <div class="main-actions"><button id="deskRefreshBtn" class="btn btn-secondary" type="button">Обновить</button><button id="deskLogoutBtn" class="btn btn-ghost" type="button">Выйти</button></div>
+      </div>
+      <div class="content">
+        <div class="thread">
+          <div id="deskThreadStream" class="thread-stream"><div class="empty">Здесь появится переписка по выбранному тикету. Клиент видит только свои доступные тикеты и может вести диалог по задаче как в мессенджере.</div></div>
+          <div class="composer-row"><textarea id="deskComposer" class="composer" placeholder="Напишите сообщение по тикету..." disabled></textarea><button id="deskSendBtn" class="btn btn-primary" type="button" style="width:144px" disabled>Отправить</button></div>
+        </div>
+        <aside class="aside">
+          <div class="aside-card"><h3>Карточка тикета</h3><div id="deskTicketFacts" class="kv"><div class="kv-row"><span>Статус</span><span>—</span></div><div class="kv-row"><span>Приоритет</span><span>—</span></div><div class="kv-row"><span>Исполнитель</span><span>—</span></div><div class="kv-row"><span>Создан</span><span>—</span></div><div class="kv-row"><span>Обновлен</span><span>—</span></div></div></div>
+          <div class="aside-card"><h3>История изменений</h3><div id="deskHistory" class="history"><div class="empty" style="padding:0">История появится после выбора тикета.</div></div></div>
+        </aside>
+      </div>
+    </section>
+  </div>
+  <div id="deskNewTicketModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head"><h3>Новый тикет</h3><button id="deskCloseModalBtn" class="btn btn-secondary" type="button" style="height:42px;padding:0 14px">Закрыть</button></div>
+      <div class="modal-grid">
+        <div class="field"><label for="deskTicketSubject">Тема</label><input id="deskTicketSubject" class="input" type="text" placeholder="Коротко сформулируйте задачу"></div>
+        <div class="field"><label for="deskTicketPriority">Приоритет</label><select id="deskTicketPriority" class="input"><option value="low">Низкий</option><option value="normal" selected>Средний</option><option value="high">Высокий</option><option value="critical">Критичный</option></select></div>
+        <div class="field"><label for="deskTicketDescription">Первое сообщение</label><textarea id="deskTicketDescription" class="textarea" placeholder="Опишите проблему, цель или вопрос в формате обычного чата."></textarea></div>
+      </div>
+      <div id="deskModalError" class="error"></div>
+      <div class="modal-actions"><button id="deskCreateTicketBtn" class="btn btn-primary" type="button">Создать тикет</button></div>
+    </div>
+  </div>
+  <script src="/_desk.js"></script>
+</body>
+</html>

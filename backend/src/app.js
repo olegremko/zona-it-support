@@ -21,6 +21,7 @@ export async function createApp() {
   const mainPage = path.join(siteRoot, 'zona-it-main.html');
   const portalPage = path.join(siteRoot, 'zona-it-portal.html');
   const chatPage = path.join(siteRoot, 'zona-it-chat.html');
+  const deskPage = path.join(siteRoot, 'zona-it-desk.html');
   const schemaFile = env.dbClient === 'postgres' ? 'schema.postgres.sql' : 'schema.sql';
   const schemaPath = path.resolve(process.cwd(), 'sql', schemaFile);
 
@@ -122,6 +123,10 @@ export async function createApp() {
 
   app.get('/chat', (req, res) => {
     res.sendFile(chatPage);
+  });
+
+  app.get('/desk', (req, res) => {
+    res.sendFile(deskPage);
   });
 
   app.get('/zona-it-main.html', (req, res) => {

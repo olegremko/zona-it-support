@@ -1,0 +1,14 @@
+{
+  "name": "zona-it-windows-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Windows desktop shell for Zona IT Desk",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^36.1.0"
+  }
+}
