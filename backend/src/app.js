@@ -13,6 +13,7 @@ import userRoutes from './modules/users/userRoutes.js';
 import ticketRoutes from './modules/tickets/ticketRoutes.js';
 import liveChatRoutes from './modules/livechat/liveChatRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { createMemoryRateLimit } from './middleware/rateLimit.js';
 
 export async function createApp() {
   const app = express();
@@ -59,6 +60,7 @@ export async function createApp() {
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
   app.disable('x-powered-by');
+  app.set('trust proxy', true);
   app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -69,6 +71,39 @@ export async function createApp() {
   app.get('/api/health', (req, res) => {
     res.json({ ok: true });
   });
+
+  const loginRateLimit = createMemoryRateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    keyPrefix: 'auth-login',
+    message: 'Too many login attempts'
+  });
+
+  const registerRateLimit = createMemoryRateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    keyPrefix: 'auth-register',
+    message: 'Too many registration attempts'
+  });
+
+  const liveChatStartRateLimit = createMemoryRateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 10,
+    keyPrefix: 'live-chat-start',
+    message: 'Too many live chat requests'
+  });
+
+  const liveChatMessageRateLimit = createMemoryRateLimit({
+    windowMs: 60 * 1000,
+    max: 20,
+    keyPrefix: 'live-chat-message',
+    message: 'Too many chat messages'
+  });
+
+  app.use('/api/auth/login', loginRateLimit);
+  app.use('/api/auth/register', registerRateLimit);
+  app.use('/api/live-chat/start', liveChatStartRateLimit);
+  app.use('/api/live-chat/public', liveChatMessageRateLimit);
 
   app.use('/api/auth', authRoutes);
   app.use('/api/companies', companyRoutes);
