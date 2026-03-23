@@ -55,13 +55,19 @@ function currentAssigneeSelectSql(alias = 't') {
 async function getAssignableSupportUsers() {
   return await queryMany(sql(
     `
-      SELECT DISTINCT u.id, u.full_name, u.email, r.code AS role_code, COALESCE(m.title, r.name) AS title
+      SELECT DISTINCT
+        u.id,
+        u.full_name,
+        u.email,
+        r.code AS role_code,
+        COALESCE(m.title, r.name) AS title,
+        CASE r.code WHEN 'platform_admin' THEN 0 WHEN 'support_lead' THEN 1 ELSE 2 END AS role_sort
       FROM users u
       JOIN user_company_memberships m ON m.user_id = u.id
       JOIN roles r ON r.id = m.role_id
       WHERE u.status = 'active'
         AND r.code IN ('support_agent', 'support_lead', 'platform_admin')
-      ORDER BY CASE r.code WHEN 'platform_admin' THEN 0 WHEN 'support_lead' THEN 1 ELSE 2 END, u.full_name
+      ORDER BY role_sort, u.full_name
     `
   ));
 }
