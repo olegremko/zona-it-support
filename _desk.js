@@ -110,6 +110,16 @@
     return ({ new: 'Новый', active: 'Активный', closed: 'Закрыт' }[code] || code || '—');
   }
 
+  function remoteSessionStatusLabel(code) {
+    return ({
+      requested: 'Ожидает',
+      ready: 'Готово',
+      active: 'Подключено',
+      ended: 'Завершена',
+      cancelled: 'Отменена'
+    }[code] || code || '?');
+  }
+
   function hasPermission(code) {
     return !!(state.user && state.user.permissions && state.user.permissions.indexOf(code) >= 0);
   }
@@ -346,11 +356,10 @@
     if (!panel) return;
 
     if (!state.selectedTicket || state.mode !== 'tickets') {
-      panel.innerHTML = '<div class="empty" style="padding:0">Выберите тикет, чтобы запросить или запустить удаленную помощь.</div>';
+      panel.innerHTML = '<div class="empty" style="padding:0">\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0438\u043a\u0435\u0442, \u0447\u0442\u043e\u0431\u044b \u0437\u0430\u043f\u0440\u043e\u0441\u0438\u0442\u044c \u0438\u043b\u0438 \u0437\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u0443\u0434\u0430\u043b\u0435\u043d\u043d\u0443\u044e \u043f\u043e\u043c\u043e\u0449\u044c.</div>';
       return;
     }
 
-    var ticket = state.selectedTicket;
     var session = latestRemoteSession();
     var device = latestRemoteDevice();
     var canManage = canManageRemoteDesk();
@@ -359,42 +368,42 @@
 
     if (device) {
       parts.push(
-        '<div class="history-item">' +
-          '<strong>' + escapeHtml(device.label || 'Устройство клиента') + '</strong>' +
-          '<div>' + escapeHtml(device.remote_client_id || 'ID еще не передан') + '</div>' +
-          '<div style="margin-top:6px;color:#9eb0c6;font-size:12px">Постоянный доступ: ' + escapeHtml(device.unattended_enabled ? 'включен' : 'выключен') + '</div>' +
+        '<div class="remote-card">' +
+          '<strong>' + escapeHtml(device.label || '\u0423\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u043e \u043a\u043b\u0438\u0435\u043d\u0442\u0430') + '</strong>' +
+          '<div class="remote-row"><span>ID</span><span>' + escapeHtml(device.remote_client_id || '\u0435\u0449\u0435 \u043d\u0435 \u043f\u0435\u0440\u0435\u0434\u0430\u043d') + '</span></div>' +
+          '<div class="remote-row"><span>\u0414\u043e\u0441\u0442\u0443\u043f</span><span>' + escapeHtml(device.unattended_enabled ? '\u043f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u044b\u0439' : '\u043f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443') + '</span></div>' +
         '</div>'
       );
     }
 
     if (session) {
       parts.push(
-        '<div class="history-item">' +
-          '<strong>Последняя сессия</strong>' +
-          '<div>Режим: ' + escapeHtml(session.access_mode === 'unattended' ? 'постоянный доступ' : 'разовая помощь') + '</div>' +
-          '<div>Статус: ' + escapeHtml(session.status) + '</div>' +
-          '<div>Код: ' + escapeHtml(session.join_code || '—') + '</div>' +
-          '<div style="margin-top:6px;color:#9eb0c6;font-size:12px">Инженер: ' + escapeHtml(session.engineer_name || 'не назначен') + '</div>' +
+        '<div class="remote-card">' +
+          '<strong>\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u044f\u044f \u0441\u0435\u0441\u0441\u0438\u044f</strong>' +
+          '<div class="remote-row"><span>\u0420\u0435\u0436\u0438\u043c</span><span>' + escapeHtml(session.access_mode === 'unattended' ? '\u043f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u044b\u0439' : '\u0440\u0430\u0437\u043e\u0432\u044b\u0439') + '</span></div>' +
+          '<div class="remote-row"><span>\u0421\u0442\u0430\u0442\u0443\u0441</span><span>' + escapeHtml(remoteSessionStatusLabel(session.status)) + '</span></div>' +
+          '<div class="remote-row"><span>\u041a\u043e\u0434</span><span>' + escapeHtml(session.join_code || '?') + '</span></div>' +
+          '<div class="remote-row"><span>\u0418\u043d\u0436\u0435\u043d\u0435\u0440</span><span>' + escapeHtml(session.engineer_name || '\u043d\u0435 \u043d\u0430\u0437\u043d\u0430\u0447\u0435\u043d') + '</span></div>' +
         '</div>'
       );
     } else {
-      parts.push('<div class="history-item"><strong>Сессий пока нет</strong><div>Можно запросить разовое подключение или включить постоянный доступ для этой задачи.</div></div>');
+      parts.push('<div class="remote-card"><strong>\u0421\u0435\u0441\u0441\u0438\u0439 \u043f\u043e\u043a\u0430 \u043d\u0435\u0442</strong><div class="remote-note">\u041c\u043e\u0436\u043d\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0438\u0442\u044c \u0440\u0430\u0437\u043e\u0432\u043e\u0435 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 \u0438\u043b\u0438 \u0432\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u043f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u044b\u0439 \u0434\u043e\u0441\u0442\u0443\u043f \u0434\u043b\u044f \u044d\u0442\u043e\u0439 \u0437\u0430\u0434\u0430\u0447\u0438.</div></div>');
     }
 
     var buttons = [];
     if (canRequest) {
-      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="request" style="height:40px;padding:0 14px;font-size:13px">Запросить помощь</button>');
-      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="unattended" style="height:40px;padding:0 14px;font-size:13px">Постоянный доступ</button>');
+      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="request">\u0417\u0430\u043f\u0440\u043e\u0441\u0438\u0442\u044c \u043f\u043e\u043c\u043e\u0449\u044c</button>');
+      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="unattended">\u041f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u044b\u0439 \u0434\u043e\u0441\u0442\u0443\u043f</button>');
     }
     if (canManage && session) {
-      if (session.status !== 'active') buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect" style="height:40px;padding:0 14px;font-size:13px">Подключиться</button>');
-      if (session.status === 'active' || session.status === 'ready' || session.status === 'requested') buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="finish" style="height:40px;padding:0 14px;font-size:13px">Завершить</button>');
+      if (session.status !== 'active') buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect">\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u0441\u044f</button>');
+      if (session.status === 'active' || session.status === 'ready' || session.status === 'requested') buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="finish">\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c</button>');
     }
     if (canManage && device && device.unattended_enabled) {
-      buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended" style="height:40px;padding:0 14px;font-size:13px">Отключить доступ</button>');
+      buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended">\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f</button>');
     }
 
-    parts.push('<div style="display:flex;flex-wrap:wrap;gap:8px">' + buttons.join('') + '</div>');
+    parts.push('<div class="remote-actions">' + buttons.join('') + '</div>');
     panel.innerHTML = parts.join('');
     Array.prototype.forEach.call(panel.querySelectorAll('[data-remote-action]'), function (button) {
       button.addEventListener('click', function () {
