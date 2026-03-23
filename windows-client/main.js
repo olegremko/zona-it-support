@@ -2,6 +2,7 @@ const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
 const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk';
+app.commandLine.appendSwitch('disable-http-cache');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -20,7 +21,13 @@ function createWindow() {
     }
   });
 
-  win.loadURL(DESK_URL);
+  var deskUrl = new URL(DESK_URL);
+  deskUrl.searchParams.set('platform', 'windows');
+  deskUrl.searchParams.set('appVersion', app.getVersion());
+  win.webContents.setUserAgent(win.webContents.userAgent + ' ZonaITDesk/' + app.getVersion());
+  win.webContents.session.clearCache().finally(function () {
+    win.loadURL(deskUrl.toString());
+  });
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };

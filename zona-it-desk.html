@@ -38,6 +38,11 @@
     .sidebar-title h2{margin:0;font-size:20px;font-family:'Montserrat',sans-serif}.sidebar-sub{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
     .user-chip{margin-top:16px;padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.14)}
     .user-chip strong{display:block;font-size:15px}.user-chip span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+    .mode-switch{display:flex;gap:8px;margin-top:14px}
+    .mode-btn{flex:1;height:40px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#b9cae0;cursor:pointer;font-weight:700;transition:border-color .18s, background .18s, color .18s}
+    .mode-btn:hover{border-color:rgba(0,168,107,.22);color:#eef6ff}
+    .mode-btn.active{background:linear-gradient(135deg,rgba(0,168,107,.18),rgba(127,195,255,.1));border-color:rgba(0,168,107,.34);color:#fff}
+    .browser-note{margin-bottom:16px;padding:12px 14px;border-radius:16px;background:rgba(127,195,255,.08);border:1px solid rgba(127,195,255,.18);color:#d2e6ff;font-size:13px;line-height:1.55}
     .search-box{padding:16px 22px 14px;border-bottom:1px solid var(--line)} .ticket-list{padding:12px;display:grid;gap:10px;overflow:auto;min-height:0}
     .ticket-card{background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:18px;padding:14px 14px 12px;cursor:pointer;transition:border-color .18s, background .18s}
     .ticket-card:hover{background:rgba(255,255,255,.05);border-color:rgba(0,168,107,.2)} .ticket-card.active{background:linear-gradient(180deg,rgba(0,168,107,.14),rgba(127,195,255,.05));border-color:rgba(0,168,107,.34)}
@@ -96,6 +101,7 @@
           <p>Windows-клиент в формате чата: тикеты, переписка и быстрые обновления по задачам.</p>
         </div>
       </div>
+      <div id="deskBrowserNote" class="browser-note hidden">Desk доступен только через приложение Windows. Для тестирования используйте актуальный `.exe` клиента.</div>
       <div class="auth-grid">
         <div class="field"><label for="deskEmail">Email</label><input id="deskEmail" class="input" type="email" autocomplete="username" placeholder="name@company.ru"></div>
         <div class="field"><label for="deskPassword">Пароль</label><input id="deskPassword" class="input" type="password" autocomplete="current-password" placeholder="Введите пароль"></div>
@@ -110,6 +116,10 @@
         <div class="sidebar-title"><h2>Мои тикеты</h2><button id="deskNewTicketBtn" class="btn btn-primary" type="button" style="height:42px;padding:0 16px">Новый</button></div>
         <div class="sidebar-sub">Легкий рабочий режим для клиентов: список заявок, переписка по задаче и быстрые обновления без полного портала.</div>
         <div class="user-chip"><strong id="deskUserName">Пользователь</strong><span id="deskUserMeta">Компания</span></div>
+        <div id="deskModeTabs" class="mode-switch hidden">
+          <button id="deskModeTickets" class="mode-btn active" type="button">Тикеты</button>
+          <button id="deskModeChats" class="mode-btn" type="button">Чаты</button>
+        </div>
       </div>
       <div class="search-box">
         <input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:48px;margin-bottom:10px">
