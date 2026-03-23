@@ -126,7 +126,13 @@ export async function createApp() {
   });
 
   app.get('/desk', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.sendFile(deskPage);
+  });
+
+  app.get('/_desk.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    res.sendFile(path.join(siteRoot, '_desk.js'));
   });
 
   app.get('/zona-it-main.html', (req, res) => {

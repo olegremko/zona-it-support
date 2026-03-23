@@ -43,7 +43,10 @@
     .mode-btn:hover{border-color:rgba(0,168,107,.22);color:#eef6ff}
     .mode-btn.active{background:linear-gradient(135deg,rgba(0,168,107,.18),rgba(127,195,255,.1));border-color:rgba(0,168,107,.34);color:#fff}
     .browser-note{margin-bottom:16px;padding:12px 14px;border-radius:16px;background:rgba(127,195,255,.08);border:1px solid rgba(127,195,255,.18);color:#d2e6ff;font-size:13px;line-height:1.55}
-    .search-box{padding:16px 22px 14px;border-bottom:1px solid var(--line)} .ticket-list{padding:12px;display:grid;gap:10px;overflow:auto;min-height:0}
+    .search-box{padding:16px 22px 14px;border-bottom:1px solid var(--line)}
+    .quick-ticket-panel{margin-top:12px;padding:12px;border-radius:18px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.12)}
+    .quick-ticket-label{display:block;margin-bottom:8px;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:#88a8c9;font-weight:800}
+    .ticket-list{padding:12px;display:grid;gap:10px;overflow:auto;min-height:0}
     .ticket-card{background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:18px;padding:14px 14px 12px;cursor:pointer;transition:border-color .18s, background .18s}
     .ticket-card:hover{background:rgba(255,255,255,.05);border-color:rgba(0,168,107,.2)} .ticket-card.active{background:linear-gradient(180deg,rgba(0,168,107,.14),rgba(127,195,255,.05));border-color:rgba(0,168,107,.34)}
     .ticket-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.ticket-no{font-size:12px;color:#86a0bb;font-weight:700;letter-spacing:.8px}
@@ -133,6 +136,15 @@
         <select id="deskCompanyFilter" class="input native-select hidden" style="height:44px">
           <option value="">Все компании</option>
         </select>
+        <div id="deskQuickStatusWrap" class="quick-ticket-panel hidden">
+          <label class="quick-ticket-label" for="deskQuickStatus">Быстрый статус</label>
+          <select id="deskQuickStatus" class="input native-select" style="height:44px">
+            <option value="open">Открыт</option>
+            <option value="progress">В работе</option>
+            <option value="done">Решен</option>
+            <option value="closed">Закрыт</option>
+          </select>
+        </div>
       </div>
       <div id="deskTicketList" class="ticket-list"></div>
     </aside>

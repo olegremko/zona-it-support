@@ -17,8 +17,50 @@
   var TOKEN_KEY = 'zit_desk_token';
   var USER_KEY = 'zit_desk_user';
   var IS_DESKTOP_RUNTIME = !!(window.zonaDeskEnv && window.zonaDeskEnv.platform === 'windows-electron');
+  var utf8Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { fatal: false }) : null;
 
   function $(id) { return document.getElementById(id); }
+
+  function demojibake(value) {
+    if (typeof value !== 'string' || !value) return value;
+    if (!/[РСЃ]/.test(value)) return value;
+    try {
+      if (!utf8Decoder) return value;
+      var bytes = new Uint8Array(value.length);
+      for (var i = 0; i < value.length; i += 1) {
+        bytes[i] = value.charCodeAt(i) & 255;
+      }
+      var fixed = utf8Decoder.decode(bytes);
+      return /[А-Яа-яЁё]/.test(fixed) ? fixed : value;
+    } catch (error) {
+      return value;
+    }
+  }
+
+  function fixNodeText(root) {
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (!node.nodeValue || !node.nodeValue.trim()) continue;
+      var fixed = demojibake(node.nodeValue);
+      if (fixed !== node.nodeValue) node.nodeValue = fixed;
+    }
+    Array.prototype.forEach.call(root.querySelectorAll ? root.querySelectorAll('input[placeholder], textarea[placeholder]') : [], function (field) {
+      var placeholder = field.getAttribute('placeholder');
+      if (!placeholder) return;
+      var fixed = demojibake(placeholder);
+      if (fixed !== placeholder) field.setAttribute('placeholder', fixed);
+    });
+    Array.prototype.forEach.call(root.querySelectorAll ? root.querySelectorAll('option') : [], function (option) {
+      var fixed = demojibake(option.textContent);
+      if (fixed !== option.textContent) option.textContent = fixed;
+    });
+  }
+
+  function normalizeDeskText() {
+    fixNodeText(document.body);
+  }
 
   function escapeHtml(value) {
     return String(value || '')
@@ -249,6 +291,27 @@
     $('deskTicketSearch').placeholder = isChatMode ? 'Поиск по живым чатам...' : 'Поиск по тикетам...';
   }
 
+  function canEditSelectedTicketStatus() {
+    if (!state.selectedTicket || state.mode !== 'tickets') return false;
+    if (state.user && state.user.isGlobalAdmin) return true;
+    if (hasPermission('ticket.update.all') || hasPermission('ticket.update.company')) return true;
+    return hasPermission('ticket.update.own') && state.user && state.selectedTicket.created_by_user_id === state.user.id;
+  }
+
+  function syncQuickStatusPanel() {
+    var wrap = $('deskQuickStatusWrap');
+    var select = $('deskQuickStatus');
+    if (!wrap || !select) return;
+    var visible = !!(state.mode === 'tickets' && state.selectedTicket && canEditSelectedTicketStatus());
+    wrap.classList.toggle('hidden', !visible);
+    if (!visible) {
+      closeAllCustomSelects('deskQuickStatus');
+      return;
+    }
+    select.value = state.selectedTicket.status || 'open';
+    refreshCustomSelect(select);
+  }
+
   function renderSidebarHeader() {
     var title = document.querySelector('.sidebar-title h2');
     var sub = document.querySelector('.sidebar-sub');
@@ -314,6 +377,7 @@
       history.innerHTML = '<div class="empty" style="padding:0">История появится после выбора тикета.</div>';
       composer.disabled = true;
       sendBtn.disabled = true;
+      syncQuickStatusPanel();
       return;
     }
     var ticket = state.selectedTicket;
@@ -338,6 +402,7 @@
     }).join('') : '<div class="empty" style="padding:0">История по тикету пока пуста.</div>';
     composer.disabled = false;
     sendBtn.disabled = false;
+    syncQuickStatusPanel();
   }
 
   function renderSelectedConversation() {
@@ -354,6 +419,7 @@
       history.innerHTML = '<div class="empty" style="padding:0">История диалога появится после выбора чата.</div>';
       composer.disabled = true;
       sendBtn.disabled = true;
+      syncQuickStatusPanel();
       return;
     }
     var conversation = state.selectedConversation;
@@ -376,11 +442,13 @@
     }).join('') : '<div class="empty" style="padding:0">История по чату пока пуста.</div>';
     composer.disabled = false;
     sendBtn.disabled = false;
+    syncQuickStatusPanel();
   }
 
   function renderSelectedEntity() {
     if (state.mode === 'livechat') renderSelectedConversation();
     else renderSelectedTicket();
+    normalizeDeskText();
   }
 
   function applySearch() {
@@ -418,6 +486,7 @@
     applySearch();
     if (state.mode === 'livechat') renderConversationList();
     else renderTicketList();
+    normalizeDeskText();
   }
 
   function syncCompanyFilter() {
@@ -553,6 +622,25 @@
     }
   }
 
+  async function updateSelectedTicketStatus() {
+    if (!state.selectedTicketId || !state.selectedTicket || !canEditSelectedTicketStatus()) return;
+    var select = $('deskQuickStatus');
+    var nextStatus = select.value;
+    var currentStatus = state.selectedTicket.status;
+    if (!nextStatus || nextStatus === currentStatus) return;
+    try {
+      await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId), {
+        method: 'PATCH',
+        body: JSON.stringify({ status: nextStatus })
+      });
+      await fetchTickets();
+      await selectTicket(state.selectedTicketId, true);
+    } catch (error) {
+      select.value = currentStatus;
+      refreshCustomSelect(select);
+    }
+  }
+
   async function sendMessage() {
     var body = $('deskComposer').value.trim();
     if (!body) return;
@@ -639,6 +727,9 @@
     $('deskCompanyFilter').addEventListener('change', function () {
       renderList();
     });
+    $('deskQuickStatus').addEventListener('change', function () {
+      updateSelectedTicketStatus();
+    });
     $('deskRefreshBtn').addEventListener('click', async function () {
       await fetchTickets();
       if (hasLiveChatAccess()) await fetchConversations();
@@ -667,8 +758,10 @@
   document.addEventListener('DOMContentLoaded', function () {
     bindEvents();
     refreshAllCustomSelects();
+    normalizeDeskText();
     if (!IS_DESKTOP_RUNTIME) {
       lockBrowserVersion();
+      normalizeDeskText();
       return;
     }
     restoreSession();
