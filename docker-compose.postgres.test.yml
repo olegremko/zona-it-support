@@ -1,0 +1,39 @@
+services:
+  postgres_test:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-zona_it_test}
+      POSTGRES_USER: ${POSTGRES_USER:-zona_it}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zona_it_test_password}
+    volumes:
+      - zona_it_pg_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-zona_it} -d ${POSTGRES_DB:-zona_it_test}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+    environment:
+      PORT: 4010
+      JWT_SECRET: test-secret
+      JWT_EXPIRES_IN: 12h
+      CORS_ORIGIN: http://localhost:4010
+      DB_CLIENT: postgres
+      DATABASE_URL: postgresql://${POSTGRES_USER:-zona_it}:${POSTGRES_PASSWORD:-zona_it_test_password}@postgres_test:5432/${POSTGRES_DB:-zona_it_test}
+      POSTGRES_DB: ${POSTGRES_DB:-zona_it_test}
+      POSTGRES_USER: ${POSTGRES_USER:-zona_it}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zona_it_test_password}
+    ports:
+      - "4010:4010"
+
+volumes:
+  zona_it_pg_test_data:
