@@ -3948,7 +3948,12 @@ footer {
     <div class="helper-form-title">Нужна помощь?</div>
     <input class="helper-input" placeholder="Ваш вопрос...">
     <input class="helper-input" type="tel" placeholder="+7 (___) ___-__-__">
-    <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Позвонить мне</button>
+    <div class="consent-row" style="margin:6px 0 10px" onclick="toggleConsent('consent-helper','consent-helper-err')">
+      <div class="consent-box" id="consent-helper"></div>
+      <span class="consent-text">Я согласен(на) на обработку и передачу персональных данных в соответствии с <a href="#privacy" onclick="event.stopPropagation();nav('privacy')">политикой конфиденциальности</a></span>
+    </div>
+    <p class="consent-error" id="consent-helper-err">Пожалуйста, подтвердите согласие на обработку и передачу персональных данных.</p>
+    <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="submitForm('consent-helper','consent-helper-err')">Позвонить мне</button>
   </div>
 </div>
 
