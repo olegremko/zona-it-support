@@ -94,7 +94,19 @@
         <div class="sidebar-sub">Легкий рабочий режим для клиентов: список заявок, переписка по задаче и быстрые обновления без полного портала.</div>
         <div class="user-chip"><strong id="deskUserName">Пользователь</strong><span id="deskUserMeta">Компания</span></div>
       </div>
-      <div class="search-box"><input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:48px"></div>
+      <div class="search-box">
+        <input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:48px;margin-bottom:10px">
+        <select id="deskStatusFilter" class="input" style="height:44px;margin-bottom:10px">
+          <option value="">Все статусы</option>
+          <option value="open">Открытые</option>
+          <option value="progress">В работе</option>
+          <option value="done">Решенные</option>
+          <option value="closed">Закрытые</option>
+        </select>
+        <select id="deskCompanyFilter" class="input hidden" style="height:44px">
+          <option value="">Все компании</option>
+        </select>
+      </div>
       <div id="deskTicketList" class="ticket-list"></div>
     </aside>
     <section class="main">

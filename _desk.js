@@ -33,6 +33,17 @@
   }
   function statusLabel(code) { return ({ open: 'Открыт', progress: 'В работе', done: 'Решен', closed: 'Закрыт' }[code] || code || '—'); }
   function priorityLabel(code) { return ({ low: 'Низкий', normal: 'Средний', high: 'Высокий', critical: 'Критичный' }[code] || code || '—'); }
+  function hasPermission(code) { return !!(state.user && state.user.permissions && state.user.permissions.indexOf(code) >= 0); }
+  function roleLabel() {
+    if (!state.user) return 'client_user';
+    return ({
+      client_user: 'Клиент',
+      client_admin: 'Руководитель компании',
+      support_agent: 'Инженер поддержки',
+      support_lead: 'Руководитель поддержки',
+      platform_admin: 'Администратор платформы'
+    }[state.user.role] || state.user.role || 'Клиент');
+  }
   function authHeaders() { return state.token ? { Authorization: 'Bearer ' + state.token } : {}; }
   async function api(path, options) {
     var request = Object.assign({ headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()) }, options || {});
@@ -71,6 +82,7 @@
       return '<div class="ticket-card' + (ticket.id === state.selectedTicketId ? ' active' : '') + '" data-ticket-id="' + escapeHtml(ticket.id) + '">' +
         '<div class="ticket-top"><div class="ticket-no">#' + escapeHtml(ticket.number) + '</div><div class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</div></div>' +
         '<div class="ticket-subject">' + escapeHtml(ticket.subject) + '</div>' +
+        (showCompanyContext() ? '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(ticket.company_name || 'Без компании') + (ticket.created_by_name ? ' • ' + escapeHtml(ticket.created_by_name) : '') + '</div>' : '') +
         '<div class="ticket-preview">' + escapeHtml(ticketPreview(ticket)) + '</div>' +
         '<div class="ticket-meta"><div class="pill ' + escapeHtml(ticket.priority) + '">' + escapeHtml(priorityLabel(ticket.priority)) + '</div><div class="pill normal">' + escapeHtml(relativeDate(ticket.updated_at)) + '</div></div>' +
       '</div>';
@@ -117,16 +129,39 @@
   }
   function applySearch() {
     var query = ($('deskTicketSearch').value || '').trim().toLowerCase();
+    var status = $('deskStatusFilter').value;
+    var company = $('deskCompanyFilter').value;
     state.filteredTickets = state.tickets.filter(function (ticket) {
+      if (status && ticket.status !== status) return false;
+      if (company && ticket.company_name !== company) return false;
       if (!query) return true;
       return [ticket.subject, ticket.description, String(ticket.number), ticket.company_name].filter(Boolean).some(function (value) {
         return String(value).toLowerCase().indexOf(query) >= 0;
       });
     });
   }
+  function showCompanyContext() {
+    return hasPermission('ticket.view.all') || !!(state.user && state.user.isGlobalAdmin);
+  }
+  function syncCompanyFilter() {
+    var select = $('deskCompanyFilter');
+    if (!showCompanyContext()) {
+      select.classList.add('hidden');
+      select.innerHTML = '<option value="">Все компании</option>';
+      return;
+    }
+    var current = select.value;
+    var companies = Array.from(new Set(state.tickets.map(function (ticket) { return ticket.company_name || 'Без компании'; }))).sort();
+    select.innerHTML = '<option value="">Все компании</option>' + companies.map(function (company) {
+      return '<option value="' + escapeHtml(company) + '">' + escapeHtml(company) + '</option>';
+    }).join('');
+    if (companies.indexOf(current) >= 0) select.value = current;
+    select.classList.remove('hidden');
+  }
   async function fetchTickets() {
     var data = await api('/api/tickets');
     state.tickets = data.tickets || [];
+    syncCompanyFilter();
     applySearch();
     renderTicketList();
     if (state.selectedTicketId) await selectTicket(state.selectedTicketId, true);
@@ -187,7 +222,7 @@
     if (!state.token || !state.user) return renderAuthState(false);
     renderAuthState(true);
     $('deskUserName').textContent = state.user.fullName || state.user.email || 'Пользователь';
-    $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', state.user.role || 'client_user'].join(' • ');
+    $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', roleLabel()].join(' • ');
     await fetchTickets(); renderSelectedTicket(); startPolling();
   }
   function logout() { stopPolling(); clearSession(); renderAuthState(false); $('deskPassword').value = ''; $('deskComposer').value = ''; }
@@ -195,6 +230,8 @@
     $('deskLoginBtn').addEventListener('click', login);
     $('deskPassword').addEventListener('keydown', function (event) { if (event.key === 'Enter') login(); });
     $('deskTicketSearch').addEventListener('input', function () { applySearch(); renderTicketList(); });
+    $('deskStatusFilter').addEventListener('change', function () { applySearch(); renderTicketList(); });
+    $('deskCompanyFilter').addEventListener('change', function () { applySearch(); renderTicketList(); });
     $('deskRefreshBtn').addEventListener('click', fetchTickets);
     $('deskLogoutBtn').addEventListener('click', logout);
     $('deskNewTicketBtn').addEventListener('click', openModal);

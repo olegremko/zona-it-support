@@ -2,13 +2,43 @@
   "name": "zona-it-windows-client",
   "version": "0.1.0",
   "private": true,
+  "author": "Zona IT",
   "description": "Windows desktop shell for Zona IT Desk",
   "main": "main.js",
   "scripts": {
     "dev": "electron .",
-    "start": "electron ."
+    "start": "electron .",
+    "build-win": "electron-builder --win portable nsis"
   },
   "devDependencies": {
-    "electron": "^36.1.0"
+    "electron": "^36.1.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "pro.izone.desk",
+    "productName": "Zona IT Desk",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "portable": {
+      "artifactName": "Zona-IT-Desk-${version}-portable.exe"
+    },
+    "nsis": {
+      "artifactName": "Zona-IT-Desk-${version}-setup.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

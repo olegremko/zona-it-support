@@ -19,6 +19,7 @@ const roles = [
 ];
 
 const permissions = [
+  ['perm_ticket_view_all', 'ticket.view.all', 'View all tickets'],
   ['perm_ticket_view_company', 'ticket.view.company', 'View company tickets'],
   ['perm_ticket_create', 'ticket.create', 'Create ticket'],
   ['perm_ticket_update_own', 'ticket.update.own', 'Update own ticket'],
@@ -33,9 +34,9 @@ const permissions = [
 const rolePermissions = {
   client_admin: ['ticket.view.company', 'ticket.create', 'ticket.update.company', 'user.manage.company', 'role.manage.company'],
   client_user: ['ticket.create', 'ticket.update.own'],
-  support_agent: ['ticket.view.company', 'ticket.update.company', 'ticket.assign', 'livechat.reply'],
-  support_lead: ['ticket.view.company', 'ticket.update.company', 'ticket.assign', 'ticket.comment.internal', 'role.manage.company', 'livechat.reply'],
-  platform_admin: ['ticket.view.company', 'ticket.create', 'ticket.update.company', 'ticket.assign', 'ticket.comment.internal', 'user.manage.company', 'role.manage.company', 'livechat.reply']
+  support_agent: ['ticket.view.all', 'ticket.view.company', 'ticket.update.company', 'ticket.assign', 'livechat.reply'],
+  support_lead: ['ticket.view.all', 'ticket.view.company', 'ticket.update.company', 'ticket.assign', 'ticket.comment.internal', 'role.manage.company', 'livechat.reply'],
+  platform_admin: ['ticket.view.all', 'ticket.view.company', 'ticket.create', 'ticket.update.company', 'ticket.assign', 'ticket.comment.internal', 'user.manage.company', 'role.manage.company', 'livechat.reply']
 };
 
 async function insertRole(role) {

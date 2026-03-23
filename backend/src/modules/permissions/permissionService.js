@@ -48,6 +48,12 @@ export async function getUserContext(userId) {
   // even if the DB was seeded before the permission was introduced.
   if (
     ['support_agent', 'support_lead', 'platform_admin'].includes(user.role_code) &&
+    !permissions.includes('ticket.view.all')
+  ) {
+    permissions.push('ticket.view.all');
+  }
+  if (
+    ['support_agent', 'support_lead', 'platform_admin'].includes(user.role_code) &&
     !permissions.includes('livechat.reply')
   ) {
     permissions.push('livechat.reply');

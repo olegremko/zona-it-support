@@ -113,7 +113,7 @@ async function addSystemTicketEvent(ticketId, actorUserId, body, createdAt = now
 }
 
 export async function listVisibleTickets(context) {
-  if (context.is_global_admin) {
+  if (context.is_global_admin || hasPermission(context, 'ticket.view.all')) {
     return await queryMany(`
       SELECT t.*, u.full_name AS created_by_name, c.name AS company_name, ${currentAssigneeSelectSql('t')}
       FROM tickets t
@@ -176,8 +176,10 @@ export async function getTicketById(ticketId, context) {
     [ticketId]
   );
   if (!ticket) throw notFound('Ticket not found');
-  if (ticket.company_id !== context.company_id && !context.is_global_admin) throw forbidden('Ticket belongs to another company');
-  if (!hasPermission(context, 'ticket.view.company') && ticket.created_by_user_id !== context.id) {
+  if (ticket.company_id !== context.company_id && !context.is_global_admin && !hasPermission(context, 'ticket.view.all')) {
+    throw forbidden('Ticket belongs to another company');
+  }
+  if (!hasPermission(context, 'ticket.view.company') && !hasPermission(context, 'ticket.view.all') && ticket.created_by_user_id !== context.id) {
     throw forbidden('You cannot view this ticket');
   }
 
