@@ -30,7 +30,15 @@ services:
       - zona_it_staging_data:/app/backend/data
     ports:
       - "4020:4000"
+    networks:
+      - default
+      - proxy
 
 volumes:
   zona_it_staging_data:
   zona_it_staging_pg_data:
+
+networks:
+  proxy:
+    name: zona_it_proxy
+    external: true

@@ -18,6 +18,7 @@ fi
 git fetch --all --tags
 git reset --hard "$REF"
 
+docker network create zona_it_proxy >/dev/null 2>&1 || true
 docker compose --env-file .env.staging -f docker-compose.postgres.staging.yml up -d --build
 
 echo "Staging deployed: $REF"

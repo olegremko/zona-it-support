@@ -9,6 +9,7 @@ Run a separate pre-production environment on the same VPS without touching `http
 - app: `zona-it-staging-app`
 - database: `zona-it-staging-postgres`
 - external check URL: `http://SERVER_IP:4020`
+- preferred URL: `https://staging.i-zone.pro`
 - compose file: [docker-compose.postgres.staging.yml](C:\Users\user\Desktop\codex\docker-compose.postgres.staging.yml)
 
 ## Setup
@@ -32,6 +33,7 @@ cd /opt/zona-it-support/current
 ## Health check
 
 - `http://SERVER_IP:4020/api/health`
+- `https://staging.i-zone.pro/api/health`
 
 ## Staging backup
 
@@ -42,4 +44,9 @@ cd /opt/zona-it-support/current
 
 ## Next step
 
-When needed, add `staging.i-zone.pro` in DNS and put it behind the existing reverse proxy.
+Create DNS record:
+
+- `A`
+- name: `staging`
+- value: `2.27.54.185`
+- TTL: `300`

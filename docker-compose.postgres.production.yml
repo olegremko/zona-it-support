@@ -30,6 +30,9 @@ services:
         condition: service_healthy
     expose:
       - "4000"
+    networks:
+      - default
+      - proxy
 
   caddy:
     image: caddy:2.10-alpine
@@ -44,9 +47,17 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    networks:
+      - default
+      - proxy
 
 volumes:
   zona_it_data:
   zona_it_pg_data:
   caddy_data:
   caddy_config:
+
+networks:
+  proxy:
+    name: zona_it_proxy
+    external: true
