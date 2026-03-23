@@ -1,0 +1,102 @@
+# Production Guide
+
+## Current Topology
+
+- Domain: `https://i-zone.pro`
+- Server: single VPS
+- Reverse proxy: Caddy
+- Application: Docker Compose
+- Database: SQLite in Docker volume `*_zona_it_data`
+- Project root on server: `/opt/zona-it-support/current`
+- Backups directory on server: `/opt/zona-it-support/backups`
+
+## Services
+
+```sh
+cd /opt/zona-it-support/current
+docker compose -f docker-compose.production.yml ps
+```
+
+## Deploy Latest Version
+
+```sh
+cd /opt/zona-it-support/current
+./scripts/deploy-production.sh
+```
+
+This will:
+- create a SQLite backup
+- fetch the latest code from Git
+- reset to `origin/main`
+- rebuild and restart containers
+
+## Deploy Specific Version
+
+```sh
+cd /opt/zona-it-support/current
+./scripts/deploy-production.sh v2026.03.23-1
+```
+
+## Roll Back to Previous Version
+
+```sh
+cd /opt/zona-it-support/current
+./scripts/rollback-production.sh <git-ref>
+```
+
+Example:
+
+```sh
+./scripts/rollback-production.sh v2026.03.23-1
+```
+
+## Create Manual Backup
+
+```sh
+cd /opt/zona-it-support/current
+./scripts/backup-sqlite.sh
+```
+
+## View Backups
+
+```sh
+ls -lah /opt/zona-it-support/backups
+```
+
+## View Logs
+
+```sh
+cd /opt/zona-it-support/current
+docker compose -f docker-compose.production.yml logs -f app
+docker compose -f docker-compose.production.yml logs -f caddy
+```
+
+## Restart Services
+
+```sh
+cd /opt/zona-it-support/current
+docker compose -f docker-compose.production.yml restart
+```
+
+## Release Tags
+
+Recommended pattern:
+
+- `v2026.03.23-1`
+- `v2026.03.25-1`
+- `v2026.03.25-2`
+
+Create tag locally:
+
+```powershell
+cd C:\Users\user\Desktop\codex
+& "C:\Program Files\Git\cmd\git.exe" tag -a v2026.03.23-1 -m "First VPS production release"
+& "C:\Program Files\Git\cmd\git.exe" push origin v2026.03.23-1
+```
+
+## Next Planned Infrastructure Step
+
+- migrate from SQLite to PostgreSQL
+- keep application containerized
+- keep reverse proxy and release flow unchanged
+- later move app layer to Kubernetes without changing external domain setup
