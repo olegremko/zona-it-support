@@ -9,21 +9,90 @@ function nextTicketNumber() {
   return row.next_number;
 }
 
+function currentAssigneeSelectSql(alias = 't') {
+  return `
+    (
+      SELECT ta.user_id
+      FROM ticket_assignees ta
+      WHERE ta.ticket_id = ${alias}.id AND ta.active = 1
+      ORDER BY ta.created_at DESC
+      LIMIT 1
+    ) AS assignee_user_id,
+    (
+      SELECT u.full_name
+      FROM ticket_assignees ta
+      JOIN users u ON u.id = ta.user_id
+      WHERE ta.ticket_id = ${alias}.id AND ta.active = 1
+      ORDER BY ta.created_at DESC
+      LIMIT 1
+    ) AS assignee_name
+  `;
+}
+
+function getAssignableSupportUsers() {
+  return db.prepare(`
+    SELECT DISTINCT u.id, u.full_name, u.email, r.code AS role_code, COALESCE(m.title, r.name) AS title
+    FROM users u
+    JOIN user_company_memberships m ON m.user_id = u.id
+    JOIN roles r ON r.id = m.role_id
+    WHERE u.status = 'active'
+      AND r.code IN ('support_agent', 'support_lead', 'platform_admin')
+    ORDER BY CASE r.code WHEN 'platform_admin' THEN 0 WHEN 'support_lead' THEN 1 ELSE 2 END, u.full_name
+  `).all();
+}
+
+function getTicketHistory(ticketId) {
+  const rows = db.prepare(`
+    SELECT tm.id, tm.message_type, tm.body, tm.created_at, u.full_name AS author_name
+    FROM ticket_messages tm
+    LEFT JOIN users u ON u.id = tm.author_user_id
+    WHERE tm.ticket_id = ? AND tm.message_type IN ('system', 'internal_note')
+    ORDER BY tm.created_at DESC
+  `).all(ticketId);
+
+  return rows.map((row) => ({
+    id: row.id,
+    type: row.message_type,
+    body: row.body,
+    created_at: row.created_at,
+    author_name: row.author_name || null
+  }));
+}
+
+function addSystemTicketEvent(ticketId, actorUserId, body, createdAt = nowIso()) {
+  db.prepare(`
+    INSERT INTO ticket_messages (id, ticket_id, author_user_id, message_type, body, is_internal, created_at)
+    VALUES (?, ?, ?, 'system', ?, 0, ?)
+  `).run(createId('msg'), ticketId, actorUserId || null, body, createdAt);
+}
+
 export function listVisibleTickets(context) {
-  if (hasPermission(context, 'ticket.view.company')) {
+  if (context.is_global_admin) {
     return db.prepare(`
-      SELECT t.*, u.full_name AS created_by_name
+      SELECT t.*, u.full_name AS created_by_name, c.name AS company_name, ${currentAssigneeSelectSql('t')}
       FROM tickets t
       JOIN users u ON u.id = t.created_by_user_id
+      LEFT JOIN companies c ON c.id = t.company_id
+      ORDER BY t.updated_at DESC
+    `).all();
+  }
+
+  if (hasPermission(context, 'ticket.view.company')) {
+    return db.prepare(`
+      SELECT t.*, u.full_name AS created_by_name, c.name AS company_name, ${currentAssigneeSelectSql('t')}
+      FROM tickets t
+      JOIN users u ON u.id = t.created_by_user_id
+      LEFT JOIN companies c ON c.id = t.company_id
       WHERE t.company_id = ?
       ORDER BY t.updated_at DESC
     `).all(context.company_id);
   }
 
   return db.prepare(`
-    SELECT t.*, u.full_name AS created_by_name
+    SELECT t.*, u.full_name AS created_by_name, c.name AS company_name, ${currentAssigneeSelectSql('t')}
     FROM tickets t
     JOIN users u ON u.id = t.created_by_user_id
+    LEFT JOIN companies c ON c.id = t.company_id
     WHERE t.company_id = ? AND t.created_by_user_id = ?
     ORDER BY t.updated_at DESC
   `).all(context.company_id, context.id);
@@ -45,7 +114,25 @@ export function getTicketById(ticketId, context) {
     ORDER BY tm.created_at ASC
   `).all(ticketId);
 
-  return { ...ticket, messages };
+  const createdBy = db.prepare('SELECT full_name FROM users WHERE id = ?').get(ticket.created_by_user_id);
+  const assignee = db.prepare(`
+    SELECT ta.user_id, u.full_name
+    FROM ticket_assignees ta
+    JOIN users u ON u.id = ta.user_id
+    WHERE ta.ticket_id = ? AND ta.active = 1
+    ORDER BY ta.created_at DESC
+    LIMIT 1
+  `).get(ticketId);
+
+  return {
+    ...ticket,
+    created_by_name: createdBy?.full_name || null,
+    assignee_user_id: assignee?.user_id || null,
+    assignee_name: assignee?.full_name || null,
+    history: getTicketHistory(ticketId),
+    assignable_users: hasPermission(context, 'ticket.assign') || context.is_global_admin ? getAssignableSupportUsers() : [],
+    messages
+  };
 }
 
 export function createTicket(context, input) {
@@ -67,6 +154,8 @@ export function createTicket(context, input) {
     VALUES (?, ?, ?, 'message', ?, 0, ?)
   `).run(messageId, ticketId, context.id, input.description.trim(), now);
 
+  addSystemTicketEvent(ticketId, context.id, 'Тикет создан', now);
+
   return getTicketById(ticketId, context);
 }
 
@@ -74,14 +163,18 @@ export function addTicketMessage(ticketId, context, body) {
   const ticket = getTicketById(ticketId, context);
   if (!body?.trim()) throw badRequest('Message body is required');
 
-  const now = nowIso();
-  db.prepare(`
+const now = nowIso();
+db.prepare(`
     INSERT INTO ticket_messages (id, ticket_id, author_user_id, message_type, body, is_internal, created_at)
     VALUES (?, ?, ?, 'message', ?, 0, ?)
   `).run(createId('msg'), ticketId, context.id, body.trim(), now);
 
   db.prepare('UPDATE tickets SET updated_at = ?, status = CASE WHEN status = ? THEN ? ELSE status END WHERE id = ?')
     .run(now, 'open', 'progress', ticketId);
+
+  if (ticket.status === 'open') {
+    addSystemTicketEvent(ticketId, context.id, 'Статус изменен: Открыт -> В работе', now);
+  }
 
   return getTicketById(ticketId, context);
 }
@@ -101,12 +194,56 @@ export function updateTicket(ticketId, context, input) {
   const nextCategory = input.category === undefined ? ticket.category : input.category;
   const nextPriority = input.priority || ticket.priority;
   const nextStatus = canUpdateCompany && input.status ? input.status : ticket.status;
+  const canAssign = hasPermission(context, 'ticket.assign') || context.is_global_admin;
+  const nextAssigneeUserId = input.assigneeUserId === undefined ? null : (input.assigneeUserId || null);
 
   db.prepare(`
     UPDATE tickets
     SET subject = ?, description = ?, category = ?, priority = ?, status = ?, updated_at = ?, closed_at = CASE WHEN ? = 'closed' THEN COALESCE(closed_at, ?) ELSE NULL END
     WHERE id = ?
   `).run(nextSubject, nextDescription, nextCategory, nextPriority, nextStatus, now, nextStatus, now, ticketId);
+
+  if (input.priority && input.priority !== ticket.priority) {
+    addSystemTicketEvent(ticketId, context.id, `Приоритет изменен: ${ticket.priority} -> ${input.priority}`, now);
+  }
+  if (canUpdateCompany && input.status && input.status !== ticket.status) {
+    addSystemTicketEvent(ticketId, context.id, `Статус изменен: ${ticket.status} -> ${input.status}`, now);
+  }
+  if (canAssign && input.assigneeUserId !== undefined) {
+    const currentAssignee = db.prepare(`
+      SELECT ta.user_id, u.full_name
+      FROM ticket_assignees ta
+      JOIN users u ON u.id = ta.user_id
+      WHERE ta.ticket_id = ? AND ta.active = 1
+      ORDER BY ta.created_at DESC
+      LIMIT 1
+    `).get(ticketId);
+
+    db.prepare('UPDATE ticket_assignees SET active = 0 WHERE ticket_id = ? AND active = 1').run(ticketId);
+
+    if (nextAssigneeUserId) {
+      const assigneeUser = db.prepare(`
+        SELECT u.id, u.full_name
+        FROM users u
+        JOIN user_company_memberships m ON m.user_id = u.id
+        JOIN roles r ON r.id = m.role_id
+        WHERE u.id = ? AND u.status = 'active' AND r.code IN ('support_agent', 'support_lead', 'platform_admin')
+        LIMIT 1
+      `).get(nextAssigneeUserId);
+      if (!assigneeUser) throw badRequest('Assignee not found');
+
+      db.prepare(`
+        INSERT INTO ticket_assignees (id, ticket_id, user_id, assigned_by_user_id, created_at, active)
+        VALUES (?, ?, ?, ?, ?, 1)
+      `).run(createId('tas'), ticketId, assigneeUser.id, context.id, now);
+
+      if (!currentAssignee || currentAssignee.user_id !== assigneeUser.id) {
+        addSystemTicketEvent(ticketId, context.id, `Назначен исполнитель: ${assigneeUser.full_name}`, now);
+      }
+    } else if (currentAssignee) {
+      addSystemTicketEvent(ticketId, context.id, `Исполнитель снят: ${currentAssignee.full_name}`, now);
+    }
+  }
 
   return getTicketById(ticketId, context);
 }

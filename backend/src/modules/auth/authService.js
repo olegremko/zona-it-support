@@ -37,6 +37,7 @@ export function login(email, password) {
       companyId: context?.company_id || null,
       companyName: context?.company_name || null,
       role: context?.role_code || null,
+      isGlobalAdmin: Boolean(user.is_global_admin),
       permissions: context?.permissions || []
     }
   };

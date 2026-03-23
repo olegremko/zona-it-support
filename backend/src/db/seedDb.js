@@ -54,19 +54,35 @@ db.prepare('INSERT OR IGNORE INTO companies (id, name, slug, status, created_at,
 
 const adminId = createId('usr');
 const agentId = createId('usr');
+const platformAdminId = createId('usr');
+const platformAdminAltId = createId('usr');
+const superUserId = createId('usr');
 const passwordHash = bcrypt.hashSync('demo1234', 10);
 
 db.prepare('INSERT OR IGNORE INTO users (id, email, password_hash, full_name, status, is_global_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
   .run(adminId, 'demo@company.ru', passwordHash, 'Demo Client Admin', 'active', 0, now, now);
 db.prepare('INSERT OR IGNORE INTO users (id, email, password_hash, full_name, status, is_global_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
   .run(agentId, 'agent@zonait.local', passwordHash, 'Support Agent', 'active', 0, now, now);
+db.prepare('INSERT OR IGNORE INTO users (id, email, password_hash, full_name, status, is_global_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+  .run(platformAdminId, 'admin@zonait.local', passwordHash, 'Platform Admin', 'active', 1, now, now);
+db.prepare('INSERT OR IGNORE INTO users (id, email, password_hash, full_name, status, is_global_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+  .run(platformAdminAltId, 'admin@i-zone.pro', passwordHash, 'Platform Admin I-Zone', 'active', 1, now, now);
+db.prepare('INSERT OR IGNORE INTO users (id, email, password_hash, full_name, status, is_global_admin, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+  .run(superUserId, 'superuser@i-zone.pro', passwordHash, 'I-Zone Superuser', 'active', 1, now, now);
 
 const clientAdminRole = db.prepare('SELECT id FROM roles WHERE code = ?').get('client_admin');
 const supportAgentRole = db.prepare('SELECT id FROM roles WHERE code = ?').get('support_agent');
+const platformAdminRole = db.prepare('SELECT id FROM roles WHERE code = ?').get('platform_admin');
 
 db.prepare('INSERT OR IGNORE INTO user_company_memberships (id, user_id, company_id, role_id, title, is_primary, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
   .run(createId('mbr'), adminId, companyId, clientAdminRole.id, 'IT Manager', 1, now);
 db.prepare('INSERT OR IGNORE INTO user_company_memberships (id, user_id, company_id, role_id, title, is_primary, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
   .run(createId('mbr'), agentId, companyId, supportAgentRole.id, 'Support Engineer', 1, now);
+db.prepare('INSERT OR IGNORE INTO user_company_memberships (id, user_id, company_id, role_id, title, is_primary, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+  .run(createId('mbr'), platformAdminId, companyId, platformAdminRole.id, 'Platform Administrator', 1, now);
+db.prepare('INSERT OR IGNORE INTO user_company_memberships (id, user_id, company_id, role_id, title, is_primary, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+  .run(createId('mbr'), platformAdminAltId, companyId, platformAdminRole.id, 'Platform Administrator', 1, now);
+db.prepare('INSERT OR IGNORE INTO user_company_memberships (id, user_id, company_id, role_id, title, is_primary, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+  .run(createId('mbr'), superUserId, companyId, platformAdminRole.id, 'Superuser', 1, now);
 
 console.log('Database seeded');

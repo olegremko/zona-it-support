@@ -34,6 +34,12 @@ export function getUserContext(userId) {
   ) {
     permissions.push('ticket.create');
   }
+  if (
+    ['support_agent', 'support_lead', 'platform_admin'].includes(user.role_code) &&
+    !permissions.includes('ticket.assign')
+  ) {
+    permissions.push('ticket.assign');
+  }
 
   return { ...user, permissions };
 }

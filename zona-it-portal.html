@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -108,6 +108,96 @@ button{cursor:pointer}
 .cdh{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .cdt{font-size:14px;font-weight:700;color:var(--nv);font-family:'Montserrat',sans-serif}
 .cdl{font-size:12px;color:var(--gr);font-weight:600;cursor:pointer}.cdl:hover{text-decoration:underline}
+.analytics-card{background:linear-gradient(180deg,#102843,#0d2238);border-radius:18px;border:1px solid rgba(84,143,198,.18);overflow:hidden;position:relative;box-shadow:0 22px 42px rgba(7,18,33,.18);margin-top:18px;z-index:1}
+.analytics-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 22%,rgba(0,168,107,.18),transparent 34%),radial-gradient(circle at 82% 18%,rgba(66,165,245,.16),transparent 28%),linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0));pointer-events:none}
+.analytics-head{position:relative;z-index:1;padding:18px 20px 14px;border-bottom:1px solid rgba(148,176,207,.12);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.analytics-title{font-size:15px;font-weight:800;color:#f3f8ff;font-family:'Montserrat',sans-serif}
+.analytics-sub{font-size:12px;color:rgba(219,232,245,.68);margin-top:4px;max-width:620px}
+.analytics-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.analytics-tab{padding:8px 12px;border-radius:999px;border:1px solid rgba(148,176,207,.16);background:rgba(255,255,255,.04);color:rgba(226,237,247,.76);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .18s}
+.analytics-tab:hover{border-color:rgba(0,168,107,.45);color:#fff;transform:translateY(-1px)}
+.analytics-tab.on{background:linear-gradient(135deg,rgba(0,168,107,.18),rgba(39,113,255,.18));border-color:rgba(0,168,107,.42);color:#fff;box-shadow:0 10px 20px rgba(0,168,107,.15)}
+.analytics-tabs.light .analytics-tab{background:#eef4fb;color:#17324d;border-color:rgba(16,40,67,.12)}
+.analytics-tabs.light .analytics-tab:hover{color:#0b1e33;border-color:rgba(0,168,107,.35)}
+.analytics-tabs.light .analytics-tab.on{background:linear-gradient(135deg,rgba(0,168,107,.12),rgba(39,113,255,.12));color:#0b1e33;box-shadow:0 10px 18px rgba(16,40,67,.08)}
+.analytics-body{position:relative;z-index:1;padding:18px 20px 22px}
+.analytics-grid{display:grid;grid-template-columns:1.6fr .85fr;gap:18px;align-items:stretch}
+.analytics-plot{position:relative;border-radius:16px;border:1px solid rgba(148,176,207,.12);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));padding:18px;overflow:hidden;min-height:320px}
+.analytics-plot::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(148,176,207,.08) 1px, transparent 1px),linear-gradient(90deg, rgba(148,176,207,.08) 1px, transparent 1px);background-size:100% 64px,64px 100%;mask-image:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.24));pointer-events:none}
+.analytics-svg{position:relative;z-index:1;width:100%;height:240px;display:block}
+.analytics-bars rect{transition:height .7s ease,y .7s ease,opacity .35s ease}
+.analytics-open-bars rect{transition:height .7s ease,y .7s ease,opacity .35s ease}
+.analytics-bars .closed-wave{mix-blend-mode:screen;opacity:.88}
+.analytics-open-bars .open-wave{mix-blend-mode:screen;opacity:.92}
+.analytics-x{position:relative;z-index:1;display:grid;grid-template-columns:repeat(var(--points,7),1fr);gap:10px;margin-top:14px}
+.analytics-x span{font-size:11px;color:rgba(221,233,245,.7);text-align:center}
+.analytics-side{display:flex;flex-direction:column;gap:12px}
+.analytics-metric{padding:16px 16px 14px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(148,176,207,.12)}
+.analytics-metric-k{font-size:11px;color:rgba(221,233,245,.62);text-transform:uppercase;letter-spacing:.08em}
+.analytics-metric-v{font-size:30px;line-height:1;margin-top:8px;font-weight:800;font-family:'Montserrat',sans-serif;color:#fff}
+.analytics-metric-s{font-size:12px;color:rgba(221,233,245,.72);margin-top:6px}
+.analytics-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.analytics-legend-item{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:rgba(228,238,248,.78)}
+.analytics-dot{width:10px;height:10px;border-radius:50%}
+.analytics-dot.resolved{background:#2dcf92;box-shadow:0 0 12px rgba(45,207,146,.45)}
+.analytics-dot.open{background:#ffb347;box-shadow:0 0 12px rgba(255,179,71,.42)}
+.analytics-empty{padding:56px 28px;text-align:center;color:rgba(228,238,248,.78);font-size:13px}
+.company-card.is-hidden{display:none!important}
+.company-overview-copy{padding:0 0 14px}
+.report-filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.report-filters-card{position:relative;z-index:300;overflow:visible!important}
+.report-filter-box{min-height:98px;padding:12px 14px;border-radius:16px;background:linear-gradient(180deg,#f7fbff,#eef5fb);border:1px solid rgba(24,58,92,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 12px 22px rgba(16,40,67,.05);position:relative;overflow:visible;display:flex;flex-direction:column;justify-content:flex-start}
+.report-filter-box::before{content:'';position:absolute;inset:auto -40px -46px auto;width:120px;height:120px;background:radial-gradient(circle,rgba(0,168,107,.10),transparent 68%);pointer-events:none}
+.report-filter-box::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.55),transparent 50%);pointer-events:none}
+.report-filter-title{position:relative;z-index:1;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6c8197;margin-bottom:8px;line-height:1;min-height:10px;text-align:center}
+.report-input,.report-select{position:relative;z-index:1;width:100%;height:46px;border-radius:13px;border:1px solid rgba(22,53,84,.12);background:linear-gradient(180deg,#ffffff,#f4f8fc);padding:0 14px;font-size:13px;font-weight:600;color:#163554;box-shadow:0 8px 16px rgba(16,40,67,.05);transition:border-color .18s,box-shadow .18s,transform .18s}
+.report-input:hover,.report-select:hover{border-color:rgba(0,168,107,.28)}
+.report-input:focus,.report-select:focus{border-color:rgba(0,168,107,.45);box-shadow:0 0 0 4px rgba(0,168,107,.10),0 16px 28px rgba(16,40,67,.08);transform:translateY(-1px)}
+.report-select{appearance:none;-webkit-appearance:none;-moz-appearance:none;padding-right:52px;background-image:radial-gradient(circle at calc(100% - 24px) 50%,rgba(0,168,107,.12) 0,rgba(0,168,107,.12) 16px,transparent 16px),linear-gradient(45deg,transparent 50%,#00a86b 50%),linear-gradient(135deg,#00a86b 50%,transparent 50%),linear-gradient(180deg,#ffffff,#f4f8fc);background-position:right 8px center,calc(100% - 24px) calc(50% - 3px),calc(100% - 18px) calc(50% - 3px),0 0;background-size:32px 32px,6px 6px,6px 6px,100% 100%;background-repeat:no-repeat}
+.report-select option{color:#163554;background:#ffffff}
+.report-date-row{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr auto;gap:10px;width:100%;align-items:center}
+.report-date-field{position:relative;z-index:80}
+.report-date-btn{width:100%;min-height:46px;border:none;border-radius:13px;padding:0 46px 0 14px;background:linear-gradient(180deg,#ffffff,#f4f8fc);box-shadow:0 8px 16px rgba(16,40,67,.05);border:1px solid rgba(22,53,84,.12);display:flex;align-items:center;justify-content:center;color:#163554;font-size:13px;font-weight:700;cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .18s;position:relative}
+.report-date-btn:hover{border-color:rgba(0,168,107,.28)}
+.report-date-btn:focus{outline:none;border-color:rgba(0,168,107,.45);box-shadow:0 0 0 4px rgba(0,168,107,.10),0 16px 28px rgba(16,40,67,.08);transform:translateY(-1px)}
+.report-date-btn i{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#2f6287;font-size:12px;pointer-events:none;z-index:2}
+.report-date-btn::after{content:'';position:absolute;right:7px;top:7px;bottom:7px;width:32px;border-radius:11px;background:linear-gradient(180deg,rgba(0,168,107,.12),rgba(39,113,255,.08));pointer-events:none}
+.report-date-label{position:relative;z-index:1}
+.report-date-dropdown{position:relative;z-index:90}
+.report-date-menu{position:absolute;left:0;top:calc(100% + 8px);width:286px;padding:12px;background:linear-gradient(180deg,#ffffff,#eff6fb);border:1px solid rgba(22,53,84,.12);border-radius:16px;box-shadow:0 18px 36px rgba(11,30,51,.14);display:none;z-index:500}
+.report-date-dropdown.open .report-date-menu{display:block}
+.report-date-reset{min-width:42px;height:42px;border:none;border-radius:12px;background:linear-gradient(180deg,#f3f7fb,#e8f1f9);border:1px solid rgba(22,53,84,.10);box-shadow:0 8px 16px rgba(16,40,67,.04);display:flex;align-items:center;justify-content:center;color:#4f667d;cursor:pointer;transition:all .16s}
+.report-date-reset:hover{color:#0b1e33;border-color:rgba(0,168,107,.28);transform:translateY(-1px)}
+.report-cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.report-cal-title{font-size:13px;font-weight:800;color:#163554}
+.report-cal-nav{width:32px;height:32px;border:none;border-radius:10px;background:linear-gradient(180deg,#f4f8fc,#e8f1f9);border:1px solid rgba(22,53,84,.10);color:#163554;cursor:pointer}
+.report-cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.report-cal-week span{font-size:10px;font-weight:800;color:#7a8ea3;text-align:center;text-transform:uppercase}
+.report-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.report-cal-day{height:34px;border:none;border-radius:10px;background:transparent;color:#163554;font-size:12px;font-weight:700;cursor:pointer;transition:all .16s}
+.report-cal-day:hover{background:rgba(0,168,107,.08);color:#0b1e33}
+.report-cal-day.muted{color:#9db0c1}
+.report-cal-day.today{box-shadow:inset 0 0 0 1px rgba(0,168,107,.24)}
+.report-cal-day.on{background:linear-gradient(135deg,rgba(0,168,107,.14),rgba(39,113,255,.10));color:#0b1e33}
+.report-filter-box .analytics-tabs{position:relative;z-index:1}
+.report-filter-box .analytics-tabs.light .analytics-tab{min-width:0;flex:1;justify-content:center;text-align:center;min-height:40px;font-size:10px;border-radius:13px;padding:0 10px}
+.report-filter-box .analytics-tabs.light{align-items:center;justify-content:center;width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.report-filter-box .analytics-tabs.light .analytics-tab span{display:block;line-height:1}
+.report-filter-control{position:relative;z-index:3;flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:46px}
+.report-dropdown{position:relative;z-index:120;width:100%}
+.report-dropdown-btn{width:100%;min-height:46px;border:none;border-radius:13px;padding:0 52px 0 16px;background:linear-gradient(180deg,#ffffff,#f4f8fc);box-shadow:0 8px 16px rgba(16,40,67,.05);border:1px solid rgba(22,53,84,.12);display:flex;align-items:center;justify-content:center;gap:10px;color:#163554;font-size:13px;font-weight:700;cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .18s}
+.report-dropdown-btn:hover{border-color:rgba(0,168,107,.28)}
+.report-dropdown-btn:focus{outline:none;border-color:rgba(0,168,107,.45);box-shadow:0 0 0 4px rgba(0,168,107,.10),0 16px 28px rgba(16,40,67,.08);transform:translateY(-1px)}
+.report-dropdown-btn::after{content:'';position:absolute;right:8px;top:7px;bottom:7px;width:32px;border-radius:11px;background:linear-gradient(180deg,rgba(0,168,107,.12),rgba(39,113,255,.08))}
+.report-dropdown-btn::before{content:'';position:absolute;right:20px;top:50%;transform:translateY(-45%) rotate(45deg);width:7px;height:7px;border-right:2px solid #00a86b;border-bottom:2px solid #00a86b;z-index:1;transition:transform .18s}
+.report-dropdown.open .report-dropdown-btn::before{transform:translateY(-30%) rotate(225deg)}
+.report-dropdown-label{position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.report-dropdown-menu{position:absolute;left:0;right:0;top:calc(100% + 8px);padding:8px;background:linear-gradient(180deg,#ffffff,#eff6fb);border:1px solid rgba(22,53,84,.12);border-radius:16px;box-shadow:0 18px 36px rgba(11,30,51,.14);display:none;max-height:260px;overflow:auto;z-index:400}
+.report-dropdown.open .report-dropdown-menu{display:block}
+.report-dropdown-option{width:100%;border:none;background:transparent;padding:12px 14px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#163554;font-size:14px;font-weight:600;text-align:left;cursor:pointer;transition:background .15s,color .15s,transform .15s}
+.report-dropdown-option:hover{background:rgba(0,168,107,.08);color:#0b1e33;transform:translateX(2px)}
+.report-dropdown-option.on{background:linear-gradient(135deg,rgba(0,168,107,.12),rgba(39,113,255,.10));color:#0b1e33}
+.report-dropdown-option.on::after{content:'';width:8px;height:8px;border-radius:50%;background:#00a86b;box-shadow:0 0 10px rgba(0,168,107,.35)}
 /* Ticket list items */
 .tli{display:flex;align-items:center;gap:11px;padding:11px 18px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
 .tli:last-child{border-bottom:none}
@@ -155,6 +245,24 @@ button{cursor:pointer}
 .ttw{min-width:0}
 .ttt{font-size:13px;font-weight:600;color:var(--nv);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ttc{font-size:11px;color:var(--mu);margin-top:1px}
+.ticket-inline-select{width:100%;min-width:0;height:32px;padding:0 28px 0 10px;border:1px solid rgba(22,53,84,.10);border-radius:999px;background:linear-gradient(180deg,#ffffff,#f4f8fc);font-size:11px;font-weight:700;color:#28445f;appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color .15s,box-shadow .15s,background-color .15s,color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.ticket-inline-select:hover,.ticket-inline-select:focus{box-shadow:0 0 0 3px rgba(0,168,107,.08)}
+.ticket-inline-select.status-open,.ticket-side-select.status-open{border-color:rgba(255,152,0,.22);background-color:rgba(255,152,0,.045)}
+.ticket-inline-select.status-progress,.ticket-side-select.status-progress{border-color:rgba(156,39,176,.22);background-color:rgba(156,39,176,.045)}
+.ticket-inline-select.status-done,.ticket-side-select.status-done{border-color:rgba(0,168,107,.22);background-color:rgba(0,168,107,.045)}
+.ticket-inline-select.status-closed,.ticket-side-select.status-closed{border-color:rgba(120,144,156,.24);background-color:rgba(120,144,156,.05)}
+.ticket-inline-select.priority-low,.ticket-side-select.priority-low{border-color:rgba(120,144,156,.24);background-color:rgba(120,144,156,.05)}
+.ticket-inline-select.priority-normal,.ticket-side-select.priority-normal{border-color:rgba(66,165,245,.22);background-color:rgba(66,165,245,.045)}
+.ticket-inline-select.priority-high,.ticket-side-select.priority-high{border-color:rgba(255,122,26,.22);background-color:rgba(255,122,26,.045)}
+.ticket-inline-select.priority-critical,.ticket-side-select.priority-critical{border-color:rgba(229,57,53,.22);background-color:rgba(229,57,53,.045)}
+.ticket-inline-select.status-open:hover,.ticket-inline-select.status-open:focus,.ticket-side-select.status-open:hover,.ticket-side-select.status-open:focus{border-color:rgba(255,152,0,.45);background-image:linear-gradient(180deg,rgba(255,152,0,.06),rgba(255,152,0,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.status-progress:hover,.ticket-inline-select.status-progress:focus,.ticket-side-select.status-progress:hover,.ticket-side-select.status-progress:focus{border-color:rgba(156,39,176,.45);background-image:linear-gradient(180deg,rgba(156,39,176,.06),rgba(156,39,176,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.status-done:hover,.ticket-inline-select.status-done:focus,.ticket-side-select.status-done:hover,.ticket-side-select.status-done:focus{border-color:rgba(0,168,107,.45);background-image:linear-gradient(180deg,rgba(0,168,107,.06),rgba(0,168,107,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.status-closed:hover,.ticket-inline-select.status-closed:focus,.ticket-side-select.status-closed:hover,.ticket-side-select.status-closed:focus{border-color:rgba(120,144,156,.45);background-image:linear-gradient(180deg,rgba(120,144,156,.06),rgba(120,144,156,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.priority-low:hover,.ticket-inline-select.priority-low:focus,.ticket-side-select.priority-low:hover,.ticket-side-select.priority-low:focus{border-color:rgba(120,144,156,.45);background-image:linear-gradient(180deg,rgba(120,144,156,.06),rgba(120,144,156,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.priority-normal:hover,.ticket-inline-select.priority-normal:focus,.ticket-side-select.priority-normal:hover,.ticket-side-select.priority-normal:focus{border-color:rgba(66,165,245,.45);background-image:linear-gradient(180deg,rgba(66,165,245,.06),rgba(66,165,245,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.priority-high:hover,.ticket-inline-select.priority-high:focus,.ticket-side-select.priority-high:hover,.ticket-side-select.priority-high:focus{border-color:rgba(255,122,26,.45);background-image:linear-gradient(180deg,rgba(255,122,26,.06),rgba(255,122,26,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
+.ticket-inline-select.priority-critical:hover,.ticket-inline-select.priority-critical:focus,.ticket-side-select.priority-critical:hover,.ticket-side-select.priority-critical:focus{border-color:rgba(229,57,53,.45);background-image:linear-gradient(180deg,rgba(229,57,53,.06),rgba(229,57,53,.03)),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:0 0,right 10px center;background-size:100% 100%,10px 6px}
 .tas{display:flex;align-items:center;gap:6px}
 .taa{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--nv),var(--nv2));display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
 /* Chat view */
@@ -165,10 +273,27 @@ button{cursor:pointer}
 .cr{display:flex;justify-content:space-between;margin-bottom:8px}
 .cr:last-child{margin-bottom:0}
 .ck{font-size:12px;color:var(--mu)}.cv{font-size:12px;font-weight:600;color:var(--nv);text-align:right;max-width:140px}
+.cv.editable{max-width:156px}
+.ticket-side-select{width:100%;height:34px;padding:0 30px 0 11px;border:1px solid rgba(22,53,84,.10);border-radius:11px;background:linear-gradient(180deg,#ffffff,#f4f8fc);font-size:12px;font-weight:700;color:#28445f;appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color .15s,box-shadow .15s,background-color .15s,color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a7a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center}
+.ticket-side-select:hover,.ticket-side-select:focus{box-shadow:0 0 0 3px rgba(0,168,107,.08)}
 .cen{display:flex;align-items:center;gap:9px;background:var(--bg);border-radius:8px;padding:9px 11px}
 .cea{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--nv),var(--nv2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
 .cen2{font-size:13px;font-weight:600;color:var(--nv)}.cer{font-size:11px;color:var(--mu)}
 .ced{width:7px;height:7px;border-radius:50%;background:var(--gr);flex-shrink:0}
+.assign-wrap{margin-top:12px}
+.assign-label{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.history-actions{display:flex;justify-content:flex-end;margin-bottom:10px}
+.history-more{padding:6px 10px;border-radius:999px;border:1px solid var(--bd);background:var(--bg);font-size:11px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .15s}
+.history-more:hover{border-color:var(--gr);color:var(--gr)}
+.history-empty{font-size:12px;color:var(--mu);padding:8px 0}
+.history-modal{position:fixed;inset:0;background:rgba(7,18,33,.45);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9500}
+.history-modal.on{display:flex}
+.history-panel{width:min(680px,calc(100vw - 40px));max-height:min(80vh,760px);background:var(--wh);border:1px solid var(--bd);border-radius:20px;box-shadow:0 26px 56px rgba(11,30,51,.24);overflow:hidden;display:flex;flex-direction:column}
+.history-panel-head{padding:18px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.history-panel-title{font-size:16px;font-weight:800;color:var(--nv);font-family:'Montserrat',sans-serif}
+.history-panel-body{padding:18px 20px;overflow-y:auto;background:linear-gradient(180deg,#f8fbff,#f2f6fb)}
+.history-close{width:34px;height:34px;border-radius:50%;border:1px solid var(--bd);background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--mu);cursor:pointer}
+.history-close:hover{border-color:var(--gr);color:var(--gr)}
 .tl{display:flex;gap:11px;margin-bottom:12px}
 .tll{display:flex;flex-direction:column;align-items:center}
 .tld{width:9px;height:9px;border-radius:50%;border:2px solid var(--gr);flex-shrink:0;background:var(--wh)}
@@ -270,7 +395,7 @@ button{cursor:pointer}
 @media(max-width:800px){.sb{display:none}.tth,.ttr{grid-template-columns:55px 1fr 110px 70px}.ci{display:none}}
 body.compact-portal #asc .act:nth-child(2),body.compact-portal #fR{display:none!important}
 body.compact-portal #app{display:flex}
-body.compact-portal .sb,body.compact-portal .tbr,body.compact-portal #v-tix,body.compact-portal #v-chat,body.compact-portal #v-new{display:none!important}
+body.compact-portal .sb,body.compact-portal .tbr,body.compact-portal #v-tix,body.compact-portal #v-chat,body.compact-portal #v-new,body.compact-portal #v-reports{display:none!important}
 body.compact-portal .tb{height:auto;padding:14px 16px}
 body.compact-portal .mn{width:100%}
 body.compact-portal #v-dash{display:flex!important}
@@ -309,14 +434,41 @@ body.compact-portal .compact-support{display:grid;gap:14px}
 .adm-grid.one{grid-template-columns:1fr}
 .adm-note{font-size:12px;color:var(--mu);line-height:1.6}
 .adm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
-.adm-list{display:flex;flex-direction:column;gap:0}
-.adm-user{display:grid;grid-template-columns:minmax(0,1.1fr) 180px 150px;gap:12px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--bd)}
-.adm-user:last-child{border-bottom:none}
+.adm-list{display:flex;flex-direction:column;gap:10px;padding:10px;background:linear-gradient(180deg,rgba(15,45,74,.08),rgba(11,30,51,.04))}
+.adm-user{display:grid;grid-template-columns:minmax(260px,1.4fr) 170px 130px 150px;gap:12px;align-items:center;padding:14px 16px;border:1px solid rgba(11,30,51,.08);border-radius:12px;background:var(--wh);box-shadow:0 6px 18px rgba(11,30,51,.04);transition:border-color .18s,box-shadow .18s,transform .18s}
+.adm-user:hover{border-color:rgba(0,168,107,.28);box-shadow:0 10px 24px rgba(11,30,51,.08);transform:translateY(-1px)}
 .adm-user-main{min-width:0}
 .adm-user-name{font-size:13px;font-weight:700;color:var(--nv)}
 .adm-user-meta{font-size:11px;color:var(--mu);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.adm-user-role select,.adm-user-title input,.adm-form input,.adm-form select{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--wh);font-size:13px;color:var(--tx)}
-.adm-user-role select:focus,.adm-user-title input:focus,.adm-form input:focus,.adm-form select:focus{border-color:var(--gr)}
+.adm-user-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.adm-mini{
+  position:relative;display:inline-flex;align-items:center;gap:7px;padding:6px 10px 6px 8px;border-radius:999px;
+  font-size:10px;font-weight:800;letter-spacing:.2px;border:1px solid transparent;overflow:hidden
+}
+.adm-mini::before{
+  content:'';position:absolute;inset:0;opacity:.9;
+  background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 55%);
+  pointer-events:none
+}
+.adm-mini i{font-size:11px}
+.adm-mini span{font-size:9px;font-weight:700;opacity:.82;text-transform:uppercase;letter-spacing:.55px}
+.adm-mini b{font-size:11px;font-weight:900}
+.adm-mini.green{
+  background:linear-gradient(135deg,rgba(0,168,107,.16),rgba(0,168,107,.07));
+  color:var(--gr);border-color:rgba(0,168,107,.16);box-shadow:0 6px 16px rgba(0,168,107,.12)
+}
+.adm-mini.yellow{
+  background:linear-gradient(135deg,rgba(255,193,7,.18),rgba(255,193,7,.08));
+  color:#a26a00;border-color:rgba(255,193,7,.18);box-shadow:0 6px 16px rgba(255,193,7,.12)
+}
+.adm-user-actions{display:flex;justify-content:flex-end}
+.adm-user-summary{font-size:12px;font-weight:700;color:var(--nv)}
+.adm-user-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700}
+.adm-user-status::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.adm-user-status.active{color:var(--gr)}
+.adm-user-status.dismissed{color:var(--rd)}
+.adm-user-name input,.adm-user-role select,.adm-user-title input,.adm-form input,.adm-form select{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--wh);font-size:13px;color:var(--tx)}
+.adm-user-name input:focus,.adm-user-role select:focus,.adm-user-title input:focus,.adm-form input:focus,.adm-form select:focus{border-color:var(--gr)}
 .perm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .perm-role{border:1px solid var(--bd);border-radius:12px;background:var(--bg);overflow:hidden}
 .perm-role-head{padding:12px 14px;border-bottom:1px solid var(--bd);background:var(--wh)}
@@ -326,11 +478,64 @@ body.compact-portal .compact-support{display:grid;gap:14px}
 .perm-check{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--tx)}
 .perm-check input{margin-top:2px}
 .adm-empty{padding:28px;text-align:center;color:var(--mu);font-size:13px}
-.lc-wrap{display:grid;grid-template-columns:320px 1fr;gap:18px;height:100%}
+.company-wrap{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;width:100%;align-items:start}
+.company-stack{display:flex;flex-direction:column;gap:18px}
+.company-toolbar{display:flex;justify-content:flex-end;gap:10px;margin-bottom:16px}
+.company-card{background:var(--wh);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.company-head{padding:15px 18px;border-bottom:1px solid var(--bd);font-size:14px;font-weight:700;color:var(--nv);font-family:'Montserrat',sans-serif}
+.company-body{padding:18px}
+.list-filter-bar{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(11,30,51,.08);background:rgba(255,255,255,.78);backdrop-filter:blur(6px)}
+.list-filter-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mu);white-space:nowrap}
+.list-filter-input{flex:1;min-width:0;padding:9px 12px;border:1px solid rgba(11,30,51,.12);border-radius:10px;background:var(--wh);font-size:12px;color:var(--nv)}
+.list-filter-input:focus{border-color:var(--gr);box-shadow:0 0 0 4px rgba(0,168,107,.08)}
+.list-filter-clear{padding:9px 12px;border-radius:10px;border:1px solid rgba(11,30,51,.12);background:var(--wh);font-size:12px;font-weight:700;color:var(--mu);cursor:pointer;transition:all .15s}
+.list-filter-clear:hover{border-color:var(--gr);color:var(--gr)}
+.company-list{display:flex;flex-direction:column;gap:10px;padding:10px;background:linear-gradient(180deg,rgba(15,45,74,.08),rgba(11,30,51,.04))}
+.company-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(11,30,51,.08);border-radius:12px;background:var(--wh);cursor:pointer;transition:background .15s,border-color .18s,box-shadow .18s,transform .18s;box-shadow:0 6px 18px rgba(11,30,51,.04)}
+.company-item:hover,.company-item.on{background:rgba(0,168,107,.05);border-color:rgba(0,168,107,.28);box-shadow:0 10px 24px rgba(11,30,51,.08);transform:translateY(-1px)}
+.company-item-main{flex:1;min-width:0}
+.company-item-name{font-size:13px;font-weight:700;color:var(--nv)}
+.company-item-meta{font-size:11px;color:var(--mu);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.company-item-date{font-size:10px;color:var(--mu);margin-top:6px}
+.company-status{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.company-status::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.company-status.active{background:rgba(0,168,107,.1);color:var(--gr)}
+.company-status.inactive{background:rgba(229,57,53,.1);color:var(--rd)}
+.company-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.company-stat{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.company-stat-label{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px}
+.company-stat-value{font-size:24px;font-weight:800;color:var(--nv);font-family:'Montserrat',sans-serif;margin-top:6px}
+.company-kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.company-kv:last-child{border-bottom:none}
+.company-k{font-size:12px;color:var(--mu)}
+.company-v{font-size:13px;font-weight:700;color:var(--nv);text-align:right}
+.company-v.status-wrap{display:flex;justify-content:flex-end}
+.company-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.company-form.one{grid-template-columns:1fr}
+.company-card.disabled{opacity:.58}
+.company-card.disabled .company-body{pointer-events:none}
+.company-report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.company-report-table{display:flex;flex-direction:column}
+.company-report-row{display:grid;grid-template-columns:minmax(0,1fr) 90px 120px;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bd)}
+.company-report-row:last-child{border-bottom:none}
+.company-report-name{font-size:13px;font-weight:700;color:var(--nv)}
+.company-report-sub{font-size:11px;color:var(--mu);margin-top:3px}
+.company-report-num{font-size:12px;font-weight:700;color:var(--nv);text-align:right}
+.company-badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:rgba(0,168,107,.08);color:var(--gr);font-size:11px;font-weight:700}
+.company-report-section{margin-top:18px}
+.company-report-section:first-child{margin-top:0}
+.lc-wrap{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;height:100%;width:100%;align-items:start}
 .lc-list,.lc-panel{background:var(--wh);border:1px solid var(--bd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.lc-list{background:linear-gradient(180deg,rgba(15,45,74,.08),rgba(11,30,51,.04))}
+.company-wrap > .company-stack,.lc-wrap > *{min-width:0}
 .lc-list-body{overflow-y:auto;flex:1}
-.lc-item{padding:14px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
-.lc-item:hover,.lc-item.on{background:rgba(0,168,107,.05)}
+.lc-item{padding:14px 16px;border:1px solid rgba(11,30,51,.08);border-radius:12px;background:var(--wh);cursor:pointer;transition:background .15s,border-color .18s,box-shadow .18s,transform .18s;box-shadow:0 6px 18px rgba(11,30,51,.04);margin:10px}
+.lc-item:hover,.lc-item.on{background:rgba(0,168,107,.05);border-color:rgba(0,168,107,.28);box-shadow:0 10px 24px rgba(11,30,51,.08);transform:translateY(-1px)}
+.lc-name{font-size:13px;font-weight:700;color:var(--nv);margin-bottom:4px}
+.lc-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--mu);margin-bottom:6px}
+.lc-meta span{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:rgba(11,30,51,.05)}
+.lc-preview{font-size:12px;color:var(--tx);line-height:1.45}
+.lc-date{font-size:10px;color:var(--mu);margin-top:8px}
 .lc-name{font-size:13px;font-weight:700;color:var(--nv)}
 .lc-meta{font-size:11px;color:var(--mu);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
 .lc-preview{font-size:12px;color:var(--tx);margin-top:7px;line-height:1.45}
@@ -350,6 +555,9 @@ body.compact-portal .compact-support{display:grid;gap:14px}
 .lc-compose textarea:focus{border-color:var(--gr)}
 @media(max-width:800px){.lc-wrap{grid-template-columns:1fr}}
 @media(max-width:800px){.adm-wrap{grid-template-columns:1fr}.adm-user{grid-template-columns:1fr}.adm-grid{grid-template-columns:1fr}}
+@media(max-width:1080px){.analytics-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.company-wrap,.dg,.report-filter-grid{grid-template-columns:1fr}.company-meta,.company-report-grid,.company-form{grid-template-columns:1fr}.company-report-row,.report-date-row{grid-template-columns:1fr}}
+@keyframes analyticsFlow{from{stroke-dashoffset:0}to{stroke-dashoffset:-160}}
 #asc .act:nth-child(2),#fR{display:none!important}
 </style>
 </head>
@@ -357,69 +565,78 @@ body.compact-portal .compact-support{display:grid;gap:14px}
 <div id="asc">
   <div class="ag"></div>
   <div class="ac">
-    <div class="acl"><div class="aclm">З</div>Зона<span> ИТ</span><small style="margin-left:6px">Портал поддержки</small></div>
+    <div class="acl"><div class="aclm">Z</div>Зона <span>ИТ</span><small style="margin-left:6px">Портал поддержки</small></div>
     <div class="actb">
-      <div class="act on" onclick="aTab('l',this)">Войти</div>
+      <div class="act on" onclick="aTab('l',this)">Вход</div>
       <div class="act" onclick="aTab('r',this)">Регистрация</div>
     </div>
     <div id="fL">
       <div class="acf"><label>Email</label><input type="email" id="lEm" placeholder="your@company.ru" value="demo@company.ru"></div>
       <div class="acf"><label>Пароль</label><input type="password" id="lPw" placeholder="..." value="demo1234" onkeypress="if(event.key==='Enter')dL()"></div>
-      <button class="acb" onclick="dL()"><i class="fas fa-sign-in-alt"></i>Войти</button>
+
+      <button class="acb" onclick="dL()"><i class="fas fa-sign-in-alt"></i> Войти</button>
     </div>
     <div id="fR" style="display:none">
       <div class="acf"><label>Имя *</label><input type="text" id="rNm" placeholder="Иван Иванов"></div>
       <div class="acf"><label>Компания</label><input type="text" id="rCo" placeholder="ООО Компания"></div>
       <div class="acf"><label>Email *</label><input type="email" id="rEm" placeholder="your@company.ru"></div>
       <div class="acf"><label>Пароль *</label><input type="password" id="rPw" placeholder="Минимум 6 символов" onkeypress="if(event.key==='Enter')dR()"></div>
-      <button class="acb" onclick="dR()"><i class="fas fa-user-plus"></i>Создать аккаунт</button>
+
+      <button class="acb" onclick="dR()"><i class="fas fa-user-plus"></i> Создать аккаунт</button>
+
     </div>
     <div class="ace" id="acE"></div>
-    <div class="ach">Доступ в портал выдается администратором.</div>
-    <div class="ach">Демо: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2c484941436c4f43415c4d4255025e59">[email&#160;protected]</a> / demo1234</div>
+    <div class="ach">Нужен доступ в портал поддержки? Обратитесь к администратору вашей компании.</div>
+    <div class="ach">Демо: demo@company.ru / demo1234</div>
   </div>
   <div class="lb">
     <div class="ld"></div>
-    <div class="li"><b id="lvE">5</b> инженеров онлайн</div>
+    <div class="li"><b id="lvE">5</b> инженеров на линии</div>
     <div class="ls"></div>
-    <div class="li">Ответ через <b id="lvT">2 мин</b></div>
+    <div class="li">Активных тикетов <b id="lvT">2 шт.</b></div>
     <div class="ls"></div>
-    <div class="li">Запрос <b id="lvL">30 сек назад</b></div>
+    <div class="li">Среднее время ответа <b id="lvL">30 минут</b></div>
   </div>
 </div>
 
 <div id="app">
   <aside class="sb">
     <div class="sbt">
-      <div class="sbl"><div class="sblm">З</div><div>Зона<span> ИТ</span><small>Портал поддержки</small></div></div>
+      <div class="sbl"><div class="sblm">Z</div><div>Зона <span>ИТ</span><small>Портал поддержки</small></div></div>
       <div class="sw">
         <div class="swh"><div class="swp"></div><span class="swl">Поддержка онлайн</span></div>
         <div class="swr"><span class="swk">Инженеров</span><span class="swv g" id="swE">5</span></div>
-        <div class="swr"><span class="swk">Время ответа</span><span class="swv" id="swT">2 мин</span></div>
-        <div class="swr"><span class="swk">Посл. запрос</span><span class="swv" id="swL">30 сек</span></div>
+        <div class="swr"><span class="swk">Активные тикеты</span><span class="swv" id="swT">2 шт.</span></div>
+        <div class="swr"><span class="swk">Среднее время ответа</span><span class="swv" id="swL">30 мин</span></div>
         <div class="swe" id="swEs"></div>
       </div>
     </div>
     <nav class="sbn">
-      <div class="ns">Главное</div>
-      <div class="ni on" onclick="sV('dash',this)"><i class="fas fa-th-large"></i>Дашборд</div>
-      <div class="ni" onclick="sV('tix',this)"><i class="fas fa-ticket-alt"></i>Мои тикеты<span class="nbg" id="nb" style="display:none">0</span></div>
-      <div class="ni" onclick="sV('new',this)"><i class="fas fa-plus-circle"></i>Новый тикет</div>
-      <div class="ni" id="navLiveChat" onclick="sV('livechat',this)" style="display:none"><i class="fas fa-headset"></i>Чаты сайта<span class="nbg" id="liveChatBadge" style="display:none">0</span></div>
-      <div class="ni" id="navAdmin" onclick="sV('admin',this)" style="display:none"><i class="fas fa-user-shield"></i>Администрирование</div>
+      <div class="ns">Меню</div>
+      <div class="ni on" onclick="sV('dash',this)"><i class="fas fa-th-large"></i> Дашборд</div>
+      <div class="ni" onclick="sV('tix',this)"><i class="fas fa-ticket-alt"></i> Тикеты<span class="nbg" id="nb" style="display:none">0</span></div>
+      <div class="ni" onclick="sV('new',this)"><i class="fas fa-plus-circle"></i> Новый тикет</div>
+      <div class="ni" id="navReports" onclick="sV('reports',this)" style="display:none"><i class="fas fa-chart-line"></i> Отчет по заявкам</div>
+      <div class="ni" id="navCompanies" onclick="sV('company',this)" style="display:none"><i class="fas fa-building"></i> Компании</div>
+      <div class="ni" id="navLiveChat" onclick="sV('livechat',this)" style="display:none"><i class="fas fa-headset"></i> Чаты сайта<span class="nbg" id="liveChatBadge" style="display:none">0</span></div>
+      <div class="ni" id="navAdmin" onclick="sV('admin',this)" style="display:none"><i class="fas fa-user-shield"></i> Администрирование</div>
     </nav>
     <div class="sbu" onclick="dLo()">
-      <div class="sbua" id="sbA">ИИ</div>
-      <div class="sbui"><div class="sbun" id="sbN">Пользователь</div><div class="sbuc" id="sbC"></div></div>
+      <div class="sbua" id="sbA">ZI</div>
+      <div class="sbui"><div class="sbun" id="sbN">Пользователь портала</div><div class="sbuc" id="sbC"></div></div>
+
+
       <i class="fas fa-sign-out-alt" style="color:rgba(255,255,255,.25);font-size:13px" title="Выйти"></i>
     </div>
   </aside>
 
   <div class="mn">
     <div class="tb">
-      <div><div class="tbt" id="tbT">Дашборд</div><div style="font-size:11px;color:var(--mu)" id="tbS">Добро пожаловать</div></div>
+      <div><div class="tbt" id="tbT">Дашборд</div><div style="font-size:11px;color:var(--mu)" id="tbS">Общий обзор заявок и активности поддержки</div></div>
+
       <div class="tbr">
-        <button class="tbb tbg" onclick="sV('new',null)"><i class="fas fa-plus"></i>Новый тикет</button>
+        <button class="tbb tbg" id="reportLaunchBtn" onclick="sV('reports',document.getElementById('navReports'))" style="display:none"><i class="fas fa-chart-line"></i> Отчет по заявкам</button>
+        <button class="tbb tbg" onclick="sV('new',null)"><i class="fas fa-plus"></i> Новый тикет</button>
       </div>
     </div>
 
@@ -427,10 +644,10 @@ body.compact-portal .compact-support{display:grid;gap:14px}
     <div id="v-dash" class="vw on">
       <div class="vs">
         <div class="sg">
-          <div class="sc" style="--ac:#FF9800"><div class="sci" style="background:rgba(255,152,0,.1);color:#FF9800"><i class="fas fa-fire"></i></div><div class="scn" style="color:#FF9800" id="stO">0</div><div class="scl">Открытых</div></div>
+          <div class="sc" style="--ac:#FF9800"><div class="sci" style="background:rgba(255,152,0,.1);color:#FF9800"><i class="fas fa-fire"></i></div><div class="scn" style="color:#FF9800" id="stO">0</div><div class="scl">Открытые</div></div>
           <div class="sc" style="--ac:#9C27B0"><div class="sci" style="background:rgba(156,39,176,.1);color:#9C27B0"><i class="fas fa-spinner"></i></div><div class="scn" style="color:#9C27B0" id="stP">0</div><div class="scl">В работе</div></div>
-          <div class="sc" style="--ac:var(--gr)"><div class="sci" style="background:rgba(0,168,107,.1);color:var(--gr)"><i class="fas fa-check-circle"></i></div><div class="scn" style="color:var(--gr)" id="stD">0</div><div class="scl">Решено</div></div>
-          <div class="sc" style="--ac:var(--nv)"><div class="sci" style="background:rgba(11,30,51,.07);color:var(--nv)"><i class="fas fa-clock"></i></div><div class="scn" style="color:var(--nv)">47 мин</div><div class="scl">Ср. время решения</div></div>
+          <div class="sc" style="--ac:var(--gr)"><div class="sci" style="background:rgba(0,168,107,.1);color:var(--gr)"><i class="fas fa-check-circle"></i></div><div class="scn" style="color:var(--gr)" id="stD">0</div><div class="scl">Решенные</div></div>
+          <div class="sc" style="--ac:var(--nv)"><div class="sci" style="background:rgba(11,30,51,.07);color:var(--nv)"><i class="fas fa-clock"></i></div><div class="scn" style="color:var(--nv)" id="stA">0</div><div class="scl">Всего тикетов</div></div>
         </div>
         <div class="dg">
           <div class="cd"><div class="cdh"><span class="cdt">Последние тикеты</span><span class="cdl" onclick="sV('tix',null)">Все</span></div><div id="dLst"></div></div>
@@ -438,7 +655,7 @@ body.compact-portal .compact-support{display:grid;gap:14px}
             <div class="cdh"><span class="cdt">Команда поддержки</span></div>
             <div style="padding:0 18px">
               <div class="mr"><span class="mk">Инженеров</span><span class="mv g" id="mE">5/8</span></div>
-              <div class="mr"><span class="mk">Ср. ответ</span><span class="mv" id="mT">2 мин</span></div>
+              <div class="mr"><span class="mk">Откр. тикеты</span><span class="mv" id="mT">2 шт.</span></div>
               <div class="mr"><span class="mk">В работе</span><span class="mv" id="mW">0</span></div>
             </div>
             <div style="padding:8px 18px 14px" id="eLst"></div>
@@ -450,7 +667,7 @@ body.compact-portal .compact-support{display:grid;gap:14px}
             <div class="compact-recent" id="compactRecent"></div>
           </div>
           <div class="compact-card">
-            <div class="compact-head"><span id="compactChatTitle">Новая проблема</span><span id="compactChatState" class="bg b-op" style="display:none"></span></div>
+            <div class="compact-head"><span id="compactChatTitle">Быстрый запрос</span><span id="compactChatState" class="bg b-op" style="display:none"></span></div>
             <div class="compact-priority" id="compactPriority">
               <button class="on" type="button" onclick="setCompactPriority(this,'normal')">Не срочно</button>
               <button type="button" onclick="setCompactPriority(this,'high')">Срочно</button>
@@ -458,8 +675,9 @@ body.compact-portal .compact-support{display:grid;gap:14px}
             </div>
             <div class="compact-msgs" id="compactMsgs"></div>
             <div class="compact-compose">
-              <textarea id="compactInput" placeholder="Опишите проблему. Если тикет уже открыт, сообщение уйдет прямо в чат с инженером."></textarea>
+              <textarea id="compactInput" placeholder="Опишите проблему. Первый ответ создаст тикет, а дальше вы сможете общаться с инженером прямо здесь."></textarea>
               <button class="send" type="button" onclick="sendCompactMessage()">Отправить</button>
+
             </div>
           </div>
         </div>
@@ -474,14 +692,15 @@ body.compact-portal .compact-support{display:grid;gap:14px}
           <div class="ch on" onclick="fSt('all',this)">Все</div>
           <div class="ch" onclick="fSt('open',this)">Открытые</div>
           <div class="ch" onclick="fSt('progress',this)">В работе</div>
-          <div class="ch" onclick="fSt('done',this)">Решённые</div>
+          <div class="ch" onclick="fSt('done',this)">Решенные</div>
           <div class="ch" onclick="fSt('closed',this)">Закрытые</div>
         </div>
       </div>
       <div class="tt">
         <div class="tth">
           <div class="tth2">Номер</div><div class="tth2">Тема</div><div class="tth2">Статус</div>
-          <div class="tth2">Приоритет</div><div class="tth2">Исполнитель</div><div class="tth2">Обновлено</div>
+          <div class="tth2">Приоритет</div><div class="tth2">Последнее обновление</div>
+          <div class="tth2">Исполнитель</div>
         </div>
         <div id="tBody"></div>
       </div>
@@ -493,15 +712,20 @@ body.compact-portal .compact-support{display:grid;gap:14px}
         <div class="ci">
           <div class="cs"><div class="csl">Тикет</div>
             <div class="cr"><span class="ck">Номер</span><span class="cv" id="ciN">#0001</span></div>
-            <div class="cr"><span class="ck">Статус</span><span class="cv" id="ciS"></span></div>
-            <div class="cr"><span class="ck">Приоритет</span><span class="cv" id="ciP"></span></div>
+            <div class="cr"><span class="ck">Статус</span><span class="cv editable" id="ciS"></span></div>
+            <div class="cr"><span class="ck">Приоритет</span><span class="cv editable" id="ciP"></span></div>
             <div class="cr"><span class="ck">Категория</span><span class="cv" id="ciC"></span></div>
             <div class="cr"><span class="ck">Создан</span><span class="cv" id="ciD"></span></div>
           </div>
-          <div class="cs"><div class="csl">Исполнитель</div>
-            <div class="cen"><div class="cea" id="ciEA">АС</div><div style="flex:1"><div class="cen2" id="ciEN"></div><div class="cer" id="ciER"></div></div><div class="ced"></div></div>
+          <div class="cs"><div class="csl">Последнее обновление</div>
+
+            <div class="cen"><div class="cea" id="ciEA">ИТ</div><div style="flex:1"><div class="cen2" id="ciEN"></div><div class="cer" id="ciER"></div></div><div class="ced"></div></div>
+            <div class="assign-wrap" id="ciAssignWrap" style="display:none">
+              <div class="assign-label">Исполнитель</div>
+              <div id="ciAssign"></div>
+            </div>
           </div>
-          <div class="cs" style="border-bottom:none"><div class="csl">История</div><div id="ciTL"></div></div>
+          <div class="cs" style="border-bottom:none"><div class="csl">История</div><div class="history-actions"><button class="history-more" type="button" id="ciHistBtn" onclick="openTicketHistoryModal()">Полная история</button></div><div id="ciTL"></div></div>
         </div>
         <div class="cm">
           <div class="chd">
@@ -509,8 +733,10 @@ body.compact-portal .compact-support{display:grid;gap:14px}
             <div class="cht" id="chT">Тикет</div>
             <div id="chB"></div>
             <div style="display:flex;gap:7px;margin-left:auto">
-              <button class="cha" onclick="cpLnk()"><i class="fas fa-link"></i>Копировать</button>
-              <button class="cha rs" id="rBtn" onclick="doRes()"><i class="fas fa-check"></i>Закрыть</button>
+              <button class="cha" onclick="cpLnk()"><i class="fas fa-link"></i> Ссылка</button>
+
+              <button class="cha rs" id="rBtn" onclick="doRes()"><i class="fas fa-check"></i> Закрыть</button>
+
             </div>
           </div>
           <div class="ms" id="msgs"></div>
@@ -534,39 +760,76 @@ body.compact-portal .compact-support{display:grid;gap:14px}
       <div class="nts">
         <div class="ntf">
           <div class="ntsec">
-            <div class="ntt"><i class="fas fa-info-circle"></i>Основная информация</div>
+            <div class="ntt"><i class="fas fa-info-circle"></i> Общая информация</div>
             <div class="fr2" style="grid-template-columns:1fr"><div class="ff"><label class="fl">Тема *</label><input class="fi" id="ntSb" placeholder="Кратко опишите проблему..."></div></div>
             <div class="fr2">
-              <div><label class="fl">Категория</label><select class="fs" id="ntCt"><option value="">Выберите...</option><option>Рабочие станции и ПК</option><option>Серверы и инфраструктура</option><option>Сетевое оборудование</option><option>1С и корпоративное ПО</option><option>Информационная безопасность</option><option>Кассы и оборудование</option><option>Другое</option></select></div>
-              <div><label class="fl">Срочность</label><select class="fs" id="ntUr"><option>Не срочно</option><option>В рабочий день</option><option selected>Мешает работе</option><option>Критично</option></select></div>
+              <div><label class="fl">Категория</label><select class="fs" id="ntCt"><option value="">Выберите...</option><option>Обслуживание рабочих мест</option><option>Серверы и инфраструктура</option><option>Сетевое оборудование</option><option>1С и бизнес-системы</option><option>Информационная безопасность</option><option>Телефония</option><option>Другое</option></select></div>
+
+              <div><label class="fl">Срочность</label><select class="fs" id="ntUr"><option>Не срочно</option><option>Важно, но не горит</option><option selected>Нужно в ближайшее время</option><option>Критично</option></select></div>
+
+
             </div>
           </div>
           <div class="ntsec">
-            <div class="ntt"><i class="fas fa-align-left"></i>Описание</div>
-            <textarea class="fta" id="ntDs" placeholder="Опишите подробно что произошло..."></textarea>
+            <div class="ntt"><i class="fas fa-align-left"></i> Описание</div>
+            <textarea class="fta" id="ntDs" placeholder="Подробно опишите проблему, симптомы и что уже пробовали сделать..."></textarea>
           </div>
           <div class="ntsec">
-            <div class="ntt"><i class="fas fa-exclamation-triangle"></i>Приоритет</div>
+            <div class="ntt"><i class="fas fa-exclamation-triangle"></i> Приоритет</div>
             <div class="pg">
               <div class="po2" data-p="low" onclick="sP(this)"><div class="pd" style="background:#78909C"></div><div class="pl2" style="color:#78909C">Низкий</div></div>
-              <div class="po2 on" data-p="normal" onclick="sP(this)"><div class="pd" style="background:#42A5F5"></div><div class="pl2" style="color:#42A5F5">Обычный</div></div>
+              <div class="po2 on" data-p="normal" onclick="sP(this)"><div class="pd" style="background:#42A5F5"></div><div class="pl2" style="color:#42A5F5">Средний</div></div>
               <div class="po2" data-p="high" onclick="sP(this)"><div class="pd" style="background:var(--or)"></div><div class="pl2" style="color:var(--or)">Высокий</div></div>
               <div class="po2" data-p="critical" onclick="sP(this)"><div class="pd" style="background:var(--rd)"></div><div class="pl2" style="color:var(--rd)">Критичный</div></div>
             </div>
           </div>
           <div class="ntsec">
-            <div class="ntt"><i class="fas fa-paperclip"></i>Вложения</div>
+            <div class="ntt"><i class="fas fa-paperclip"></i> Вложения</div>
             <div class="dz" id="dz" onclick="document.getElementById('fi-new').click()" ondragover="dzO(event)" ondragleave="dzL(event)" ondrop="dzD(event)">
               <div class="dzi"><i class="fas fa-cloud-upload-alt"></i></div>
-              <div class="dzt"><strong>Перетащите файлы сюда</strong> или нажмите для выбора<br>Изображения, видео, PDF, документы — до 50 МБ</div>
+              <div class="dzt"><strong>Перетащите файлы сюда</strong> или нажмите для выбора<br>Поддерживаются изображения, документы, PDF, архивы до 50 МБ</div>
               <div class="dzf" id="dzF"></div>
             </div>
             <input type="file" id="fi-new" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.zip,.txt" onchange="ntAddF(this.files)">
           </div>
           <div class="fa">
-            <button class="fbn fbs" onclick="sV('dash',null)"><i class="fas fa-times"></i>Отмена</button>
-            <button class="fbn fbp" onclick="sbT()"><i class="fas fa-paper-plane"></i>Создать тикет</button>
+            <button class="fbn fbs" onclick="sV('dash',null)"><i class="fas fa-times"></i> Отмена</button>
+            <button class="fbn fbp" onclick="sbT()"><i class="fas fa-paper-plane"></i> Создать тикет</button>
+
           </div>
+        </div>
+      </div>
+    </div>
+    <div id="v-reports" class="vw">
+      <div class="vs">
+        <div class="company-card report-filters-card" style="margin-bottom:18px">
+          <div class="company-head">Фильтры отчета</div>
+          <div class="company-body">
+            <div class="report-filter-grid">
+              <div class="report-filter-box"><div class="report-filter-title">Период</div>
+                <div class="analytics-tabs light report-filter-control" id="reportAnalyticsTabs">
+                  <button class="analytics-tab on" type="button" onclick="setReportPeriod('week',this)"><span>Неделя</span></button>
+                  <button class="analytics-tab" type="button" onclick="setReportPeriod('month',this)"><span>Месяц</span></button>
+                  <button class="analytics-tab" type="button" onclick="setReportPeriod('year',this)"><span>Год</span></button>
+                </div>
+              </div>
+              <div class="report-filter-box" id="reportCompanyField" style="display:none"><div class="report-filter-title">Компания</div><div class="report-filter-control"><div class="report-dropdown" id="reportCompanyDropdown"><button class="report-dropdown-btn" type="button" onclick="toggleReportCompanyDropdown(event)"><span class="report-dropdown-label" id="reportCompanyLabel">Все компании</span></button><div class="report-dropdown-menu" id="reportCompanyMenu"></div></div></div></div>
+              <div class="report-filter-box"><div class="report-filter-title">Период выборки</div><div class="report-date-row report-filter-control"><div class="report-date-field"><div class="report-date-dropdown" id="reportDateFromDropdown"><button class="report-date-btn" type="button" onclick="toggleReportDatePicker('from',event)"><span class="report-date-label" id="reportDateFromLabel">—</span><i class="fas fa-calendar-alt"></i></button><div class="report-date-menu" id="reportDateFromMenu"></div></div></div><div class="report-date-field"><div class="report-date-dropdown" id="reportDateToDropdown"><button class="report-date-btn" type="button" onclick="toggleReportDatePicker('to',event)"><span class="report-date-label" id="reportDateToLabel">—</span><i class="fas fa-calendar-alt"></i></button><div class="report-date-menu" id="reportDateToMenu"></div></div></div><button class="report-date-reset" type="button" onclick="clearReportDates()" title="Сбросить даты"><i class="fas fa-rotate-left"></i></button></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="analytics-card" style="margin-top:0">
+          <div class="analytics-head">
+            <div>
+              <div class="analytics-title">Отчет по заявкам</div>
+              <div class="analytics-sub" id="reportAnalyticsSub">Срез по закрытым тикетам и времени решения за выбранный период.</div>
+            </div>
+          </div>
+          <div class="analytics-body" id="reportAnalytics"></div>
+        </div>
+        <div class="company-card" style="margin-top:18px">
+          <div class="company-head">Статистика по сотрудникам</div>
+          <div class="company-body" id="reportEmployees"></div>
         </div>
       </div>
     </div>
@@ -582,44 +845,182 @@ body.compact-portal .compact-support{display:grid;gap:14px}
               </div>
               <div class="adm-grid" style="margin-top:12px">
                 <div class="ff"><label class="fl">Пароль</label><input id="admPassword" type="password" placeholder="Минимум 6 символов"></div>
+
                 <div class="ff"><label class="fl">Группа доступа</label><select id="admRole"></select></div>
               </div>
               <div class="adm-grid one" style="margin-top:12px">
-                <div class="ff"><label class="fl">Должность</label><input id="admTitle" placeholder="Менеджер, инженер, директор"></div>
+                <div class="ff"><label class="fl">Должность</label><input id="admTitle" placeholder="Менеджер, инженер, руководитель"></div>
+
               </div>
-              <div class="adm-note" style="margin-top:14px">Группа доступа определяет, какие разделы и действия доступны сотруднику. Должность используется для организационной структуры компании.</div>
+              <div class="adm-note" style="margin-top:14px">Группа доступа определяет, какие разделы и действия будут доступны пользователю. Должность используется для отображения в портале и отчетах.</div>
+
+
               <div class="adm-actions">
                 <button class="tbb tbg" type="button" onclick="loadAdminPanel()">Обновить</button>
+
                 <button class="tbb tbp" type="button" onclick="createAdminUser()">Добавить</button>
+
               </div>
             </div>
           </div>
           <div class="adm-card">
-            <div class="adm-head">Пользователи компании</div>
+            <div class="adm-head">Пользователи портала</div>
+
             <div class="adm-list" id="adminUsers"></div>
           </div>
         </div>
         <div class="adm-card" style="margin-top:18px">
           <div class="adm-head">Матрица прав и групп доступа</div>
           <div class="adm-body">
-            <div class="adm-note" style="margin-bottom:16px">Здесь можно настроить, какие права получают менеджеры, инженеры, руководители и другие группы доступа внутри компании.</div>
+            <div class="adm-note" style="margin-bottom:16px">Здесь можно тонко настраивать видимость разделов, работу с тикетами, живыми чатами и управлением компаниями.</div>
+
+
             <div class="perm-grid" id="adminPerms"></div>
           </div>
         </div>
       </div>
     </div>
+    <div id="v-company" class="vw">
+      <div class="vs" style="width:100%;display:block">
+        <div class="company-toolbar">
+          <button class="tbb tbg" type="button" id="companySettingsTopBtn" onclick="openCompanySettings()" style="display:none">Настроить компанию</button>
+
+          <button class="tbb tbp" type="button" id="companyCreateTopBtn" onclick="openCompanyCreate()" style="display:none">Создать компанию</button>
+
+        </div>
+        <div class="company-wrap" style="width:100%;display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start">
+          <div class="company-stack">
+            <div class="company-card">
+              <div class="company-head">Список компаний</div>
+              <div class="list-filter-bar">
+                <span class="list-filter-label">&#1044;&#1072;&#1090;&#1072;</span>
+                <input class="list-filter-input" id="companyDateFilter" type="date" onchange="setCompanyDateFilter(this.value)">
+                <button class="list-filter-clear" type="button" onclick="clearCompanyDateFilter()">&#1057;&#1073;&#1088;&#1086;&#1089;&#1080;&#1090;&#1100;</button>
+              </div>
+              <div class="company-list" id="companyList"></div>
+            </div>
+            <div class="company-card" id="companyInfoCard">
+              <div class="company-head">Карточка компании</div>
+              <div class="company-body">
+                <div class="adm-empty" id="companyCardEmpty">Выберите компанию из списка слева.</div>
+                <div id="companyCardContent" style="display:none">
+                <div class="company-form one" id="companySelectorWrap" style="display:none;margin-bottom:14px">
+                  <div class="ff"><label class="fl">Выберите компанию</label><select id="companySelect" onchange="changeManagedCompany(this.value)"></select></div>
+                </div>
+                <div class="company-kv"><span class="company-k">Название</span><span class="company-v" id="companyNameView">—</span></div>
+                <div class="company-kv"><span class="company-k">Slug</span><span class="company-v" id="companySlugView">—</span></div>
+                <div class="company-kv"><span class="company-k">Статус</span><span class="company-v status-wrap" id="companyStatusView">—</span></div>
+                <div class="company-kv"><span class="company-k">Пользователей</span><span class="company-v" id="companyUsersCount">0</span></div>
+
+                </div>
+              </div>
+            </div>
+            <div class="company-card" id="companyCreateCard" style="display:none">
+              <div class="company-head">Новая компания</div>
+              <div class="company-body">
+                <div class="company-form one">
+                  <div class="ff"><label class="fl">Название компании</label><input id="companyCreateName" placeholder="ООО Ромашка"></div>
+                  <div class="ff"><label class="fl">Slug (если нужен вручную)</label><input id="companyCreateSlug" placeholder="romashka"></div>
+
+                </div>
+                <div class="adm-actions">
+                  <button class="tbb tbp" type="button" onclick="createCompany()">Создать компанию</button>
+
+                </div>
+              </div>
+            </div>
+            <div class="company-card" id="companySettingsCard" style="display:none">
+              <div class="company-head">Настройки компании</div>
+              <div class="company-body">
+                <div class="company-form one">
+                  <div class="ff"><label class="fl">Название</label><input id="companySettingsName" placeholder="ООО Ромашка"></div>
+                  <div class="ff"><label class="fl">Slug</label><input id="companySettingsSlug" placeholder="romashka"></div>
+                  <div class="ff"><label class="fl">Статус</label><select id="companySettingsStatus"><option value="active">Активная</option><option value="inactive">Неактивная</option></select></div>
+                  <div class="ff"><label class="fl">Контактный email</label><input id="companySettingsEmail" type="email" placeholder="support@company.ru"></div>
+                  <div class="ff"><label class="fl">Контактный телефон</label><input id="companySettingsPhone" placeholder="+7 (495) 000-00-00"></div>
+                  <div class="ff"><label class="fl">Адрес</label><input id="companySettingsAddress" placeholder="Москва, ул. Примерная, 1"></div>
+                  <div class="ff"><label class="fl">Описание</label><textarea id="companySettingsDescription" class="fta" style="min-height:120px" placeholder="Описание компании, режима поддержки, SLA и особенностей обслуживания"></textarea></div>
+                </div>
+                <div class="adm-actions">
+                  <button class="tbb tbp" type="button" onclick="saveCompanySettings()">Сохранить настройки</button>
+
+                </div>
+              </div>
+            </div>
+            <div class="company-card" id="companyUserCard">
+              <div class="company-head">Новый сотрудник компании</div>
+
+
+              <div class="company-body">
+                <div class="company-form one">
+                  <div class="ff"><label class="fl">ФИО</label><input id="companyUserFullName" placeholder="Иван Иванов"></div>
+                  <div class="ff"><label class="fl">Email</label><input id="companyUserEmail" type="email" placeholder="user@company.ru"></div>
+                  <div class="ff"><label class="fl">Пароль</label><input id="companyUserPassword" type="password" placeholder="Минимум 6 символов"></div>
+                  <div class="ff"><label class="fl">Роль</label><select id="companyUserRole"></select></div>
+                  <div class="ff"><label class="fl">Должность</label><input id="companyUserTitle" placeholder="Бухгалтер, менеджер, руководитель"></div>
+                </div>
+                <div class="adm-note" style="margin-top:14px">Роль <b>Пользователь компании</b> создает и комментирует только свои тикеты. Роль <b>Администратор компании</b> видит все тикеты своей компании и отчеты по ним.</div>
+
+
+
+
+
+                <div class="adm-actions">
+                  <button class="tbb tbg" type="button" onclick="loadCompanySection()">Обновить</button>
+
+                  <button class="tbb tbp" type="button" onclick="createCompanyUser()">Добавить пользователя</button>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="company-stack">
+            <div class="company-card" id="companyOverviewCard">
+              <div class="company-head">Аналитика по компаниям</div>
+              <div class="company-body">
+                <div class="company-overview-copy" id="companyOverviewCopy"></div>
+                <div class="analytics-tabs light" id="companyAnalyticsTabs" style="margin-bottom:14px">
+                  <button class="analytics-tab on" type="button" onclick="setCompanyAnalyticsPeriod('week',this)">Неделя</button>
+                  <button class="analytics-tab" type="button" onclick="setCompanyAnalyticsPeriod('month',this)">Месяц</button>
+                  <button class="analytics-tab" type="button" onclick="setCompanyAnalyticsPeriod('year',this)">Год</button>
+                </div>
+                <div class="analytics-card" style="margin-top:0">
+                  <div class="analytics-body" id="companyOverviewAnalytics"></div>
+                </div>
+              </div>
+            </div>
+            <div class="company-card" id="companyUsersPanel">
+              <div class="company-head">Сотрудники компании</div>
+
+              <div class="adm-list" id="companyUsers"></div>
+            </div>
+            <div class="company-card" id="companyReportPanel">
+              <div class="company-head">Отчет по тикетам</div>
+              <div class="company-body" id="companyReport"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="v-livechat" class="vw">
-      <div class="vs">
-        <div class="lc-wrap">
+      <div class="vs" style="width:100%;display:flex;justify-content:flex-start;align-items:stretch">
+        <div class="lc-wrap" style="width:100%;display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start;justify-content:start;margin:0 auto 0 0">
           <div class="lc-list">
-            <div class="adm-head">Чаты посетителей</div>
+            <div class="adm-head">Чаты сайта</div>
+            <div class="list-filter-bar">
+              <span class="list-filter-label">&#1044;&#1072;&#1090;&#1072;</span>
+              <input class="list-filter-input" id="liveChatDateFilter" type="date" onchange="setLiveChatDateFilter(this.value)">
+              <button class="list-filter-clear" type="button" onclick="clearLiveChatDateFilter()">&#1057;&#1073;&#1088;&#1086;&#1089;&#1080;&#1090;&#1100;</button>
+            </div>
             <div class="lc-list-body" id="liveChatList"></div>
           </div>
           <div class="lc-panel">
             <div class="lc-panel-head">
               <div class="lc-panel-copy">
                 <div class="lc-panel-title" id="liveChatTitle">Выберите диалог</div>
-                <div class="lc-panel-sub" id="liveChatMeta">Новые сообщения с сайта появятся здесь</div>
+                <div class="lc-panel-sub" id="liveChatMeta">Когда посетитель напишет в чат сайта, он появится в этом списке.</div>
+
               </div>
               <div class="lc-actions">
                 <button class="tbb tbg" type="button" onclick="assignLiveChatToMe()">Взять</button>
@@ -630,7 +1031,8 @@ body.compact-portal .compact-support{display:grid;gap:14px}
             <div class="lc-msgs" id="liveChatMsgs"></div>
             <div class="lc-compose">
               <textarea id="liveChatInput" placeholder="Напишите ответ посетителю..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLiveChatReply();}"></textarea>
-              <button class="tbb tbp" type="button" onclick="sendLiveChatReply()">Ответить</button>
+              <button class="tbb tbp" type="button" onclick="sendLiveChatReply()">Отправить</button>
+
             </div>
           </div>
         </div>
@@ -641,14 +1043,15 @@ body.compact-portal .compact-support{display:grid;gap:14px}
 
 <div id="im" onclick="this.classList.remove('on')"><button class="mx" onclick="document.getElementById('im').classList.remove('on')"><i class="fas fa-times"></i></button><img id="imI" src="" alt=""></div>
 <div id="toast"><i class="fas fa-check"></i><span id="tMsg"></span></div>
+<div class="history-modal" id="ticketHistoryModal" onclick="if(event.target===this)closeTicketHistoryModal()"><div class="history-panel"><div class="history-panel-head"><div class="history-panel-title" id="ticketHistoryTitle">История тикета</div><button class="history-close" type="button" onclick="closeTicketHistoryModal()"><i class="fas fa-times"></i></button></div><div class="history-panel-body" id="ticketHistoryBody"></div></div></div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var PORTAL_PARAMS=new URLSearchParams(location.search);
 var PORTAL_COMPACT=PORTAL_PARAMS.get('compact')==='1';
 var PORTAL_ENTRY=PORTAL_PARAMS.get('entry')||'default';
 // ===============================================================
-//  ЗОНА ИТ — Shared Data Layer  (shared_db.js)
-//  Подключается на обе страницы: портал и виджет
+//   Zona IT Shared Data Layer
+//   Базовый слой данных: авторизация, пользователи, тикеты и справочники
 // ===============================================================
 
 const ZIT = (() => {
@@ -693,7 +1096,7 @@ const ZIT = (() => {
   let ticketsCache = [];
   let ticketsById = new Map();
 
-  function normalizeTicket(t){
+function normalizeTicket(t){
     // from backend: id, number, subject, description, category, priority, status, created_at, updated_at, messages[]
     return {
       id: t.id,
@@ -703,9 +1106,27 @@ const ZIT = (() => {
       category: t.category,
       priority: t.priority,
       status: t.status,
+      companyId: t.company_id || t.companyId || '',
       createdAt: t.created_at,
       updatedAt: t.updated_at,
+      closedAt: t.closed_at || t.closedAt || null,
       createdByName: t.created_by_name,
+      companyName: t.company_name || t.companyName || '',
+      assigneeUserId: t.assignee_user_id || t.assigneeUserId || null,
+      assigneeName: t.assignee_name || t.assigneeName || '',
+      history: (t.history || []).map(h => ({
+        id: h.id,
+        type: h.type,
+        body: h.body,
+        authorName: h.author_name || h.authorName || '',
+        time: Date.parse(h.created_at || h.createdAt || Date.now())
+      })),
+      assignableUsers: (t.assignable_users || t.assignableUsers || []).map(u => ({
+        id: u.id,
+        fullName: u.full_name || u.fullName || u.email || 'Сотрудник',
+        title: u.title || '',
+        roleCode: u.role_code || u.roleCode || ''
+      })),
       messages: (t.messages || []).map(m => ({
         id: m.id,
         from: m.message_type === 'system' ? 'system' : 'user',
@@ -740,8 +1161,9 @@ const ZIT = (() => {
     const time = typeof ts === 'string' ? Date.parse(ts) : ts;
     const d=Date.now()-time,m=60000,h=3600000,day=86400000;
     if(d<m) return 'только что';
-    if(d<h) return Math.floor(d/m)+' мин назад';
-    if(d<day) return Math.floor(d/h)+' ч назад';
+
+    if(d<3600000) return Math.floor(d/m)+' мин назад';
+    if(d<86400000) return Math.floor(d/h)+' ч назад';
     return new Date(time).toLocaleDateString('ru',{day:'numeric',month:'short'});
   }
   function fmtSize(b){
@@ -755,15 +1177,17 @@ const ZIT = (() => {
     esc,
 
     async login(email, password){
-      if(!email||!password) return {ok:false, err:'Заполните все поля'};
+      if(!email||!password) return {ok:false, err:'Введите email и пароль'};
       try {
         const res = await api('/api/auth/login', { method:'POST', body:{ email, password } });
         const user = {
           id: res.user.id,
           email: res.user.email,
           name: res.user.fullName,
+          companyId: res.user.companyId,
           company: res.user.companyName,
           role: res.user.role,
+          isGlobalAdmin: !!res.user.isGlobalAdmin,
           permissions: res.user.permissions || []
         };
         setSession(res.token, user);
@@ -780,8 +1204,10 @@ const ZIT = (() => {
           id: res.user.id,
           email: res.user.email,
           name: res.user.fullName,
+          companyId: res.user.companyId,
           company: res.user.companyName,
           role: res.user.role,
+          isGlobalAdmin: !!res.user.isGlobalAdmin,
           permissions: res.user.permissions || []
         };
         setSession(res.token, user);
@@ -808,6 +1234,8 @@ const ZIT = (() => {
         return { ok:true, ticket:t, id:t.id };
       } catch(e){
         return { ok:false, err: e.message || 'Не удалось создать тикет' };
+
+
       }
     },
 
@@ -819,6 +1247,8 @@ const ZIT = (() => {
         return { ok:true, ticket:t };
       } catch(e){
         return { ok:false, err: e.message || 'Не удалось отправить сообщение' };
+
+
       }
     },
 
@@ -830,7 +1260,24 @@ const ZIT = (() => {
         return { ok:true, ticket:t };
       } catch(e){
         return { ok:false, err: e.message || 'Не удалось закрыть тикет' };
+
+
       }
+    },
+
+    async updateTicket(ticketId,payload){
+      try {
+        await api('/api/tickets/' + encodeURIComponent(ticketId), { method:'PATCH', body:payload });
+        const t = await getTicket(ticketId);
+        if (typeof window.onNewMessage === 'function') window.onNewMessage(ticketId);
+        return { ok:true, ticket:t };
+      } catch(e){
+        return { ok:false, err: e.message || 'Не удалось обновить тикет' };
+      }
+    },
+
+    async getTicketDetails(ticketId){
+      return await getTicket(ticketId);
     },
 
     async getUsers(){
@@ -849,6 +1296,49 @@ const ZIT = (() => {
 
     async updateUserRole(userId, roleCode){
       return await api('/api/users/' + encodeURIComponent(userId) + '/role', { method:'PATCH', body:{ roleCode } });
+    },
+
+    async getCompanies(){
+      const res = await api('/api/companies');
+      return res.companies || [];
+    },
+
+    async createCompany(payload){
+      return await api('/api/companies', { method:'POST', body:payload });
+    },
+
+    async getCompany(companyId){
+      return await api('/api/companies/' + encodeURIComponent(companyId));
+    },
+
+    async updateCompany(companyId, payload){
+      return await api('/api/companies/' + encodeURIComponent(companyId), { method:'PATCH', body:payload });
+    },
+
+    async getCompanyRoles(companyId){
+      const res = await api('/api/companies/' + encodeURIComponent(companyId) + '/roles');
+      return res.roles || [];
+    },
+
+    async getCompanyUsers(companyId){
+      const res = await api('/api/companies/' + encodeURIComponent(companyId) + '/users');
+      return res.users || [];
+    },
+
+    async createCompanyUser(companyId, payload){
+      return await api('/api/companies/' + encodeURIComponent(companyId) + '/users', { method:'POST', body:payload });
+    },
+
+    async updateCompanyUserRole(companyId, userId, roleCode){
+      return await api('/api/companies/' + encodeURIComponent(companyId) + '/users/' + encodeURIComponent(userId) + '/role', { method:'PATCH', body:{ roleCode } });
+    },
+
+    async updateCompanyUser(companyId, userId, payload){
+      return await api('/api/companies/' + encodeURIComponent(companyId) + '/users/' + encodeURIComponent(userId), { method:'PATCH', body:payload });
+    },
+
+    async getCompanyReport(companyId){
+      return await api('/api/companies/' + encodeURIComponent(companyId) + '/report');
     },
 
     async getPermissionMatrix(){
@@ -898,37 +1388,205 @@ const ZIT = (() => {
     // UI helpers (kept for compatibility)
     relTime,
     fmtSize,
-    STATUS_LABEL:{open:'Открыт',progress:'В работе',done:'Решён',closed:'Закрыт',new:'Новый'},
+    STATUS_LABEL:{open:'Открыт',progress:'В работе',done:'Решен',closed:'Закрыт',new:'Новый'},
     STATUS_COLOR:{open:'#FF9800',progress:'#9C27B0',done:'#00A86B',closed:'#78909C'},
     STATUS_CSS:  {open:'s-open',progress:'s-progress',done:'s-done',closed:'s-closed'},
-    PRIO_LABEL:  {low:'Низкий',normal:'Обычный',high:'Высокий',critical:'Критичный'},
+    PRIO_LABEL:  {low:'Низкий',normal:'Средний',high:'Высокий',critical:'Критичный'},
   };
 })();
 
 ZIT.register=async function(){
-  return { ok:false, err:'Доступ в портал выдается администратором.' };
+  return { ok:false, err:'Нужен вход в портал поддержки.' };
 };
 
 
 var CU=null,cTid=null,ntPri='normal',ntFs=[],chatFs=[],fSt2='all',fSr='';
-var ENGS=['Алексей С.','Дмитрий К.','Мария В.','Иван Р.','Елена Т.'];
+var ENGS=['Иван П.','Никита К.','Мария С.','Олег Р.','Анна М.'];
 var SC={open:'b-op',progress:'b-pr',done:'b-dn',closed:'b-cl'};
-var SL={open:'Открыт',progress:'В работе',done:'Решён',closed:'Закрыт'};
+var SL={open:'Открыт',progress:'В работе',done:'Решен',closed:'Закрыт'};
 var SK={open:'#FF9800',progress:'#9C27B0',done:'#00A86B',closed:'#78909C'};
-var PL={low:'Низкий',normal:'Обычный',high:'Высокий',critical:'Критичный'};
+var PL={low:'Низкий',normal:'Средний',high:'Высокий',critical:'Критичный'};
 var PC={low:'p-lo',normal:'p-no',high:'p-hi',critical:'p-cr'};
+function ticketStatusOptions(selected){
+  return ['open','progress','done','closed'].map(function(value){
+    return '<option value="'+value+'"'+(value===selected?' selected':'')+'>'+SL[value]+'</option>';
+  }).join('');
+}
+function ticketPriorityOptions(selected){
+  return ['low','normal','high','critical'].map(function(value){
+    return '<option value="'+value+'"'+(value===selected?' selected':'')+'>'+PL[value]+'</option>';
+  }).join('');
+}
+function ticketStatusSelectClass(value){return 'ticket-inline-select status-'+(value||'open');}
+function ticketPrioritySelectClass(value){return 'ticket-inline-select priority-'+(value||'normal');}
+function syncTicketSelectAppearance(select,kind,value){
+  if(!select)return;
+  select.className=(kind==='status'?ticketStatusSelectClass(value):ticketPrioritySelectClass(value));
+}
+function renderTicketListSelect(ticket,kind){
+  var value=kind==='status'?ticket.status:ticket.priority;
+  var cls=kind==='status'?ticketStatusSelectClass(value):ticketPrioritySelectClass(value);
+  var options=kind==='status'?ticketStatusOptions(value):ticketPriorityOptions(value);
+  return '<select class="'+cls+'" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" onmouseup="event.stopPropagation()" onchange="updateTicketField(\''+ticket.id+'\',\''+kind+'\',this.value,event,this)">'+options+'</select>';
+}
+function renderTicketSideSelect(ticket,kind){
+  var value=kind==='status'?ticket.status:ticket.priority;
+  var options=kind==='status'?ticketStatusOptions(value):ticketPriorityOptions(value);
+  return '<select class="ticket-side-select '+(kind==='status'?'status-':'priority-')+(value||'')+'" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" onmouseup="event.stopPropagation()" onchange="updateTicketField(\''+ticket.id+'\',\''+kind+'\',this.value,event,this)">'+options+'</select>';
+}
+function canAssignTicket(){return !!(CU&&(CU.isGlobalAdmin||hasPerm('ticket.assign')));}
+function buildTicketHistory(ticket){
+  var history=[].concat(ticket.history||[]);
+  if(ticket.createdAt){
+    history.push({id:'created-'+ticket.id,type:'system',body:'Тикет создан',authorName:ticket.createdByName||'',time:Date.parse(ticket.createdAt)});
+  }
+  history.sort(function(a,b){return (b.time||0)-(a.time||0);});
+  var seen={};
+  return history.filter(function(item){
+    var key=(item.body||'')+'|'+(item.time||0);
+    if(seen[key])return false;
+    seen[key]=true;
+    return true;
+  });
+}
+function renderTicketHistoryEntries(entries,limit){
+  var rows=(entries||[]).slice(0,limit||entries.length);
+  if(!rows.length)return '<div class="history-empty">История изменений пока не заполнена.</div>';
+  return rows.map(function(item,index){
+    var stamp=new Date(item.time||Date.now()).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    var meta=item.authorName?ZIT.esc(item.authorName)+' • '+stamp:stamp;
+    return '<div class="tl"><div class="tll"><div class="tld'+(index===0?' f':'')+'"></div><div class="tll2"></div></div><div><div class="tlev">'+ZIT.esc(item.body||'Изменение тикета')+'</div><div class="tltm">'+meta+'</div></div></div>';
+  }).join('');
+}
+function renderTicketAssigneeSelect(ticket){
+  var users=ticket.assignableUsers||[];
+  if(!canAssignTicket()||!users.length){
+    return '<div class="history-empty">'+ZIT.esc(ticket.assigneeName||'Исполнитель не назначен')+'</div>';
+  }
+  var options=['<option value="">Не назначен</option>'].concat(users.map(function(user){
+    var label=user.title?user.fullName+' • '+user.title:user.fullName;
+    return '<option value="'+user.id+'"'+(ticket.assigneeUserId===user.id?' selected':'')+'>'+ZIT.esc(label)+'</option>';
+  })).join('');
+  return '<select class="ticket-side-select" onchange="updateTicketField(\''+ticket.id+'\',\'assigneeUserId\',this.value,event,this)">'+options+'</select>';
+}
+function renderTicketSidebarMeta(ticket){
+  var history=buildTicketHistory(ticket);
+  var latest=history[0]||null;
+  var latestMessage=(ticket.messages||[]).filter(function(msg){return msg.from!=='system';}).slice(-1)[0]||null;
+  var actor=latest&&latest.authorName?latest.authorName:(ticket.assigneeName||latestMessage&&latestMessage.authorName||'Без исполнителя');
+  var initials=actor&&actor!=='Без исполнителя'?actor.split(' ').map(function(part){return part[0];}).join('').slice(0,2).toUpperCase():'—';
+  var subtitle=latest?latest.body:(latestMessage?'Последнее сообщение в тикете':'Тикет ожидает обновлений');
+  var metaLine=latest?new Date(latest.time||Date.now()).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):(latestMessage?new Date(latestMessage.time||Date.now()).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'Нет действий');
+  document.getElementById('ciEA').textContent=initials;
+  document.getElementById('ciEN').textContent=actor;
+  document.getElementById('ciER').textContent=subtitle+' • '+metaLine;
+  document.getElementById('ciTL').innerHTML=renderTicketHistoryEntries(history,3);
+  document.getElementById('ciAssign').innerHTML=renderTicketAssigneeSelect(ticket);
+  document.getElementById('ciAssignWrap').style.display='block';
+  document.getElementById('ciHistBtn').style.display=history.length?'inline-flex':'none';
+}
+var ticketHistoryModalTicket=null;
+function openTicketHistoryModal(){
+  if(!ticketHistoryModalTicket)return;
+  var modal=document.getElementById('ticketHistoryModal');
+  var body=document.getElementById('ticketHistoryBody');
+  var title=document.getElementById('ticketHistoryTitle');
+  if(title)title.textContent='История тикета #'+String(ticketHistoryModalTicket.number||0).padStart(4,'0');
+  if(body)body.innerHTML=renderTicketHistoryEntries(buildTicketHistory(ticketHistoryModalTicket));
+  if(modal)modal.classList.add('on');
+}
+function closeTicketHistoryModal(){
+  var modal=document.getElementById('ticketHistoryModal');
+  if(modal)modal.classList.remove('on');
+}
 var compactPriority='normal';
 var adminUsers=[],adminRoles=[],adminMatrix=null;
+var companiesData=[],managedCompanyId='',companyUsers=[],companyRoles=[],companyReport=null;
+var companyViewMode='list';
+var editingCompanyUserId='';
+var dashboardAnalyticsPeriod='week',companyAnalyticsPeriod='week';
+var reportPeriod='month',reportDateFrom='',reportDateTo='',reportCompanyId='all',reportDatePickerField='',reportDatePickerMonth=null;
+var reportDatesManuallyCleared=false;
 var liveChats=[],liveChatCurrentId=null,liveChatCurrent=null,liveChatPoll=null;
+var companyDateFilter='',liveChatDateFilter='';
 
 function hasPerm(code){return !!(CU&&Array.isArray(CU.permissions)&&CU.permissions.indexOf(code)!==-1);}
 function canManageUsers(){return hasPerm('user.manage.company');}
 function canManageRoles(){return hasPerm('role.manage.company');}
-function canReplyLiveChat(){return hasPerm('livechat.reply');}
+function canReplyLiveChat(){return hasPerm('livechat.reply')||!!(CU&&(CU.isGlobalAdmin||CU.role==='platform_admin'));}
+function canViewReports(){return !!(CU&&(isPlatformAdmin()||hasPerm('ticket.view.company')));}
+function isPlatformAdmin(){
+  if(!CU)return false;
+  return !!(CU.isGlobalAdmin||CU.role==='platform_admin'||CU.email==='admin@zonait.local'||CU.email==='admin@i-zone.pro'||CU.email==='superuser@i-zone.pro');
+}
+function canAccessCompanySection(){return !!(CU&&(isPlatformAdmin()||canManageUsers()));}
+function managedCompany(){return companiesData.find(function(company){return company.id===managedCompanyId;})||null;}
+function roleLabel(code){
+  if(code==='client_admin')return 'Администратор компании';
+  if(code==='client_user')return 'Пользователь компании';
+  if(code==='support_agent')return 'Инженер поддержки';
+  if(code==='support_lead')return 'Руководитель поддержки';
+
+  if(code==='platform_admin')return 'Платформенный администратор';
+  return code||'—';
+}
+function companyStatusLabel(status){
+  return status==='inactive'?'Неактивная':'Активная';
+}
+function companyStatusClass(status){
+  return status==='inactive'?'inactive':'active';
+}
+function localDateKey(value){
+  if(!value)return '';
+  if(typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value))return value;
+  var d=value instanceof Date?new Date(value.getTime()):new Date(value);
+  if(Number.isNaN(d.getTime()))return '';
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dateOnly(value){
+  return localDateKey(value);
+}
+function dateLabel(value){
+  if(!value)return '';
+  var d=new Date(value);
+  if(Number.isNaN(d.getTime()))return '';
+  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+function setCompanyDateFilter(value){
+  companyDateFilter=value||'';
+  renderCompanyList();
+}
+function clearCompanyDateFilter(){
+  companyDateFilter='';
+  var el=document.getElementById('companyDateFilter');
+  if(el)el.value='';
+  renderCompanyList();
+}
+function setLiveChatDateFilter(value){
+  liveChatDateFilter=value||'';
+  renderLiveChatList();
+}
+function clearLiveChatDateFilter(){
+  liveChatDateFilter='';
+  var el=document.getElementById('liveChatDateFilter');
+  if(el)el.value='';
+  renderLiveChatList();
+}
 
 function aTab(t,el){document.querySelectorAll('.act').forEach(function(e){e.classList.remove('on');});if(el)el.classList.add('on');document.getElementById('fL').style.display='';document.getElementById('fR').style.display='none';document.getElementById('acE').textContent='';}
-async function dL(){var r=await ZIT.login(document.getElementById('lEm').value.trim(),document.getElementById('lPw').value);if(!r.ok){document.getElementById('acE').textContent=r.err;return;}CU=r.user;await sApp();}
-async function dR(){document.getElementById('acE').textContent='Доступ в портал выдается администратором.';}
+async function dL(){
+  try{
+    var r=await ZIT.login(document.getElementById('lEm').value.trim(),document.getElementById('lPw').value);
+    if(!r.ok){document.getElementById('acE').textContent=r.err;return;}
+    CU=r.user||{};
+    if(!CU.name&&CU.fullName)CU.name=CU.fullName;
+    if(!CU.company&&CU.companyName)CU.company=CU.companyName;
+    await sApp();
+  }catch(e){
+    document.getElementById('acE').textContent=(e&&e.message)?e.message:'Не удалось открыть портал после входа';
+  }
+}
+async function dR(){document.getElementById('acE').textContent='Регистрация отключена. Доступы выдает администратор.';}
 function dLo(){if(liveChatPoll){clearInterval(liveChatPoll);liveChatPoll=null;}ZIT.logout();CU=null;document.getElementById('app').style.display='none';document.getElementById('asc').style.display='flex';showAuthScreen('l');}
 function showAuthScreen(tab){
   document.getElementById('app').style.display='none';
@@ -945,27 +1603,36 @@ function showAuthScreen(tab){
 async function sApp(){
   document.getElementById('asc').style.display='none';
   document.getElementById('app').style.display='flex';
-  var ini=CU.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+  var displayName=(CU&& (CU.name||CU.fullName||CU.email||'Пользователь'))||'Пользователь';
+  var displayCompany=(CU&& (CU.company||CU.companyName||''))||'';
+  var ini=displayName.split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
   document.getElementById('sbA').textContent=ini;
-  document.getElementById('sbN').textContent=CU.name;
-  document.getElementById('sbC').textContent=CU.company||'';
+  document.getElementById('sbN').textContent=displayName;
+  document.getElementById('sbC').textContent=displayCompany;
+  var navReports=document.getElementById('navReports');
+  if(navReports)navReports.style.display=canViewReports()&&!PORTAL_COMPACT?'flex':'none';
+  var reportLaunchBtn=document.getElementById('reportLaunchBtn');
+  if(reportLaunchBtn)reportLaunchBtn.style.display=canViewReports()&&!PORTAL_COMPACT?'inline-flex':'none';
+  var navCompanies=document.getElementById('navCompanies');
+  if(navCompanies)navCompanies.style.display=canAccessCompanySection()&&!PORTAL_COMPACT?'flex':'none';
   var navLiveChat=document.getElementById('navLiveChat');
   if(navLiveChat)navLiveChat.style.display=canReplyLiveChat()&&!PORTAL_COMPACT?'flex':'none';
   var navAdmin=document.getElementById('navAdmin');
-  if(navAdmin)navAdmin.style.display=(canManageUsers()||canManageRoles())&&!PORTAL_COMPACT?'flex':'none';
+  if(navAdmin)navAdmin.style.display=(isPlatformAdmin()&&canManageRoles())&&!PORTAL_COMPACT?'flex':'none';
   await rDash();await rList();stSt();
-  if((canManageUsers()||canManageRoles())&&!PORTAL_COMPACT)await loadAdminPanel();
+  if(canAccessCompanySection()&&!PORTAL_COMPACT)await loadCompanySection();
+  if((isPlatformAdmin()&&canManageRoles())&&!PORTAL_COMPACT)await loadAdminPanel();
   if(canReplyLiveChat()&&!PORTAL_COMPACT)startLiveChatPolling();
   if(PORTAL_COMPACT){
     document.body.classList.add('compact-portal');
     document.getElementById('tbT').textContent='Поддержка';
-    document.getElementById('tbS').textContent='Последние тикеты и быстрый чат с инженером';
+    document.getElementById('tbS').textContent='Последние тикеты и быстрый канал связи с инженером';
     await renderCompactRecent();
     await renderCompactMessages();
   }
 }
 
-VM={dash:'Дашборд',tix:'Мои тикеты',chat:'Тикет',new:'Новый тикет',admin:'Администрирование',livechat:'Чаты сайта'};
+VM={dash:'Дашборд',tix:'Тикеты',chat:'Тикет',new:'Новый тикет',reports:'Отчет по заявкам',company:'Компании',admin:'Администрирование',livechat:'Чаты сайта'};
 function sV(n,el){
   document.querySelectorAll('.vw').forEach(function(v){v.classList.remove('on');});
   document.querySelectorAll('.ni').forEach(function(i){i.classList.remove('on');});
@@ -974,19 +1641,455 @@ function sV(n,el){
   document.getElementById('tbT').textContent=VM[n]||n;
   if(n==='dash')rDash();
   if(n==='tix')rList();
+  if(n==='reports')renderTicketReports();
+  if(n==='company'){
+    companyViewMode='list';
+    managedCompanyId='';
+    loadCompanySection();
+  }
+  if(n==='admin')loadAdminPanel();
+}
+
+function analyticsPeriodMeta(period){
+  if(period==='year')return { points:12, type:'month' };
+  if(period==='month')return { points:30, type:'day' };
+  return { points:7, type:'day' };
+}
+function analyticsPeriodLabel(period){
+  if(period==='year')return 'за год';
+  if(period==='month')return 'за 30 дней';
+  return 'за 7 дней';
+}
+function monthShort(date){
+  return date.toLocaleDateString('ru-RU',{month:'short'}).replace('.','');
+}
+function buildAnalyticsSeries(tickets,period){
+  var meta=analyticsPeriodMeta(period), now=new Date();
+  var buckets=[], map={};
+  for(var i=meta.points-1;i>=0;i--){
+    var start=new Date(now);
+    if(meta.type==='month'){
+      start.setDate(1);start.setHours(0,0,0,0);
+      start.setMonth(now.getMonth()-i,1);
+    }else{
+      start.setHours(0,0,0,0);
+      start.setDate(now.getDate()-i);
+    }
+    var key=meta.type==='month'?(start.getFullYear()+'-'+String(start.getMonth()+1).padStart(2,'0')):localDateKey(start);
+    var label=meta.type==='month'?monthShort(start):(String(start.getDate()).padStart(2,'0')+'.'+String(start.getMonth()+1).padStart(2,'0'));
+    var bucket={key:key,label:label,resolved:0,opened:0,resolutionHours:0,resolutionCount:0,created:0};
+    buckets.push(bucket);
+    map[key]=bucket;
+  }
+  (tickets||[]).forEach(function(ticket){
+    var createdAt=ticket.createdAt||ticket.created_at;
+    if(createdAt){
+      var createdDate=new Date(createdAt);
+      if(!isNaN(createdDate)){
+        var createdKey=meta.type==='month'?(createdDate.getFullYear()+'-'+String(createdDate.getMonth()+1).padStart(2,'0')):localDateKey(createdDate);
+        if(map[createdKey]){
+          map[createdKey].created+=1;
+          if(ticket.status==='open')map[createdKey].opened+=1;
+        }
+      }
+    }
+    var closedAt=ticket.closedAt||ticket.closed_at||null;
+    if(!closedAt)return;
+    var closedDate=new Date(closedAt);
+    var openedDate=new Date(createdAt||closedAt);
+    if(isNaN(closedDate)||isNaN(openedDate))return;
+    var closedKey=meta.type==='month'?(closedDate.getFullYear()+'-'+String(closedDate.getMonth()+1).padStart(2,'0')):localDateKey(closedDate);
+    if(!map[closedKey])return;
+    var diff=Math.max(0,(closedDate-openedDate)/36e5);
+    map[closedKey].resolved+=1;
+    map[closedKey].resolutionHours+=diff;
+    map[closedKey].resolutionCount+=1;
+  });
+  buckets.forEach(function(bucket){
+    bucket.avgHours=bucket.resolutionCount?Number((bucket.resolutionHours/bucket.resolutionCount).toFixed(1)):0;
+  });
+  return buckets;
+}
+function buildAnalyticsSvg(series){
+  var width=760,height=240,padX=18,padY=22,baseY=height-padY;
+  var maxResolved=Math.max.apply(null,series.map(function(point){return point.resolved;}));
+  var maxOpened=Math.max.apply(null,series.map(function(point){return point.opened;}));
+  if(!isFinite(maxResolved)||maxResolved<1)maxResolved=1;
+  if(!isFinite(maxOpened)||maxOpened<1)maxOpened=1;
+  var maxTickets=Math.max(maxResolved,maxOpened,1);
+  var step=series.length>1?(width-padX*2)/(series.length-1):width-padX*2;
+  var barWidth=Math.max(16,Math.min(22,step*0.24));
+  var gap=Math.max(8,Math.min(16,barWidth*0.55));
+  var closedOffset=(barWidth/2)+(gap/2);
+  var bars=[],openBars=[];
+  series.forEach(function(point,index){
+    var x=padX+(series.length>1?step*index:(width/2));
+    var barHeight=Math.max(point.resolved?6:0,(point.resolved/maxTickets)*(height-padY*2));
+    var openBarHeight=Math.max(point.opened?6:0,(point.opened/maxTickets)*(height-padY*2));
+    if(barHeight>0){
+      var closedX=(x-closedOffset).toFixed(2);
+      var closedY=(baseY-barHeight).toFixed(2);
+      var closedW=barWidth.toFixed(2);
+      var closedH=barHeight.toFixed(2);
+      var closedWaveHeight=Math.max(10,Math.min(14,barHeight*0.16));
+      var closedWaveY=(baseY-closedWaveHeight-1).toFixed(2);
+      var closedWaveTravel=Math.max(0,barHeight-closedWaveHeight-2).toFixed(2);
+      bars.push(
+        '<g class="closed-bar-wrap">'+
+          '<rect x="'+closedX+'" y="'+closedY+'" width="'+closedW+'" height="'+closedH+'" rx="10" fill="rgba(45,207,146,.34)" stroke="rgba(45,207,146,.36)" />'+
+          '<rect class="closed-wave" x="'+closedX+'" y="'+closedWaveY+'" width="'+closedW+'" height="'+closedWaveHeight.toFixed(2)+'" rx="10" fill="url(#analyticsClosedWaveGradient)" clip-path="url(#analyticsClosedWaveClip'+index+')">'+
+            '<animateTransform attributeName="transform" type="translate" from="0 0" to="0 -'+closedWaveTravel+'" dur="2.4s" repeatCount="indefinite" calcMode="spline" keySplines="0.28 0.08 0.22 1" keyTimes="0;1" />'+
+          '</rect>'+
+          '<clipPath id="analyticsClosedWaveClip'+index+'"><rect x="'+closedX+'" y="'+closedY+'" width="'+closedW+'" height="'+closedH+'" rx="10" /></clipPath>'+
+        '</g>'
+      );
+    }
+    if(openBarHeight>0){
+      var openX=(x+gap/2).toFixed(2);
+      var openY=(baseY-openBarHeight).toFixed(2);
+      var openW=barWidth.toFixed(2);
+      var openH=openBarHeight.toFixed(2);
+      var waveHeight=Math.max(10,Math.min(14,openBarHeight*0.16));
+      var waveY=(baseY-waveHeight-1).toFixed(2);
+      var waveTravel=Math.max(0,openBarHeight-waveHeight-2).toFixed(2);
+      openBars.push(
+        '<g class="open-bar-wrap">'+
+          '<rect x="'+openX+'" y="'+openY+'" width="'+openW+'" height="'+openH+'" rx="9" fill="rgba(255,179,71,.72)" stroke="rgba(255,196,118,.9)" />'+
+          '<rect class="open-wave" x="'+openX+'" y="'+waveY+'" width="'+openW+'" height="'+waveHeight.toFixed(2)+'" rx="9" fill="url(#analyticsOpenWaveGradient)" clip-path="url(#analyticsOpenWaveClip'+index+')">'+
+            '<animateTransform attributeName="transform" type="translate" from="0 0" to="0 -'+waveTravel+'" dur="2.2s" repeatCount="indefinite" calcMode="spline" keySplines="0.28 0.08 0.22 1" keyTimes="0;1" />'+
+          '</rect>'+
+          '<clipPath id="analyticsOpenWaveClip'+index+'"><rect x="'+openX+'" y="'+openY+'" width="'+openW+'" height="'+openH+'" rx="9" /></clipPath>'+
+        '</g>'
+      );
+    }
+  });
+  return ''+
+    '<svg class="analytics-svg" viewBox="0 0 '+width+' '+height+'" preserveAspectRatio="none">'+
+      '<defs>'+
+        '<linearGradient id="analyticsClosedWaveGradient" x1="0" y1="1" x2="0" y2="0">'+
+          '<stop offset="0%" stop-color="rgba(175,255,228,0)"></stop>'+
+          '<stop offset="22%" stop-color="rgba(175,255,228,.10)"></stop>'+
+          '<stop offset="50%" stop-color="rgba(227,255,246,.42)"></stop>'+
+          '<stop offset="78%" stop-color="rgba(175,255,228,.12)"></stop>'+
+          '<stop offset="100%" stop-color="rgba(175,255,228,0)"></stop>'+
+        '</linearGradient>'+
+        '<linearGradient id="analyticsOpenWaveGradient" x1="0" y1="1" x2="0" y2="0">'+
+          '<stop offset="0%" stop-color="rgba(255,229,160,0)"></stop>'+
+          '<stop offset="22%" stop-color="rgba(255,229,160,.10)"></stop>'+
+          '<stop offset="50%" stop-color="rgba(255,244,216,.42)"></stop>'+
+          '<stop offset="78%" stop-color="rgba(255,229,160,.12)"></stop>'+
+          '<stop offset="100%" stop-color="rgba(255,229,160,0)"></stop>'+
+        '</linearGradient>'+
+      '</defs>'+
+      '<g class="analytics-bars">'+bars.join('')+'</g>'+
+      '<g class="analytics-open-bars">'+openBars.join('')+'</g>'+
+    '</svg>';
+}
+function buildAnalyticsMarkup(tickets,period,scopeLabel){
+  if(!(tickets||[]).length)return '<div class="analytics-empty">Пока нет данных для построения графика.</div>';
+  var series=buildAnalyticsSeries(tickets,period);
+  var resolvedTotal=series.reduce(function(sum,point){return sum+point.resolved;},0);
+  var openTotal=series.reduce(function(sum,point){return sum+point.opened;},0);
+  var createdTotal=series.reduce(function(sum,point){return sum+point.created;},0);
+  var avgHoursBase=series.filter(function(point){return point.avgHours>0;});
+  var avgHours=avgHoursBase.length?(avgHoursBase.reduce(function(sum,point){return sum+point.avgHours;},0)/avgHoursBase.length):0;
+  var fastest=avgHoursBase.length?Math.min.apply(null,avgHoursBase.map(function(point){return point.avgHours;})):0;
+  return ''+
+    '<div class="analytics-grid">'+
+      '<div class="analytics-plot">'+
+        '<div class="analytics-legend">'+
+          '<span class="analytics-legend-item"><span class="analytics-dot resolved"></span>Закрытые тикеты</span>'+
+          '<span class="analytics-legend-item"><span class="analytics-dot open"></span>Открытые тикеты</span>'+
+        '</div>'+
+        buildAnalyticsSvg(series)+
+        '<div class="analytics-x" style="--points:'+series.length+'">'+series.map(function(point){return '<span>'+ZIT.esc(point.label)+'</span>';}).join('')+'</div>'+
+      '</div>'+
+      '<div class="analytics-side">'+
+        '<div class="analytics-metric"><div class="analytics-metric-k">Закрыто '+analyticsPeriodLabel(period)+'</div><div class="analytics-metric-v">'+resolvedTotal+'</div><div class="analytics-metric-s">'+scopeLabel+'</div></div>'+
+        '<div class="analytics-metric"><div class="analytics-metric-k">Открыто '+analyticsPeriodLabel(period)+'</div><div class="analytics-metric-v">'+openTotal+'</div><div class="analytics-metric-s">Тикеты в статусе "Открыт"</div></div>'+
+        '<div class="analytics-metric"><div class="analytics-metric-k">Создано '+analyticsPeriodLabel(period)+'</div><div class="analytics-metric-v">'+createdTotal+'</div><div class="analytics-metric-s">Все обращения в выбранном срезе</div></div>'+
+        '<div class="analytics-metric"><div class="analytics-metric-k">Среднее время решения</div><div class="analytics-metric-v">'+avgHours.toFixed(1)+' ч</div><div class="analytics-metric-s">Лучший показатель: '+fastest.toFixed(1)+' ч</div></div>'+
+      '</div>'+
+    '</div>';
+}
+function analyticsTicketsScope(){
+  if(isPlatformAdmin())return 'Все компании';
+  if(CU&&(CU.company||CU.companyName))return 'Компания: '+(CU.company||CU.companyName);
+  return 'Текущий доступ';
+}
+function renderDashboardAnalytics(tickets){
+  var box=document.getElementById('dashboardAnalytics');
+  var sub=document.getElementById('dashboardAnalyticsSub');
+  if(!box)return;
+  if(sub)sub.textContent=isPlatformAdmin()?'Сводный технологичный обзор по всем компаниям, которые доступны суперпользователю.':'Динамика по вашей компании: закрытие тикетов и среднее время решения.';
+  box.innerHTML=buildAnalyticsMarkup(tickets,dashboardAnalyticsPeriod,analyticsTicketsScope());
+}
+function renderCompanyOverviewAnalytics(tickets){
+  var box=document.getElementById('companyOverviewAnalytics');
+  var copy=document.getElementById('companyOverviewCopy');
+  if(!box)return;
+  var selectedCompany=managedCompany();
+  if(copy)copy.textContent='';
+  box.innerHTML=buildAnalyticsMarkup(tickets,companyAnalyticsPeriod,selectedCompany?selectedCompany.name:analyticsTicketsScope());
+}
+function setDashboardAnalyticsPeriod(period,el){
+  dashboardAnalyticsPeriod=period;
+  document.querySelectorAll('#dashboardAnalyticsTabs .analytics-tab').forEach(function(btn){btn.classList.remove('on');});
+  if(el)el.classList.add('on');
+  rDash();
+}
+function setCompanyAnalyticsPeriod(period,el){
+  companyAnalyticsPeriod=period;
+  document.querySelectorAll('#companyAnalyticsTabs .analytics-tab').forEach(function(btn){btn.classList.remove('on');});
+  if(el)el.classList.add('on');
+  var visibleTickets=(window.__dashboardTickets||[]).filter(function(ticket){
+    return !managedCompanyId || ticket.companyId===managedCompanyId || ticket.company_id===managedCompanyId;
+  });
+  renderCompanyOverviewAnalytics(visibleTickets);
+}
+function syncCompanyLayout(){
+  var hasCompany=!!managedCompanyId;
+  ['companyInfoCard','companyUserCard','companyUsersPanel','companyReportPanel'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.classList.toggle('is-hidden',!hasCompany);
+  });
+  var overview=document.getElementById('companyOverviewCard');
+  if(overview)overview.classList.toggle('is-hidden',hasCompany);
+}
+function formatInputDate(date){
+  return localDateKey(date);
+}
+function formatHumanDate(value){
+  if(!value)return '—';
+  var parts=value.split('-');
+  if(parts.length!==3)return value;
+  return parts[2]+'.'+parts[1]+'.'+parts[0];
+}
+function syncReportDateButtons(){
+  var fromLabel=document.getElementById('reportDateFromLabel');
+  var toLabel=document.getElementById('reportDateToLabel');
+  if(fromLabel)fromLabel.textContent=formatHumanDate(reportDateFrom);
+  if(toLabel)toLabel.textContent=formatHumanDate(reportDateTo);
+}
+function closeReportDatePickers(){
+  ['reportDateFromDropdown','reportDateToDropdown'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.classList.remove('open');
+  });
+  reportDatePickerField='';
+}
+function calendarMonthName(date){
+  return date.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+}
+function renderReportDatePicker(field){
+  var menu=document.getElementById(field==='from'?'reportDateFromMenu':'reportDateToMenu');
+  if(!menu)return;
+  var baseValue=field==='from'?reportDateFrom:reportDateTo;
+  var baseDate=baseValue?new Date(baseValue+'T00:00:00'):new Date();
+  if(!reportDatePickerMonth||reportDatePickerField!==field){
+    reportDatePickerMonth=new Date(baseDate.getFullYear(),baseDate.getMonth(),1);
+  }
+  reportDatePickerField=field;
+  var monthStart=new Date(reportDatePickerMonth.getFullYear(),reportDatePickerMonth.getMonth(),1);
+  var gridStart=new Date(monthStart);
+  var dayOffset=(monthStart.getDay()+6)%7;
+  gridStart.setDate(monthStart.getDate()-dayOffset);
+  var todayKey=formatInputDate(new Date());
+  var selectedKey=field==='from'?reportDateFrom:reportDateTo;
+  var weekNames=['пн','вт','ср','чт','пт','сб','вс'];
+  var cells=[];
+  for(var i=0;i<42;i++){
+    var d=new Date(gridStart);
+    d.setDate(gridStart.getDate()+i);
+    var key=formatInputDate(d);
+    var classes=['report-cal-day'];
+    if(d.getMonth()!==monthStart.getMonth())classes.push('muted');
+    if(key===todayKey)classes.push('today');
+    if(key===selectedKey)classes.push('on');
+    cells.push('<button class="'+classes.join(' ')+'" type="button" onclick="selectReportDate(\''+field+'\',\''+key+'\')">'+d.getDate()+'</button>');
+  }
+  menu.innerHTML='' +
+    '<div class="report-cal-head">' +
+      '<button class="report-cal-nav" type="button" onclick="shiftReportDateMonth(-1)"><i class="fas fa-chevron-left"></i></button>' +
+      '<div class="report-cal-title">'+ZIT.esc(calendarMonthName(monthStart))+'</div>' +
+      '<button class="report-cal-nav" type="button" onclick="shiftReportDateMonth(1)"><i class="fas fa-chevron-right"></i></button>' +
+    '</div>' +
+    '<div class="report-cal-week">'+weekNames.map(function(name){return '<span>'+name+'</span>';}).join('')+'</div>' +
+    '<div class="report-cal-grid">'+cells.join('')+'</div>';
+}
+function toggleReportDatePicker(field,event){
+  if(event)event.stopPropagation();
+  var dropdown=document.getElementById(field==='from'?'reportDateFromDropdown':'reportDateToDropdown');
+  if(!dropdown)return;
+  var willOpen=!dropdown.classList.contains('open');
+  closeReportDatePickers();
+  if(!willOpen)return;
+  dropdown.classList.add('open');
+  reportDatePickerField=field;
+  reportDatePickerMonth=null;
+  renderReportDatePicker(field);
+}
+function shiftReportDateMonth(delta){
+  if(!reportDatePickerField)return;
+  if(!reportDatePickerMonth){
+    var currentValue=reportDatePickerField==='from'?reportDateFrom:reportDateTo;
+    var currentDate=currentValue?new Date(currentValue+'T00:00:00'):new Date();
+    reportDatePickerMonth=new Date(currentDate.getFullYear(),currentDate.getMonth(),1);
+  }
+  reportDatePickerMonth.setMonth(reportDatePickerMonth.getMonth()+delta);
+  renderReportDatePicker(reportDatePickerField);
+}
+function selectReportDate(field,value){
+  reportDatesManuallyCleared=false;
+  if(field==='from')reportDateFrom=value;
+  else reportDateTo=value;
+  syncReportDateButtons();
+  closeReportDatePickers();
+  renderTicketReports();
+}
+function applyReportPreset(period){
+  reportPeriod=period;
+  reportDatesManuallyCleared=false;
+  var now=new Date(), from=new Date(now);
+  if(period==='year'){from.setFullYear(now.getFullYear()-1);}
+  else if(period==='month'){from.setMonth(now.getMonth()-1);}
+  else{from.setDate(now.getDate()-6);}
+  reportDateFrom=formatInputDate(from);
+  reportDateTo=formatInputDate(now);
+  syncReportDateButtons();
+}
+function setReportPeriod(period,el){
+  document.querySelectorAll('#reportAnalyticsTabs .analytics-tab').forEach(function(btn){btn.classList.remove('on');});
+  if(el)el.classList.add('on');
+  applyReportPreset(period);
+  renderTicketReports();
+}
+function updateReportDateRange(){
+  syncReportDateButtons();
+  renderTicketReports();
+}
+function clearReportDates(){
+  reportDatesManuallyCleared=false;
+  reportDateFrom=formatInputDate(new Date());
+  reportDateTo=formatInputDate(new Date());
+  closeReportDatePickers();
+  syncReportDateButtons();
+  renderTicketReports();
+}
+function closeReportCompanyDropdown(){
+  var dropdown=document.getElementById('reportCompanyDropdown');
+  if(dropdown)dropdown.classList.remove('open');
+}
+function toggleReportCompanyDropdown(event){
+  if(event)event.stopPropagation();
+  var dropdown=document.getElementById('reportCompanyDropdown');
+  if(!dropdown)return;
+  dropdown.classList.toggle('open');
+}
+function populateReportCompanyFilter(){
+  var field=document.getElementById('reportCompanyField');
+  var menu=document.getElementById('reportCompanyMenu');
+  var label=document.getElementById('reportCompanyLabel');
+  if(!field||!menu||!label)return;
+  if(isPlatformAdmin()){
+    field.style.display='block';
+    var options=[{id:'all',name:'Все компании'}].concat((companiesData||[]).map(function(company){
+      return {id:company.id,name:company.name};
+    }));
+    if(!reportCompanyId)reportCompanyId='all';
+    var active=options.find(function(option){return option.id===reportCompanyId;})||options[0];
+    label.textContent=active?active.name:'Все компании';
+    menu.innerHTML=options.map(function(option){
+      return '<button class="report-dropdown-option'+(option.id===reportCompanyId?' on':'')+'" type="button" onclick="updateReportCompanyFilter(\''+ZIT.esc(option.id)+'\')"><span>'+ZIT.esc(option.name)+'</span></button>';
+    }).join('');
+  }else{
+    field.style.display='none';
+    reportCompanyId=(CU&&CU.companyId)||'all';
+    closeReportCompanyDropdown();
+  }
+}
+function updateReportCompanyFilter(value){
+  reportCompanyId=value||'all';
+  closeReportCompanyDropdown();
+  renderTicketReports();
+}
+function filterTicketsByReportRange(tickets){
+  return (tickets||[]).filter(function(ticket){
+    if(reportCompanyId&&reportCompanyId!=='all'&&ticket.companyId!==reportCompanyId&&ticket.company_id!==reportCompanyId)return false;
+    var stamp=ticket.closedAt||ticket.closed_at||ticket.updatedAt||ticket.updated_at||ticket.createdAt||ticket.created_at;
+    if(!stamp)return false;
+    var key=localDateKey(stamp);
+    if(reportDateFrom&&key<reportDateFrom)return false;
+    if(reportDateTo&&key>reportDateTo)return false;
+    return true;
+  });
+}
+function renderReportEmployees(tickets){
+  var box=document.getElementById('reportEmployees');
+  if(!box)return;
+  if(!tickets.length){box.innerHTML='<div class="adm-empty">За выбранный период пока нет данных.</div>';return;}
+  var rows={};
+  tickets.forEach(function(ticket){
+    var key=ticket.createdByName||'Без автора';
+    if(!rows[key])rows[key]={name:key,company:ticket.companyName||'',total:0,open:0,progress:0,closed:0,hoursTotal:0,hoursCount:0};
+    rows[key].total+=1;
+    if(ticket.status==='open')rows[key].open+=1;
+    if(ticket.status==='progress')rows[key].progress+=1;
+    if(ticket.status==='done'||ticket.status==='closed')rows[key].closed+=1;
+    var closedAt=ticket.closedAt||ticket.closed_at, createdAt=ticket.createdAt||ticket.created_at;
+    if(closedAt&&createdAt){
+      var diff=Math.max(0,(new Date(closedAt)-new Date(createdAt))/36e5);
+      rows[key].hoursTotal+=diff;
+      rows[key].hoursCount+=1;
+    }
+  });
+  var sorted=Object.keys(rows).map(function(key){return rows[key];}).sort(function(a,b){return b.total-a.total;});
+  box.innerHTML='<div class="company-report-table">'+sorted.map(function(row){
+    var companyLine=isPlatformAdmin()&&row.company?'<div class="company-report-sub">'+ZIT.esc(row.company)+'</div>':'';
+    var avg=row.hoursCount?(row.hoursTotal/row.hoursCount).toFixed(1):'0.0';
+    return '<div class="company-report-row"><div><div class="company-report-name">'+ZIT.esc(row.name)+'</div>'+companyLine+'</div><div class="company-report-num">'+row.total+'</div><div class="company-report-num">открыто '+row.open+' / в работе '+row.progress+' / закрыто '+row.closed+' / '+avg+' ч</div></div>';
+  }).join('')+'</div>';
+}
+function renderTicketReports(){
+  if(PORTAL_COMPACT||!canViewReports())return;
+  populateReportCompanyFilter();
+  if((!reportDateFrom||!reportDateTo)&&!reportDatesManuallyCleared)applyReportPreset(reportPeriod);
+  syncReportDateButtons();
+  var visible=filterTicketsByReportRange(window.__dashboardTickets||[]);
+  var sub=document.getElementById('reportAnalyticsSub');
+  var scopeText='Все компании';
+  if(reportCompanyId&&reportCompanyId!=='all'){
+    var selected=(companiesData||[]).find(function(company){return company.id===reportCompanyId;});
+    scopeText=selected?selected.name:'Выбранная компания';
+  }else if(!isPlatformAdmin()){
+    scopeText=(CU&&(CU.company||CU.companyName))||(managedCompany()&&managedCompany().name)||'Текущая компания';
+  }
+  if(sub)sub.textContent='Период: '+(reportDateFrom||'—')+' — '+(reportDateTo||'—')+'. Область: '+scopeText+'.';
+  var box=document.getElementById('reportAnalytics');
+  if(box)box.innerHTML=buildAnalyticsMarkup(visible,reportPeriod,scopeText);
+  renderReportEmployees(visible);
 }
 
 async function rDash(){
   var al=await ZIT.getTickets();
+  window.__dashboardTickets=al;
   document.getElementById('stO').textContent=al.filter(function(t){return t.status==='open';}).length;
   document.getElementById('stP').textContent=al.filter(function(t){return t.status==='progress';}).length;
   document.getElementById('stD').textContent=al.filter(function(t){return t.status==='done'||t.status==='closed';}).length;
+  document.getElementById('stA').textContent=al.length;
   document.getElementById('mW').textContent=al.filter(function(t){return t.status==='progress';}).length;
+  var openCount=al.filter(function(t){return t.status==='open'||t.status==='progress';}).length;
+  document.getElementById('mT').textContent=openCount+' шт.';
   var c=document.getElementById('dLst');
   var rc=[].concat(al).reverse().slice(0,5);
-  if(!rc.length){c.innerHTML='<div class="es"><i class="fas fa-inbox"></i><p>Тикетов пока нет</p></div>';return;}
-  c.innerHTML=rc.map(function(t){return'<div class="tli" onclick="oTk(\''+t.id+'\')"><div class="tli-ic" style="background:'+SK[t.status]+'18;color:'+SK[t.status]+'"><i class="fas fa-'+(t.status==='progress'?'spinner':t.status==='done'?'check-circle':t.status==='closed'?'lock':'clock')+'"></i></div><div class="tli-b"><div class="tli-t">'+ZIT.esc(t.subject)+'</div><div class="tli-m"><span class="bg '+(SC[t.status]||'b-cl')+'">'+SL[t.status]+'</span><span class="pb '+(PC[t.priority]||'p-no')+'">'+PL[t.priority]+'</span></div></div><span style="font-size:11px;color:var(--mu)">'+ZIT.relTime(t.updatedAt||t.updated_at||t.updated)+'</span></div>';}).join('');
-  document.getElementById('eLst').innerHTML=ENGS.map(function(n){return'<div class="ec"><div class="ea">'+n.split(' ').map(function(w){return w[0];}).join('')+'</div><div><div class="en">'+n+'</div><div class="er2">Инженер</div></div><div class="ed"></div></div>';}).join('');
+  if(!rc.length){c.innerHTML='<div class="es"><i class="fas fa-inbox"></i><p>Тикетов пока нет</p></div>';renderDashboardAnalytics(al);renderTicketReports();return;}
+  c.innerHTML=rc.map(function(t){
+    var companyLine=t.companyName?'<div style="font-size:11px;color:var(--mu);margin-top:4px">'+ZIT.esc(t.companyName)+'</div>':'';
+    return'<div class="tli" onclick="oTk(\''+t.id+'\')"><div class="tli-ic" style="background:'+SK[t.status]+'18;color:'+SK[t.status]+'"><i class="fas fa-'+(t.status==='progress'?'spinner':t.status==='done'?'check-circle':t.status==='closed'?'lock':'clock')+'"></i></div><div class="tli-b"><div class="tli-t">'+ZIT.esc(t.subject)+'</div>'+companyLine+'<div class="tli-m"><span class="bg '+(SC[t.status]||'b-cl')+'">'+SL[t.status]+'</span><span class="pb '+(PC[t.priority]||'p-no')+'">'+PL[t.priority]+'</span></div></div><span style="font-size:11px;color:var(--mu)">'+ZIT.relTime(t.updatedAt||t.updated_at||t.updated)+'</span></div>';
+  }).join('');
+  document.getElementById('eLst').innerHTML=ENGS.map(function(n){return'<div class="ec"><div class="ea">'+n.split(' ').map(function(w){return w[0];}).join('')+'</div><div><div class="en">'+n+'</div><div class="er2">инженер</div></div><div class="ed"></div></div>';}).join('');
+  renderDashboardAnalytics(al);
+  renderTicketReports();
 }
 
 async function rList(){
@@ -994,12 +2097,34 @@ async function rList(){
   var op=al.filter(function(t){return t.status==='open'||t.status==='progress';}).length;
   var nb=document.getElementById('nb');nb.textContent=op;nb.style.display=op?'flex':'none';
   var fl=al.filter(function(t){var ms=fSt2==='all'||t.status===fSt2;var ms2=!fSr||ZIT.esc(t.subject).toLowerCase().includes(fSr.toLowerCase());return ms&&ms2;});
+  fl=fl.sort(function(a,b){return Number(a.number||0)-Number(b.number||0);});
   var c=document.getElementById('tBody');
-  if(!fl.length){c.innerHTML='<div class="es"><i class="fas fa-search"></i><p>Тикетов не найдено</p></div>';return;}
-  c.innerHTML=[].concat(fl).reverse().map(function(t){return'<div class="ttr" onclick="oTk(\''+t.id+'\')"><div class="tid">#'+String(t.number||0).padStart(4,'0')+'</div><div class="ttw"><div class="ttt">'+ZIT.esc(t.subject)+'</div><div class="ttc">'+ZIT.esc(t.category||'')+'</div></div><div><span class="bg '+(SC[t.status]||'b-cl')+'">'+SL[t.status]+'</span></div><div><span class="pb '+(PC[t.priority]||'p-no')+'">'+PL[t.priority]+'</span></div><div class="tas"><div class="taa">?</div><span style="font-size:12px;color:var(--tx)">—</span></div><div style="font-size:12px;color:var(--mu)">'+ZIT.relTime(t.updatedAt||t.updated_at||t.updated)+'</div></div>';}).join('');
+  if(!fl.length){c.innerHTML='<div class="es"><i class="fas fa-search"></i><p>Ничего не найдено</p></div>';return;}
+  c.innerHTML=fl.map(function(t){
+    var assignee=t.assignee||'Не назначен';
+    var assigneeShort=assignee==='Не назначен'?'—':assignee.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    var assigneeMarkup='<div class="tas"><div class="taa">'+ZIT.esc(assigneeShort)+'</div><span style="font-size:12px;color:var(--tx)">'+ZIT.esc(assignee)+'</span></div>';
+    return'<div class="ttr" onclick="oTk(\''+t.id+'\')"><div class="tid">#'+String(t.number||0).padStart(4,'0')+'</div><div class="ttw"><div class="ttt">'+ZIT.esc(t.subject)+'</div><div class="ttc">'+ZIT.esc(t.category||'')+'</div></div><div>'+renderTicketListSelect(t,'status')+'</div><div>'+renderTicketListSelect(t,'priority')+'</div><div style="font-size:12px;color:var(--mu)">'+ZIT.relTime(t.updatedAt||t.updated_at||t.updated)+'</div><div>'+assigneeMarkup+'</div></div>';
+  }).join('');
+}
+async function updateTicketField(ticketId,field,value,event,el){
+  if(event&&typeof event.stopPropagation==='function')event.stopPropagation();
+  var payload={};payload[field]=value;
+  var result=await ZIT.updateTicket(ticketId,payload);
+  if(!result.ok){
+    tS(result.err||'Не удалось обновить тикет');
+    await rList();
+    if(cTid===ticketId)await oTk(ticketId);
+    return;
+  }
+  if(el&&el.classList.contains('ticket-inline-select'))syncTicketSelectAppearance(el,field,value);
+  await rList();
+  await rDash();
+  if(cTid===ticketId&&document.getElementById('v-chat')&&document.getElementById('v-chat').classList.contains('on'))await oTk(ticketId);
+  tS(field==='status'?'Статус обновлен':field==='priority'?'Приоритет обновлен':'Исполнитель обновлен');
 }
 async function loadAdminPanel(){
-  if(PORTAL_COMPACT||!(canManageUsers()||canManageRoles()))return;
+  if(PORTAL_COMPACT||!isPlatformAdmin()||!(canManageUsers()||canManageRoles()))return;
   try{
     if(canManageUsers()){
       adminUsers=await ZIT.getUsers();
@@ -1011,18 +2136,23 @@ async function loadAdminPanel(){
       adminMatrix=await ZIT.getPermissionMatrix();
       renderPermissionMatrix();
     }
-  }catch(e){tS(e.message||'Не удалось загрузить админ-панель');}
+  }catch(e){tS(e.message||'Не удалось выполнить операцию');}
+
+
+
 }
 function renderAdminRoleOptions(){
   var el=document.getElementById('admRole');
   if(!el)return;
-  el.innerHTML=(adminRoles||[]).map(function(role){return'<option value="'+ZIT.esc(role.code)+'">'+ZIT.esc(role.name)+' ('+ZIT.esc(role.code)+')</option>';}).join('')||'<option value="">Нет ролей</option>';
+  el.innerHTML=(adminRoles||[]).map(function(role){return'<option value="'+ZIT.esc(role.code)+'">'+ZIT.esc(role.name)+' ('+ZIT.esc(role.code)+')</option>';}).join('')||'<option value="">Нет доступных ролей</option>';
 }
 function renderAdminUsers(){
   var box=document.getElementById('adminUsers');
   if(!box)return;
-  if(!canManageUsers()){box.innerHTML='<div class="adm-empty">У вас нет прав на управление пользователями.</div>';return;}
-  if(!adminUsers.length){box.innerHTML='<div class="adm-empty">Пока нет пользователей компании.</div>';return;}
+  if(!canManageUsers()){box.innerHTML='<div class="adm-empty">У вас нет прав на просмотр и создание пользователей портала.</div>';return;}
+
+  if(!adminUsers.length){box.innerHTML='<div class="adm-empty">Пока нет пользователей портала.</div>';return;}
+
   box.innerHTML=adminUsers.map(function(user){
     var opts=(adminRoles||[]).map(function(role){return'<option value="'+ZIT.esc(role.code)+'"'+(role.code===user.role_code?' selected':'')+'>'+ZIT.esc(role.name)+'</option>';}).join('');
     return '<div class="adm-user"><div class="adm-user-main"><div class="adm-user-name">'+ZIT.esc(user.full_name||user.email)+'</div><div class="adm-user-meta">'+ZIT.esc(user.email)+' • '+ZIT.esc(user.title||'Без должности')+'</div></div><div class="adm-user-role"><select onchange="saveUserRole(\''+user.id+'\',this.value)">'+opts+'</select></div><div class="adm-user-title"><input value="'+ZIT.esc(user.title||'')+'" disabled></div></div>';
@@ -1031,29 +2161,357 @@ function renderAdminUsers(){
 function renderPermissionMatrix(){
   var box=document.getElementById('adminPerms');
   if(!box)return;
-  if(!canManageRoles()){box.innerHTML='<div class="adm-empty">У вас нет прав на изменение матрицы доступа.</div>';return;}
+  if(!canManageRoles()){box.innerHTML='<div class="adm-empty">У вас нет прав на управление матрицей прав.</div>';return;}
   if(!adminMatrix||!adminMatrix.roles||!adminMatrix.permissions){box.innerHTML='<div class="adm-empty">Матрица прав пока недоступна.</div>';return;}
   var assigned={};
   (adminMatrix.rolePermissions||[]).forEach(function(item){if(!assigned[item.role_id])assigned[item.role_id]={};assigned[item.role_id][item.code]=true;});
   box.innerHTML=(adminMatrix.roles||[]).filter(function(role){return role.scope==='company';}).map(function(role){
     var checks=(adminMatrix.permissions||[]).map(function(perm){return '<label class="perm-check"><input type="checkbox" data-role="'+role.id+'" value="'+ZIT.esc(perm.code)+'"'+((assigned[role.id]&&assigned[role.id][perm.code])?' checked':'')+'><span><b>'+ZIT.esc(perm.name||perm.code)+'</b><br>'+ZIT.esc(perm.code)+'</span></label>';}).join('');
     return '<div class="perm-role"><div class="perm-role-head"><div class="perm-role-title">'+ZIT.esc(role.name)+'</div><div class="perm-role-code">'+ZIT.esc(role.code)+'</div></div><div class="perm-role-body">'+checks+'<button class="tbb tbp" type="button" onclick="saveRolePermissions(\''+role.id+'\')">Сохранить права</button></div></div>';
+
   }).join('');
 }
 async function createAdminUser(){
   if(!canManageUsers())return;
   var payload={fullName:document.getElementById('admFullName').value.trim(),email:document.getElementById('admEmail').value.trim(),password:document.getElementById('admPassword').value,roleCode:document.getElementById('admRole').value,title:document.getElementById('admTitle').value.trim()};
   if(!payload.fullName||!payload.email||!payload.password||!payload.roleCode){tS('Заполните ФИО, email, пароль и группу доступа');return;}
+
   try{await ZIT.createUser(payload);document.getElementById('admFullName').value='';document.getElementById('admEmail').value='';document.getElementById('admPassword').value='';document.getElementById('admTitle').value='';await loadAdminPanel();tS('Пользователь добавлен');}catch(e){tS(e.message||'Не удалось добавить пользователя');}
+
+
+
+
+
 }
 async function saveUserRole(userId,roleCode){
   if(!canManageUsers())return;
-  try{await ZIT.updateUserRole(userId,roleCode);await loadAdminPanel();tS('Группа доступа обновлена');}catch(e){tS(e.message||'Не удалось обновить роль');}
+  try{await ZIT.updateUserRole(userId,roleCode);await loadAdminPanel();tS('Роль пользователя сохранена');}catch(e){tS(e.message||'Не удалось сохранить роль');}
 }
 async function saveRolePermissions(roleId){
   if(!canManageRoles())return;
   var codes=Array.from(document.querySelectorAll('input[data-role=\"'+roleId+'\"]:checked')).map(function(el){return el.value;});
-  try{await ZIT.updateRolePermissions(roleId,codes);adminMatrix=await ZIT.getPermissionMatrix();renderPermissionMatrix();tS('Права роли обновлены');}catch(e){tS(e.message||'Не удалось сохранить права');}
+  try{await ZIT.updateRolePermissions(roleId,codes);adminMatrix=await ZIT.getPermissionMatrix();renderPermissionMatrix();tS('Права сохранены');}catch(e){tS(e.message||'Не удалось сохранить права');}
+}
+async function loadCompanySection(){
+  if(PORTAL_COMPACT||!canAccessCompanySection())return;
+  try{
+    companiesData=await ZIT.getCompanies();
+    syncCompanyToolbar();
+    syncCompanyLayout();
+    if(!companiesData.length){
+      managedCompanyId='';
+      companyViewMode='create';
+      companyUsers=[];
+      companyRoles=[];
+      companyReport=null;
+      renderCompanyList();
+      renderCompanySelector();
+      renderCompanyCard();
+      setCompanyUserFormEnabled(false);
+      renderCompanyUsers();
+      renderCompanyReport();
+      renderCompanyOverviewAnalytics(window.__dashboardTickets||[]);
+      syncCompanyLayout();
+      return;
+    }
+    if(managedCompanyId&&!companiesData.some(function(company){return company.id===managedCompanyId;})){
+      managedCompanyId='';
+    }
+    renderCompanyList();
+    renderCompanySelector();
+    if(!managedCompanyId){
+      companyRoles=[];
+      companyUsers=[];
+      companyReport=null;
+      renderCompanyRoleOptions();
+      renderCompanyCard();
+      setCompanyUserFormEnabled(false);
+      renderCompanyUsers();
+      renderCompanyReport();
+      renderCompanyOverviewAnalytics(window.__dashboardTickets||[]);
+      syncCompanyLayout();
+      return;
+    }
+    companyRoles=await ZIT.getCompanyRoles(managedCompanyId);
+    companyUsers=await ZIT.getCompanyUsers(managedCompanyId);
+    companyReport=await ZIT.getCompanyReport(managedCompanyId);
+    renderCompanyRoleOptions();
+    renderCompanyCard();
+    setCompanyUserFormEnabled(!!managedCompanyId);
+    renderCompanyUsers();
+    renderCompanyReport();
+    renderCompanyOverviewAnalytics((window.__dashboardTickets||[]).filter(function(ticket){
+      return ticket.companyId===managedCompanyId || ticket.company_id===managedCompanyId;
+    }));
+    syncCompanyLayout();
+  }catch(e){tS(e.message||'Не удалось загрузить раздел компаний');}
+
+
+}
+function renderCompanyList(){
+  var box=document.getElementById('companyList');
+  var filterInput=document.getElementById('companyDateFilter');
+  if(!box)return;
+  if(filterInput&&filterInput.value!==companyDateFilter)filterInput.value=companyDateFilter;
+  if(!companiesData.length){
+    box.innerHTML='<div class="adm-empty">\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0439. \u0421\u043e\u0437\u0434\u0430\u0439\u0442\u0435 \u043f\u0435\u0440\u0432\u0443\u044e \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u044e, \u0438 \u0437\u0434\u0435\u0441\u044c \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u0441\u043f\u0438\u0441\u043e\u043a.</div>';
+    return;
+  }
+  var filteredCompanies=(companiesData||[]).filter(function(company){
+    if(!companyDateFilter)return true;
+    return dateOnly(company.createdAt||company.updatedAt)===companyDateFilter;
+  });
+  if(!filteredCompanies.length){
+    box.innerHTML='<div class="adm-empty">\u0417\u0430 \u0432\u044b\u0431\u0440\u0430\u043d\u043d\u0443\u044e \u0434\u0430\u0442\u0443 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b.</div>';
+    return;
+  }
+  box.innerHTML=filteredCompanies.map(function(company){
+    return '<div class="company-item'+(company.id===managedCompanyId?' on':'')+'" onclick="changeManagedCompany(\''+company.id+'\')"><div class="company-item-main"><div class="company-item-name">'+ZIT.esc(company.name)+'</div><div class="company-item-meta">'+ZIT.esc(company.slug||'')+'</div><div class="company-item-date">\u0414\u0430\u0442\u0430: '+ZIT.esc(dateLabel(company.createdAt||company.updatedAt)||'\u2014')+'</div></div><span class="company-status '+companyStatusClass(company.status)+'">'+companyStatusLabel(company.status)+'</span></div>';
+  }).join('');
+}
+function syncCompanyToolbar(){
+  var topBtn=document.getElementById('companyCreateTopBtn');
+  var settingsBtn=document.getElementById('companySettingsTopBtn');
+  var createCard=document.getElementById('companyCreateCard');
+  var settingsCard=document.getElementById('companySettingsCard');
+  if(topBtn)topBtn.style.display=isPlatformAdmin()?'inline-flex':'none';
+  if(settingsBtn)settingsBtn.style.display=(isPlatformAdmin()&&managedCompanyId)?'inline-flex':'none';
+  if(createCard)createCard.style.display=(isPlatformAdmin()&&companyViewMode==='create')?'block':'none';
+  if(settingsCard)settingsCard.style.display=(isPlatformAdmin()&&companyViewMode==='settings'&&!!managedCompanyId)?'block':'none';
+}
+function renderCompanySelector(){
+  var wrap=document.getElementById('companySelectorWrap');
+  var select=document.getElementById('companySelect');
+  if(wrap)wrap.style.display=isPlatformAdmin()?'grid':'none';
+  syncCompanyToolbar();
+  if(select){
+    select.innerHTML=(companiesData||[]).map(function(company){
+      return '<option value="'+ZIT.esc(company.id)+'"'+(company.id===managedCompanyId?' selected':'')+'>'+ZIT.esc(company.name)+'</option>';
+    }).join('')||'<option value="">Нет компаний</option>';
+  }
+}
+function setCompanyUserFormEnabled(enabled){
+  var card=document.getElementById('companyUserCard');
+  var inputs=['companyUserFullName','companyUserEmail','companyUserPassword','companyUserRole','companyUserTitle'];
+  if(card)card.classList.toggle('disabled',!enabled);
+  inputs.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.disabled=!enabled;
+  });
+}
+function renderCompanyRoleOptions(){
+  var el=document.getElementById('companyUserRole');
+  if(!el)return;
+  var roles=(companyRoles&&companyRoles.length)?companyRoles:[
+    {code:'client_user'},
+    {code:'client_admin'}
+  ];
+  el.innerHTML=roles.map(function(role){
+    return '<option value="'+ZIT.esc(role.code)+'">'+ZIT.esc(roleLabel(role.code))+'</option>';
+  }).join('')||'<option value="">Нет доступных ролей</option>';
+}
+function renderCompanyCard(){
+  var company=managedCompany();
+  var empty=document.getElementById('companyCardEmpty');
+  var content=document.getElementById('companyCardContent');
+  if(empty)empty.style.display=company?'none':'block';
+  if(content)content.style.display=company?'block':'none';
+  document.getElementById('companyNameView').textContent=company?company.name:'—';
+  document.getElementById('companySlugView').textContent=company?company.slug:'—';
+  document.getElementById('companyStatusView').innerHTML=company?('<span class="company-status '+companyStatusClass(company.status)+'">'+companyStatusLabel(company.status)+'</span>'):'—';
+  document.getElementById('companyUsersCount').textContent=String((companyUsers||[]).length);
+  if(company&&isPlatformAdmin()){
+    document.getElementById('companySettingsName').value=company.name||'';
+    document.getElementById('companySettingsSlug').value=company.slug||'';
+    document.getElementById('companySettingsStatus').value=company.status||'active';
+    document.getElementById('companySettingsEmail').value=company.contactEmail||'';
+    document.getElementById('companySettingsPhone').value=company.contactPhone||'';
+    document.getElementById('companySettingsAddress').value=company.address||'';
+    document.getElementById('companySettingsDescription').value=company.description||'';
+  }
+  syncCompanyToolbar();
+}
+function renderCompanyUsers(){
+  var box=document.getElementById('companyUsers');
+  if(!box)return;
+  if(!canAccessCompanySection()){box.innerHTML='<div class="adm-empty">У вас нет доступа к разделу компаний.</div>';return;}
+  if(!managedCompanyId){box.innerHTML='<div class="adm-empty">Сначала выберите компанию слева.</div>';return;}
+  if(!companyUsers.length){box.innerHTML='<div class="adm-empty">Пока нет пользователей компании.</div>';return;}
+
+  box.innerHTML=companyUsers.map(function(user){
+    if(editingCompanyUserId!==user.id){
+      var statusLabelView=user.status==='dismissed'?'Уволен':'Работает';
+      return '<div class="adm-user"><div class="adm-user-main"><div class="adm-user-name">'+ZIT.esc(user.fullName||user.email)+'</div><div class="adm-user-meta">'+ZIT.esc(user.email)+' • '+ZIT.esc(user.title||'Без должности')+'</div><div class="adm-user-badges"><span class="adm-mini green" title="Всего тикетов"><i class="fas fa-check-circle"></i><span>Всего</span><b>'+Number(user.totalTickets||0)+'</b></span><span class="adm-mini yellow" title="Активные тикеты"><i class="fas fa-clock"></i><span>В работе</span><b>'+Number(user.activeTickets||0)+'</b></span></div></div><div class="adm-user-summary">'+ZIT.esc(roleLabel(user.roleCode))+'</div><div class="adm-user-status '+(user.status==='dismissed'?'dismissed':'active')+'">'+statusLabelView+'</div><div class="adm-user-actions"><button class="tbb tbg" type="button" onclick="startEditCompanyUser(\''+user.id+'\')"><i class="fas fa-pen"></i></button></div></div>';
+    }
+    var opts=(companyRoles||[]).map(function(role){
+      return '<option value="'+ZIT.esc(role.code)+'"'+(role.code===user.roleCode?' selected':'')+'>'+ZIT.esc(roleLabel(role.code))+'</option>';
+    }).join('');
+    var statusLabel=user.status==='dismissed'?'Уволен':'Работает';
+    var statusOptions='<option value="active"'+(user.status!=='dismissed'?' selected':'')+'>Работает</option><option value="dismissed"'+(user.status==='dismissed'?' selected':'')+'>Уволен</option>';
+    return '<div class="adm-user"><div class="adm-user-main"><div class="adm-user-name"><input id="companyUserName-'+user.id+'" value="'+ZIT.esc(user.fullName||user.email)+'"></div><div class="adm-user-meta">'+ZIT.esc(user.email)+' • текущий статус: '+statusLabel+'</div></div><div class="adm-user-role"><select id="companyUserRoleEdit-'+user.id+'">'+opts+'</select></div><div class="adm-user-title"><input id="companyUserTitleEdit-'+user.id+'" value="'+ZIT.esc(user.title||'')+'" placeholder="Должность"></div><div class="adm-user-role"><select id="companyUserStatus-'+user.id+'">'+statusOptions+'</select></div><div class="adm-user-actions" style="gap:8px"><button class="tbb tbg" type="button" onclick="cancelEditCompanyUser()"><i class="fas fa-times"></i></button><button class="tbb tbp" type="button" onclick="saveCompanyUser(\''+user.id+'\')"><i class="fas fa-check"></i></button></div></div>';
+
+  }).join('');
+}
+function renderCompanyReport(){
+  var box=document.getElementById('companyReport');
+  if(!box)return;
+  if(!managedCompanyId){box.innerHTML='<div class="adm-empty">Сначала выберите компанию.</div>';return;}
+  if(!companyReport||!companyReport.summary){box.innerHTML='<div class="adm-empty">Отчет по компании пока недоступен.</div>';return;}
+  var summary=companyReport.summary;
+  var statusBadges=(companyReport.byStatus||[]).map(function(row){
+    return '<span class="company-badge">'+ZIT.esc(SL[row.status]||row.status)+': '+(row.count||0)+'</span>';
+  }).join(' ')||'<span class="company-badge">Статусов пока нет</span>';
+  var priorityBadges=(companyReport.byPriority||[]).map(function(row){
+    return '<span class="company-badge">'+ZIT.esc(PL[row.priority]||row.priority)+': '+(row.count||0)+'</span>';
+  }).join(' ')||'<span class="company-badge">Приоритетов пока нет</span>';
+  var creators=(companyReport.byCreator||[]).map(function(row){
+    return '<div class="company-report-row"><div><div class="company-report-name">'+ZIT.esc(row.fullName||row.email||'Пользователь компании')+'</div><div class="company-report-sub">'+ZIT.esc(row.email||'')+'</div></div><div class="company-report-num">'+(row.count||0)+'</div><div class="company-report-num">создано</div></div>';
+
+
+  }).join('')||'<div class="adm-empty">По создателям пока нет данных.</div>';
+  var assignees=(companyReport.byAssignee||[]).map(function(row){
+    return '<div class="company-report-row"><div><div class="company-report-name">'+ZIT.esc(row.fullName||'Не назначено')+'</div><div class="company-report-sub">Среднее время решения: '+ZIT.esc(String(row.avgResolutionHours||0))+' ч</div></div><div class="company-report-num">'+(row.count||0)+'</div><div class="company-report-num">тикетов</div></div>';
+  }).join('')||'<div class="adm-empty">По исполнителям пока нет данных.</div>';
+  box.innerHTML='' +
+    '<div class="company-report-section">' +
+      '<div class="company-report-grid">' +
+        '<div class="company-stat"><div class="company-stat-label">Всего тикетов</div><div class="company-stat-value">'+(summary.totalTickets||0)+'</div></div>' +
+        '<div class="company-stat"><div class="company-stat-label">Открытые</div><div class="company-stat-value">'+(summary.openTickets||0)+'</div></div>' +
+        '<div class="company-stat"><div class="company-stat-label">В работе</div><div class="company-stat-value">'+(summary.inProgressTickets||0)+'</div></div>' +
+        '<div class="company-stat"><div class="company-stat-label">Среднее время решения</div><div class="company-stat-value">'+ZIT.esc(String(summary.avgResolutionHours||0))+' ч</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="company-report-section"><div class="company-report-sub" style="margin-bottom:10px">Статусы: '+statusBadges+'</div><div class="company-report-sub">Приоритеты: '+priorityBadges+'</div></div>' +
+    '<div class="company-report-section"><div class="company-head" style="margin:-18px -18px 0;padding:15px 18px;border:1px solid var(--bd);border-left:none;border-right:none;background:var(--wh)">Создатели тикетов</div><div class="company-report-table" style="margin:0 -18px -18px">'+creators+'</div></div>' +
+    '<div class="company-report-section"><div class="company-head" style="margin:0 -18px 0;padding:15px 18px;border:1px solid var(--bd);border-left:none;border-right:none;background:var(--wh)">Исполнители поддержки</div><div class="company-report-table" style="margin:0 -18px -18px">'+assignees+'</div></div>';
+}
+async function changeManagedCompany(companyId){
+  managedCompanyId=companyId||'';
+  editingCompanyUserId='';
+  companyViewMode=managedCompanyId?'details':'list';
+  renderCompanyList();
+  await loadCompanySection();
+}
+function startEditCompanyUser(userId){
+  editingCompanyUserId=userId;
+  renderCompanyUsers();
+}
+function cancelEditCompanyUser(){
+  editingCompanyUserId='';
+  renderCompanyUsers();
+}
+function openCompanyCreate(){
+  if(!isPlatformAdmin())return;
+  companyViewMode='create';
+  managedCompanyId='';
+  companyUsers=[];
+  companyRoles=[];
+  companyReport=null;
+  renderCompanyList();
+  renderCompanySelector();
+  renderCompanyCard();
+  setCompanyUserFormEnabled(false);
+  renderCompanyUsers();
+  renderCompanyReport();
+  renderCompanyOverviewAnalytics(window.__dashboardTickets||[]);
+  syncCompanyLayout();
+}
+function openCompanySettings(){
+  if(!isPlatformAdmin())return;
+  if(!managedCompanyId){
+    tS('Сначала выберите компанию для настройки');
+    return;
+  }
+  companyViewMode='settings';
+  syncCompanyToolbar();
+  renderCompanyCard();
+  syncCompanyLayout();
+}
+async function saveCompanySettings(){
+  if(!isPlatformAdmin()||!managedCompanyId)return;
+  var payload={
+    name:document.getElementById('companySettingsName').value.trim(),
+    slug:document.getElementById('companySettingsSlug').value.trim(),
+    status:document.getElementById('companySettingsStatus').value,
+    contactEmail:document.getElementById('companySettingsEmail').value.trim(),
+    contactPhone:document.getElementById('companySettingsPhone').value.trim(),
+    address:document.getElementById('companySettingsAddress').value.trim(),
+    description:document.getElementById('companySettingsDescription').value.trim()
+  };
+  if(!payload.name||!payload.slug){tS('Введите название компании и slug');return;}
+  try{
+    await ZIT.updateCompany(managedCompanyId,payload);
+    companyViewMode='details';
+    await loadCompanySection();
+    tS('Настройки компании сохранены');
+  }catch(e){tS(e.message||'Не удалось сохранить настройки компании');}
+}
+async function createCompany(){
+  if(!isPlatformAdmin())return;
+  var payload={name:document.getElementById('companyCreateName').value.trim(),slug:document.getElementById('companyCreateSlug').value.trim()};
+  if(!payload.name){tS('Введите название компании');return;}
+  try{
+    var res=await ZIT.createCompany(payload);
+    document.getElementById('companyCreateName').value='';
+    document.getElementById('companyCreateSlug').value='';
+    managedCompanyId=res.company.id;
+    companyViewMode='details';
+    companyRoles=[{code:'client_user'},{code:'client_admin'}];
+    renderCompanyRoleOptions();
+    setCompanyUserFormEnabled(true);
+    await loadCompanySection();
+    tS('Компания успешно создана');
+  }catch(e){tS(e.message||'Не удалось создать компанию');}
+}
+async function createCompanyUser(){
+  if(!canAccessCompanySection())return;
+  if(!managedCompanyId){tS('Сначала выберите компанию');return;}
+  var payload={
+    fullName:document.getElementById('companyUserFullName').value.trim(),
+    email:document.getElementById('companyUserEmail').value.trim(),
+    password:document.getElementById('companyUserPassword').value,
+    roleCode:document.getElementById('companyUserRole').value||'client_user',
+    title:document.getElementById('companyUserTitle').value.trim()
+  };
+  if(!payload.fullName||!payload.email||!payload.password||!payload.roleCode){tS('Заполните ФИО, email, пароль и роль');return;}
+  try{
+    await ZIT.createCompanyUser(managedCompanyId,payload);
+    document.getElementById('companyUserFullName').value='';
+    document.getElementById('companyUserEmail').value='';
+    document.getElementById('companyUserPassword').value='';
+    document.getElementById('companyUserTitle').value='';
+    await loadCompanySection();
+    tS('Пользователь компании добавлен');
+  }catch(e){tS(e.message||'Не удалось добавить пользователя компании');}
+}
+async function saveCompanyUserRole(userId,roleCode){
+  if(!canAccessCompanySection()||!managedCompanyId)return;
+  try{
+    await ZIT.updateCompanyUserRole(managedCompanyId,userId,roleCode);
+    await loadCompanySection();
+    editingCompanyUserId='';
+    tS('Роль пользователя обновлена');
+  }catch(e){tS(e.message||'Не удалось обновить роль пользователя');}
+}
+async function saveCompanyUser(userId){
+  if(!canAccessCompanySection()||!managedCompanyId)return;
+  var payload={
+    fullName:document.getElementById('companyUserName-'+userId).value.trim(),
+    title:document.getElementById('companyUserTitleEdit-'+userId).value.trim(),
+    status:document.getElementById('companyUserStatus-'+userId).value
+  };
+  var nextRole=document.getElementById('companyUserRoleEdit-'+userId).value;
+  if(!payload.fullName){tS('Введите ФИО пользователя');return;}
+  try{
+    var current=companyUsers.find(function(user){return user.id===userId;});
+    if(current&&current.roleCode!==nextRole){
+      await ZIT.updateCompanyUserRole(managedCompanyId,userId,nextRole);
+    }
+    await ZIT.updateCompanyUser(managedCompanyId,userId,payload);
+    await loadCompanySection();
+    editingCompanyUserId='';
+    tS('Пользователь обновлен');
+  }catch(e){tS(e.message||'Не удалось сохранить пользователя');}
 }
 async function loadLiveChats(){
   if(!canReplyLiveChat())return;
@@ -1080,13 +2538,21 @@ function startLiveChatPolling(){
 function renderLiveChatList(){
   var box=document.getElementById('liveChatList');
   var badge=document.getElementById('liveChatBadge');
+  var filterInput=document.getElementById('liveChatDateFilter');
   if(!box)return;
-  var pendingCount=(liveChats||[]).filter(function(chat){return chat.status==='new';}).length;
+  if(filterInput&&filterInput.value!==liveChatDateFilter)filterInput.value=liveChatDateFilter;
+  var visibleChats=(liveChats||[]).filter(function(chat){
+    if(!liveChatDateFilter)return true;
+    return dateOnly(chat.lastMessageAt||chat.updatedAt||chat.createdAt)===liveChatDateFilter;
+  });
+  var pendingCount=(visibleChats||[]).filter(function(chat){return chat.status==='new';}).length;
   if(badge){badge.textContent=pendingCount;badge.style.display=pendingCount?'flex':'none';}
-  if(!liveChats.length){box.innerHTML='<div class="adm-empty">Пока нет активных обращений с сайта.</div>';return;}
-  if(!liveChatCurrentId&&liveChats.length)liveChatCurrentId=liveChats[0].id;
-  box.innerHTML=liveChats.map(function(chat){
-    return '<div class="lc-item'+(liveChatCurrentId===chat.id?' on':'')+'" onclick="selectLiveChat(\''+chat.id+'\')"><div class="lc-name">'+ZIT.esc(chat.visitorName||'Посетитель')+'</div><div class="lc-meta"><span>'+ZIT.esc(chat.status)+'</span><span>'+(chat.assignedUserName?ZIT.esc(chat.assignedUserName):'Не назначен')+'</span></div><div class="lc-preview">'+ZIT.esc(chat.lastMessagePreview||'Без сообщений')+'</div></div>';
+  if(!liveChats.length){box.innerHTML='<div class="adm-empty">\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u0430\u043a\u0442\u0438\u0432\u043d\u044b\u0445 \u043e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0439 \u0441 \u0441\u0430\u0439\u0442\u0430.</div>';return;}
+  if(!visibleChats.length){box.innerHTML='<div class="adm-empty">\u0417\u0430 \u0432\u044b\u0431\u0440\u0430\u043d\u043d\u0443\u044e \u0434\u0430\u0442\u0443 \u0447\u0430\u0442\u044b \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b.</div>';return;}
+  if(!liveChatCurrentId&&visibleChats.length)liveChatCurrentId=visibleChats[0].id;
+  if(liveChatCurrentId&&!visibleChats.some(function(chat){return chat.id===liveChatCurrentId;}))liveChatCurrentId=visibleChats[0].id;
+  box.innerHTML=visibleChats.map(function(chat){
+    return '<div class="lc-item'+(liveChatCurrentId===chat.id?' on':'')+'" onclick="selectLiveChat(\''+chat.id+'\')"><div class="lc-name">'+ZIT.esc(chat.visitorName||'\u041f\u043e\u0441\u0435\u0442\u0438\u0442\u0435\u043b\u044c')+'</div><div class="lc-meta"><span>'+ZIT.esc(chat.status)+'</span><span>'+(chat.assignedUserName?ZIT.esc(chat.assignedUserName):'\u041d\u0435 \u043d\u0430\u0437\u043d\u0430\u0447\u0435\u043d')+'</span></div><div class="lc-preview">'+ZIT.esc(chat.lastMessagePreview||'\u0411\u0435\u0437 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0439')+'</div><div class="lc-date">\u0414\u0430\u0442\u0430: '+ZIT.esc(dateLabel(chat.lastMessageAt||chat.updatedAt||chat.createdAt)||'\u2014')+'</div></div>';
   }).join('');
 }
 async function selectLiveChat(conversationId){
@@ -1105,12 +2571,12 @@ function renderLiveChatMessages(messages){
   if(!box||!title||!meta)return;
   if(!liveChatCurrent){
     title.textContent='Выберите диалог';
-    meta.textContent='Новые сообщения с сайта появятся здесь';
-    box.innerHTML='<div class="adm-empty">Выберите обращение слева, чтобы ответить посетителю.</div>';
+    meta.textContent='Когда посетитель напишет в чат сайта, он появится в этом списке.';
+    box.innerHTML='<div class="adm-empty">Выберите чат слева, чтобы открыть переписку.</div>';
     return;
   }
   title.textContent=liveChatCurrent.visitorName||'Посетитель';
-  meta.textContent=(liveChatCurrent.assignedUserName?('Оператор: '+liveChatCurrent.assignedUserName+' • '):'')+'Статус: '+liveChatCurrent.status;
+  meta.textContent=(liveChatCurrent.assignedUserName?('Назначен: '+liveChatCurrent.assignedUserName+' • '):'')+'Статус: '+liveChatCurrent.status;
   box.innerHTML=(messages||[]).map(function(msg){
     var cls=msg.authorType==='operator'?'operator':(msg.authorType==='visitor'?'visitor':'system');
     return '<div class="lc-bubble '+cls+'">'+(cls!=='operator'&&cls!=='system'?'<div class="lc-author">'+ZIT.esc(msg.authorName||'Посетитель')+'</div>':'')+ZIT.esc(msg.body||'')+'</div>';
@@ -1124,8 +2590,8 @@ async function assignLiveChatToMe(){
     liveChatCurrent=data.conversation;
     renderLiveChatMessages(data.messages||[]);
     await loadLiveChats();
-    tS('Диалог назначен на вас');
-  }catch(e){tS(e.message||'Не удалось взять диалог');}
+    tS('Чат назначен на вас');
+  }catch(e){tS(e.message||'Не удалось назначить чат');}
 }
 async function closeLiveChat(){
   if(!liveChatCurrentId)return;
@@ -1134,8 +2600,8 @@ async function closeLiveChat(){
     liveChatCurrent=data.conversation;
     renderLiveChatMessages(data.messages||[]);
     await loadLiveChats();
-    tS('Диалог закрыт');
-  }catch(e){tS(e.message||'Не удалось закрыть диалог');}
+    tS('Чат закрыт');
+  }catch(e){tS(e.message||'Не удалось закрыть чат');}
 }
 async function convertLiveChatToTicket(){
   if(!liveChatCurrentId)return;
@@ -1151,7 +2617,7 @@ async function convertLiveChatToTicket(){
     await rList();
     tS('Тикет открыт');
     if(data&&data.ticket&&data.ticket.id)oTk(data.ticket.id);
-  }catch(e){tS(e.message||'Не удалось создать тикет из чата');}
+  }catch(e){tS(e.message||'Не удалось открыть тикет из чата');}
 }
 async function sendLiveChatReply(){
   if(!liveChatCurrentId)return;
@@ -1167,25 +2633,23 @@ async function sendLiveChatReply(){
   }catch(e){tS(e.message||'Не удалось отправить ответ');}
 }
 function setCompactPriority(el,val){compactPriority=val;document.querySelectorAll('#compactPriority button').forEach(function(b){b.classList.remove('on');});el.classList.add('on');}
-async function renderCompactRecent(){var wrap=document.getElementById('compactRecent');if(!wrap)return;var al=[].concat(await ZIT.getTickets()).reverse().slice(0,6);if(!al.length){wrap.innerHTML='<div class="es" style="padding:26px"><i class="fas fa-inbox"></i><p>Пока нет тикетов. Напишите проблему ниже и мы сразу создадим обращение.</p></div>';return;}wrap.innerHTML=al.map(function(t){return'<div class="compact-ticket'+(cTid===t.id?' on':'')+'" onclick="selectCompactTicket(\''+t.id+'\')"><div class="compact-ticket-ic" style="background:'+SK[t.status]+'18;color:'+SK[t.status]+'"><i class="fas fa-'+(t.status==='progress'?'spinner':t.status==='done'?'check-circle':t.status==='closed'?'lock':'clock')+'"></i></div><div class="compact-ticket-body"><div class="compact-ticket-title">#'+String(t.number||0).padStart(4,'0')+' '+ZIT.esc(t.subject)+'</div><div class="compact-ticket-meta"><span>'+SL[t.status]+'</span><span>'+(PL[t.priority]||'Обычный')+'</span><span>'+ZIT.relTime(t.updatedAt||t.updated_at||t.updated)+'</span></div></div></div>';}).join('');}
-async function renderCompactMessages(){var box=document.getElementById('compactMsgs');if(!box)return;var title=document.getElementById('compactChatTitle'),state=document.getElementById('compactChatState');if(!cTid){title.textContent='Новая проблема';state.style.display='none';box.innerHTML='<div class="es" style="padding:24px"><i class="fas fa-comments"></i><p>Опишите проблему ниже. После отправки создадим тикет и подключим инженера в этот же чат.</p></div>';return;}var t=ZIT.peekTicket(cTid);if(!t){t=await (async()=>{var arr=await ZIT.getTickets();return arr.find(function(x){return x.id===cTid;});})();}if(!t){cTid=null;await renderCompactMessages();return;}title.textContent='#'+String(t.number||0).padStart(4,'0')+' '+t.subject;state.style.display='inline-flex';state.className='bg '+(SC[t.status]||'b-cl');state.textContent=SL[t.status];box.innerHTML=(t.messages||[]).map(function(m){if(m.from==='system')return'<div class="compact-bubble system">'+ZIT.esc(m.text)+'</div>';var own=m.from==='user';return'<div class="compact-bubble '+(own?'user':'support')+'">'+(!own?'<div class="compact-author">'+ZIT.esc(m.authorName||'Поддержка')+'</div>':'')+ZIT.esc(m.text||'')+'</div>';}).join('');box.scrollTop=box.scrollHeight;}
+async function renderCompactRecent(){var wrap=document.getElementById('compactRecent');if(!wrap)return;var al=[].concat(await ZIT.getTickets()).reverse().slice(0,6);if(!al.length){wrap.innerHTML='<div class="es" style="padding:26px"><i class="fas fa-inbox"></i><p>Пока нет тикетов. Напишите новое сообщение ниже, и оно создаст обращение.</p></div>';return;}wrap.innerHTML=al.map(function(t){return'<div class="compact-ticket'+(cTid===t.id?' on':'')+'" onclick="selectCompactTicket(\''+t.id+'\')"><div class="compact-ticket-ic" style="background:'+SK[t.status]+'18;color:'+SK[t.status]+'"><i class="fas fa-'+(t.status==='progress'?'spinner':t.status==='done'?'check-circle':t.status==='closed'?'lock':'clock')+'"></i></div><div class="compact-ticket-body"><div class="compact-ticket-title">#'+String(t.number||0).padStart(4,'0')+' '+ZIT.esc(t.subject)+'</div><div class="compact-ticket-meta"><span>'+SL[t.status]+'</span><span>'+(PL[t.priority]||'Средний')+'</span><span>'+ZIT.relTime(t.updatedAt||t.updated_at||t.updated)+'</span></div></div></div>';}).join('');}
+async function renderCompactMessages(){var box=document.getElementById('compactMsgs');if(!box)return;var title=document.getElementById('compactChatTitle'),state=document.getElementById('compactChatState');if(!cTid){title.textContent='Быстрый запрос';state.style.display='none';box.innerHTML='<div class="es" style="padding:24px"><i class="fas fa-comments"></i><p>Напишите сообщение ниже. После первого сообщения будет создан тикет, и вы сможете продолжить общение здесь.</p></div>';return;}var t=ZIT.peekTicket(cTid);if(!t){t=await (async()=>{var arr=await ZIT.getTickets();return arr.find(function(x){return x.id===cTid;});})();}if(!t){cTid=null;await renderCompactMessages();return;}title.textContent='#'+String(t.number||0).padStart(4,'0')+' '+t.subject;state.style.display='inline-flex';state.className='bg '+(SC[t.status]||'b-cl');state.textContent=SL[t.status];box.innerHTML=(t.messages||[]).map(function(m){if(m.from==='system')return'<div class="compact-bubble system">'+ZIT.esc(m.text)+'</div>';var own=m.from==='user';return'<div class="compact-bubble '+(own?'user':'support')+'">'+(!own?'<div class="compact-author">'+ZIT.esc(m.authorName||'Инженер')+'</div>':'')+ZIT.esc(m.text||'')+'</div>';}).join('');box.scrollTop=box.scrollHeight;}
 async function selectCompactTicket(id){cTid=id;await renderCompactRecent();await renderCompactMessages();}
-async function sendCompactMessage(){var input=document.getElementById('compactInput');if(!input||!CU)return;var text=input.value.trim();if(!text)return;if(!cTid){var subject=text.replace(/\\s+/g,' ').slice(0,64);if(!subject)subject='Новое обращение';var created=await ZIT.createTicket(CU,subject,'',compactPriority,text);if(!created.ok){toast(created.err||'Ошибка');return;}cTid=created.id;}else{var r=await ZIT.addMessage(cTid,CU,text);if(!r.ok){toast(r.err||'Ошибка');return;}}input.value='';await renderCompactRecent();await renderCompactMessages();await rDash();await rList();}
+async function sendCompactMessage(){var input=document.getElementById('compactInput');if(!input||!CU)return;var text=input.value.trim();if(!text)return;if(!cTid){var subject=text.replace(/\\s+/g,' ').slice(0,64);if(!subject)subject='Новый запрос';var created=await ZIT.createTicket(CU,subject,'',compactPriority,text);if(!created.ok){toast(created.err||'Ошибка');return;}cTid=created.id;}else{var r=await ZIT.addMessage(cTid,CU,text);if(!r.ok){toast(r.err||'Ошибка');return;}}input.value='';await renderCompactRecent();await renderCompactMessages();await rDash();await rList();}
 function fSt(s,el){fSt2=s;document.querySelectorAll('.fr .ch').forEach(function(c){c.classList.remove('on');});el.classList.add('on');rList();}
 function fSearch(v){fSr=v;rList();}
 
 async function oTk(id){
-  var al=await ZIT.getTickets(),t=al.find(function(x){return x.id===id;});if(!t)return;
+  var t=await ZIT.getTicketDetails(id);if(!t)return;
   cTid=id;chatFs=[];
+  ticketHistoryModalTicket=t;
   document.getElementById('ciN').textContent='#'+String(t.number||0).padStart(4,'0');
-  document.getElementById('ciS').innerHTML='<span class="bg '+(SC[t.status]||'b-cl')+'">'+SL[t.status]+'</span>';
-  document.getElementById('ciP').innerHTML='<span class="pb '+(PC[t.priority]||'p-no')+'">'+PL[t.priority]+'</span>';
+  document.getElementById('ciS').innerHTML=renderTicketSideSelect(t,'status');
+  document.getElementById('ciP').innerHTML=renderTicketSideSelect(t,'priority');
   document.getElementById('ciC').textContent=t.category||'—';
   document.getElementById('ciD').textContent=new Date(Date.parse(t.createdAt||t.created_at||Date.now())).toLocaleDateString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('ciEA').textContent='—';
-  document.getElementById('ciEN').textContent='—';
-  document.getElementById('ciER').textContent='—';
-  document.getElementById('ciTL').innerHTML='';
+  renderTicketSidebarMeta(t);
   document.getElementById('chT').textContent=t.subject;
   document.getElementById('chB').innerHTML='<span class="bg '+(SC[t.status]||'b-cl')+'">'+SL[t.status]+'</span>';
   document.getElementById('rBtn').style.display=t.status==='closed'?'none':'';
@@ -1201,14 +2665,15 @@ function rMsgs(msgs){
   c.innerHTML=msgs.map(function(m){
     if(m.from==='system')return'<div class="mg sy"><div class="mb sy2">'+ZIT.esc(m.text)+'</div></div>';
     var own=Boolean(CU&&m.authorUserId&&m.authorUserId===CU.id);
-    var ini=own?(CU?CU.name.split(' ').map(function(w){return w[0];}).join('').substring(0,2):'Вы'):(m.authorName||'ИТ').substring(0,2);
+    var ownName=CU?((CU.name||CU.fullName||CU.email||'Вы').split(' ').map(function(w){return w[0];}).join('').substring(0,2)):'Вы';
+    var ini=own?ownName:(m.authorName||'ИТ').substring(0,2);
     var fh=(m.files||[]).map(function(f){if(/\.(jpg|jpeg|png|gif|webp)$/i.test(f.name)&&f.dataUrl)return'<img class="mim" src="'+f.dataUrl+'" onclick="document.getElementById(&quot;imI&quot;).src=this.src;document.getElementById(&quot;im&quot;).classList.add(&quot;on&quot;)">';return'<div class="mat"><div class="mai"><i class="fas '+fi2(f.name)+'"></i></div><div><div class="man">'+ZIT.esc(f.name||'')+'</div><div class="mas">'+ZIT.fmtSize(f.size)+'</div></div></div>';}).join('');
-    return'<div class="mg'+(own?' ow':'')+' "><div class="mav'+(own?' g':'')+'">'+ini+'</div><div class="mc">'+(!own?'<div class="msn">'+ZIT.esc(m.authorName||'Поддержка')+'</div>':'')+'<div class="mb '+(own?'ot':'ic')+'">'+ZIT.esc(m.text||'')+fh+'</div><div class="mt">'+new Date(m.time).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>';
+    return'<div class="mg'+(own?' ow':'')+' "><div class="mav'+(own?' g':'')+'">'+ini+'</div><div class="mc">'+(!own?'<div class="msn">'+ZIT.esc(m.authorName||'Инженер')+'</div>':'')+'<div class="mb '+(own?'ot':'ic')+'">'+ZIT.esc(m.text||'')+fh+'</div><div class="mt">'+new Date(m.time).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})+'</div></div></div>';
   }).join('');
   c.scrollTop=c.scrollHeight;
 }
 
-async function sMsg(){var inp=document.getElementById('mInp'),t=inp.value.trim();if(!t&&!chatFs.length)return;var r=await ZIT.addMessage(cTid,CU,t);if(!r.ok){toast(r.err||'Ошибка');return;}inp.value='';chatFs=[];document.getElementById('achp').innerHTML='';inp.style.height='auto';var tk=await (async()=>{var al=await ZIT.getTickets();return al.find(function(x){return x.id===cTid;});})();if(tk)rMsgs(tk.messages);}
+async function sMsg(){var inp=document.getElementById('mInp'),t=inp.value.trim();if(!t&&!chatFs.length)return;var r=await ZIT.addMessage(cTid,CU,t);if(!r.ok){toast(r.err||' [!i?? Q i?? T i??');return;}inp.value='';chatFs=[];document.getElementById('achp').innerHTML='';inp.style.height='auto';var tk=await (async()=>{var al=await ZIT.getTickets();return al.find(function(x){return x.id===cTid;});})();if(tk)rMsgs(tk.messages);}
 window.onNewMessage=async function(id){if(cTid===id){var t=ZIT.peekTicket(id);if(!t){t=await (async()=>{var al=await ZIT.getTickets();return al.find(function(x){return x.id===id;});})();}if(t)rMsgs(t.messages);}if(PORTAL_COMPACT){await renderCompactRecent();await renderCompactMessages();}};
 async function doRes(){var r=await ZIT.closeTicket(cTid);if(!r.ok){toast(r.err||'Ошибка');return;}var t=r.ticket;if(t){rMsgs(t.messages);document.getElementById('rBtn').style.display='none';document.getElementById('chB').innerHTML='<span class="bg b-cl">Закрыт</span>';}await rList();await rDash();toast('Тикет закрыт');}
 function cpLnk(){try{navigator.clipboard.writeText(location.href+'#t'+cTid);}catch(e){}toast('Ссылка скопирована');}
@@ -1222,7 +2687,7 @@ function ntAddF(fl){Array.from(fl).forEach(function(f){if(f.size>50*1024*1024){t
 function rDzF(){document.getElementById('dzF').innerHTML=ntFs.map(function(f,i){return'<div class="dzfi"><i class="fas '+fi2(f.name)+' t"></i><span>'+ZIT.esc(f.name)+'</span><i class="fas fa-times rm" onclick="ntFs.splice('+i+',1);rDzF()"></i></div>';}).join('');}
 async function sbT(){
   var s=document.getElementById('ntSb'),d=document.getElementById('ntDs');
-  if(!s.value.trim()){s.focus();toast('Укажите тему обращения');return;}
+  if(!s.value.trim()){s.focus();toast('Введите тему');return;}
   if(!d.value.trim()){d.focus();toast('Опишите проблему');return;}
   var r=await ZIT.createTicket(CU,s.value.trim(),document.getElementById('ntCt').value,ntPri,d.value.trim());
   if(!r.ok){toast(r.err||'Ошибка');return;}
@@ -1240,7 +2705,7 @@ var tT2;
 function toast(msg){clearTimeout(tT2);var el=document.getElementById('toast');document.getElementById('tMsg').textContent=msg;el.classList.add('on');tT2=setTimeout(function(){el.classList.remove('on');},3000);}
 
 function rand2(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function fmtT2(s){return s<60?s+' сек':Math.floor(s/60)+' мин '+s%60+' сек';}
+function fmtT2(s){return s<60?s+' мин':Math.floor(s/60)+' ч '+s%60+' мин';}
 function stSt(){
   function up(){
     var n=rand2(4,6),t=rand2(40,180),l=rand2(10,90);
@@ -1249,7 +2714,7 @@ function stSt(){
     ids.forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
     var ids2=[['lvT',fmtT2(t)],['swT',fmtT2(t)],['mT',fmtT2(t)]];
     ids2.forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
-    var ids3=[['lvL',l+' сек'],['swL',l+' сек']];
+    var ids3=[['lvL',l+' мин'],['swL',l+' мин']];
     ids3.forEach(function(x){var el=document.getElementById(x[0]);if(el)el.textContent=x[1];});
     var se=document.getElementById('swEs');if(se)se.innerHTML=sh.map(function(n){return'<div class="sweb">'+n+'</div>';}).join('');
   }
@@ -1262,6 +2727,15 @@ setInterval(async function(){
 },6000);
 
 (function(){var s=ZIT.getSession();if(s&&s.id&&PORTAL_ENTRY!=='login'){CU=s;stSt();sApp();}else{stSt();showAuthScreen('l');}})();
+document.addEventListener('click',function(e){
+  var dropdown=document.getElementById('reportCompanyDropdown');
+  if(dropdown&&!dropdown.contains(e.target))dropdown.classList.remove('open');
+  var fromDropdown=document.getElementById('reportDateFromDropdown');
+  if(fromDropdown&&!fromDropdown.contains(e.target)){
+    var toDropdown=document.getElementById('reportDateToDropdown');
+    if(!toDropdown||!toDropdown.contains(e.target))closeReportDatePickers();
+  }
+});
 window.addEventListener('message',function(e){
   if(!e.data||typeof e.data!=='object')return;
   if(e.data.type==='openLogin')showAuthScreen('l');
@@ -1276,3 +2750,4 @@ window.addEventListener('message',function(e){
 </script>
 </body>
 </html>
+

@@ -27,7 +27,8 @@ const updateSchema = z.object({
   description: z.string().min(3).optional(),
   category: z.string().nullable().optional(),
   priority: z.enum(['low', 'normal', 'high', 'critical']).optional(),
-  status: z.enum(['open', 'progress', 'done', 'closed']).optional()
+  status: z.enum(['open', 'progress', 'done', 'closed']).optional(),
+  assigneeUserId: z.string().nullable().optional()
 }).refine((value) => Object.keys(value).length > 0, {
   message: 'At least one field is required'
 });

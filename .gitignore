@@ -4,6 +4,7 @@ backend/data/
 backend/server.out.log
 backend/server.err.log
 backend/.env
+.env.production
 edge-profile/
 .DS_Store
 Thumbs.db

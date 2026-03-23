@@ -14,8 +14,8 @@ router.get('/roles', requireAuth, requirePermission('user.manage.company'), asyn
   const roles = db.prepare(`
     SELECT id, code, name, scope, is_system
     FROM roles
-    WHERE scope = 'company'
-    ORDER BY code
+    WHERE code IN ('client_admin', 'client_user')
+    ORDER BY CASE code WHEN 'client_admin' THEN 0 ELSE 1 END
   `).all();
 
   res.json({ roles });

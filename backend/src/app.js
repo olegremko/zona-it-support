@@ -22,6 +22,16 @@ export function createApp() {
   if (fs.existsSync(schemaPath)) {
     db.exec(fs.readFileSync(schemaPath, 'utf8'));
   }
+  const companyColumns = db.prepare(`PRAGMA table_info(companies)`).all();
+  const ensureCompanyColumn = (name, sql) => {
+    if (companyColumns.length && !companyColumns.some((col) => col.name === name)) {
+      db.exec(sql);
+    }
+  };
+  ensureCompanyColumn('description', 'ALTER TABLE companies ADD COLUMN description TEXT');
+  ensureCompanyColumn('contact_email', 'ALTER TABLE companies ADD COLUMN contact_email TEXT');
+  ensureCompanyColumn('contact_phone', 'ALTER TABLE companies ADD COLUMN contact_phone TEXT');
+  ensureCompanyColumn('address', 'ALTER TABLE companies ADD COLUMN address TEXT');
   const liveChatColumns = db.prepare(`PRAGMA table_info(live_chat_conversations)`).all();
   if (liveChatColumns.length && !liveChatColumns.some((col) => col.name === 'ticket_id')) {
     db.exec('ALTER TABLE live_chat_conversations ADD COLUMN ticket_id TEXT');

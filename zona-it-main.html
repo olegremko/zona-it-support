@@ -825,36 +825,25 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .blog-links a { color: var(--green); font-weight: 600; font-size: 14px; }
 .blog-links a:hover { text-decoration: underline; }
 
-/* ===== EXIT POPUP ===== */
-.exit-popup {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-  z-index: 3000; display: none; align-items: center; justify-content: center;
-  backdrop-filter: blur(8px); padding: 20px;
-}
-.exit-popup.show { display: flex; }
-.exit-card {
-  background: #fff; border-radius: var(--radius);
-  max-width: 460px; width: 100%; padding: 40px; text-align: center;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.3);
-  animation: pop-in .4s cubic-bezier(.175,.885,.32,1.275);
-}
-@keyframes pop-in {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-.exit-icon { font-size: 48px; margin-bottom: 16px; }
-.exit-title { font-size: 22px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
-.exit-text { font-size: 15px; color: var(--text-light); margin-bottom: 24px; line-height: 1.6; }
+/* ===== FORM INPUTS ===== */
 .exit-input {
-  width: 100%; padding: 14px 18px; border-radius: 50px;
-  border: 1px solid var(--border); font-family: 'Inter', sans-serif; font-size: 15px;
-  outline: none; margin-bottom: 14px; transition: border-color .2s;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  appearance: none;
 }
-.exit-input:focus { border-color: var(--green); }
-.exit-btns { display: flex; flex-direction: column; gap: 10px; }
-.exit-tg { color: var(--text-light); font-size: 13px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.exit-tg i { color: #2CA5E0; }
-.exit-dismiss { color: var(--text-light); font-size: 13px; cursor: pointer; margin-top: 8px; text-decoration: underline; }
+.exit-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(0,168,107,.12);
+}
+.exit-input::placeholder {
+  color: rgba(255,255,255,.55);
+}
 
 /* ===== CHATBOT ===== */
 .chatbot {
@@ -931,9 +920,17 @@ footer {
 .contact-item i { color: var(--green); width: 16px; }
 .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 12px; }
 .footer-copy { color: rgba(255,255,255,0.3); font-size: 13px; }
-.footer-policy { display: flex; gap: 20px; }
-.footer-policy a { color: rgba(255,255,255,0.3); font-size: 13px; transition: color .2s; }
-.footer-policy a:hover { color: var(--green); }
+.footer-policy,
+.footer-policy-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-policy a,
+.footer-policy-links a { color: rgba(255,255,255,0.3); font-size: 13px; transition: color .2s; }
+.footer-policy a:hover,
+.footer-policy-links a:hover { color: var(--green); }
+.footer-legal-note {
+  margin-top: 18px; padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.42); font-size: 13px; line-height: 1.7;
+}
 
 /* ===== SERVICE DETAIL PANEL ===== */
 .svc-panel-overlay {
@@ -2158,13 +2155,6 @@ footer {
     <div style="max-width:480px;margin:0 auto;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);padding:36px">
       <input class="exit-input" placeholder="Ваше имя" style="margin-bottom:12px;background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.15);color:#fff">
       <input class="exit-input" placeholder="Телефон или Email" style="margin-bottom:12px;background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.15);color:#fff">
-      <select class="select-styled" style="width:100%;margin-bottom:20px;background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.15);color:#fff">
-        <option>Что вас интересует?</option>
-        <option>Обслуживание компьютеров</option>
-        <option>Серверы и сети</option>
-        <option>Поддержка 1С</option>
-        <option>Полный аутсорсинг</option>
-      </select>
       <div class="consent-row" onclick="toggleConsent('consent-main','consent-main-err')">
         <div class="consent-box" id="consent-main"></div>
         <span class="consent-text">Я ознакомлен(а) и согласен(на) с <a href="#privacy" onclick="nav('privacy');event.stopPropagation()">Политикой конфиденциальности</a> и даю согласие на обработку персональных данных в соответствии с Федеральным законом №&nbsp;152-ФЗ</span>
@@ -2174,6 +2164,66 @@ footer {
     </div>
   </div>
 </section>
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="#home" onclick="nav('home')" class="logo" style="display:inline-flex;margin-bottom:16px"><div class="logo-mark">З</div>Зона<span> ИТ</span></a>
+        <p class="footer-desc">ИТ-аутсорсинг для компаний с 2012 года. Более 200 клиентов по всей России.</p>
+        <div class="footer-social">
+          <a href="https://t.me/zona_it" class="soc-btn" target="_blank"><i class="fab fa-telegram"></i></a>
+          <a href="https://vk.com/zona_it" class="soc-btn" target="_blank"><i class="fab fa-vk"></i></a>
+          <a href="https://wa.me/74951234567" class="soc-btn" target="_blank"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://youtube.com/@zona_it" class="soc-btn" target="_blank"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Услуги</div>
+        <div class="footer-links">
+          <a href="#service-pc" onclick="nav('service-pc')">Обслуживание ПК</a>
+          <a href="#service-servers" onclick="nav('service-servers')">Серверы</a>
+          <a href="#service-network" onclick="nav('service-network')">Сети</a>
+          <a href="#service-1c" onclick="nav('service-1c')">1С и ERP</a>
+          <a href="#service-kassa" onclick="nav('service-kassa')">Кассы</a>
+          <a href="#service-security" onclick="nav('service-security')">Безопасность</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Компания</div>
+        <div class="footer-links">
+          <a href="#about" onclick="nav('about')">О нас</a>
+          <a href="#team" onclick="nav('team')">Команда</a>
+          <a href="#cases" onclick="nav('cases')">Кейсы</a>
+          <a href="#blog" onclick="nav('blog')">Блог</a>
+          <a href="#vacancies" onclick="nav('vacancies')">Вакансии</a>
+          <a href="#partners" onclick="nav('partners')">Партнёрам</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Контакты</div>
+        <div class="contact-item"><i class="fas fa-phone"></i><a href="tel:+74951234567" style="color:var(--green);font-weight:600"> +7 (495) 123-45-67</a></div>
+        <div class="contact-item"><i class="fas fa-envelope"></i> <a href="mailto:info@zona-it.ru" style="color:var(--green);font-weight:600">info@zona-it.ru</a></div>
+        <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Москва, ул. Технологическая, 1</div>
+        <div class="contact-item"><i class="fas fa-clock"></i> Поддержка 24/7/365</div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2024 Зона ИТ. Все права защищены.</span>
+      <div class="footer-policy-links">
+        <a href="#privacy" onclick="nav('privacy')">Политика конфиденциальности</a>
+        <a href="#terms" onclick="nav('terms')">Условия использования</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<div style="background:#060f1a;padding:0 0 32px;">
+  <div class="container">
+    <div class="footer-legal-note" style="margin-top:0;">
+      Компания Zona IT работает с 2012 года. Все права на материалы сайта, тексты, интерфейсы и графические элементы защищены.
+      По вопросам сотрудничества и поддержки: +7 (495) 123-45-67, info@zona-it.ru.
+    </div>
+  </div>
+</div>
 </div>
 
 <div id="page-service-pc" class="page-view" style="display:none">
@@ -2297,6 +2347,14 @@ footer {
     </div>
   </div>
 </footer>
+<div style="background:#060f1a;padding:0 0 32px;">
+  <div class="container">
+    <div class="footer-legal-note" style="margin-top:0;">
+      Компания Zona IT работает с 2012 года. Все права на материалы сайта, тексты, интерфейсы и графические элементы защищены.
+      По вопросам сотрудничества и поддержки: +7 (495) 123-45-67, info@zona-it.ru.
+    </div>
+  </div>
+</div>
 </div>
 
 <div id="page-service-servers" class="page-view" style="display:none">
@@ -3824,9 +3882,8 @@ footer {
 
 <!-- ================================ -->
 
-<!-- EXIT POPUP -->
-<div class="exit-popup" id="exitPopup">
-  <div class="exit-card">
+<div class="exit-popup" id="exitPopup" style="display:none !important; visibility:hidden !important; pointer-events:none !important;">
+  <div class="exit-card" style="display:none !important;">
     <div class="exit-icon">👋</div>
     <div class="exit-title">Не уходите!</div>
     <p class="exit-text">Хотите, поможем подобрать оптимальный пакет за 5 минут?</p>
@@ -4157,7 +4214,7 @@ function ensurePortalFrame(){
   var frame=document.getElementById('supportPortalFrame');
   if(!frame||supportPortalLoaded)return;
   frame.onload=function(){supportPortalLoaded=true;};
-  frame.src='zona-it-portal.html';
+  frame.src='zona-it-portal.html?v=20260320b';
 }
 function sendChatMessage(msg){
   var frame=document.getElementById('supportChatFrame');
@@ -4326,9 +4383,8 @@ function openCase(idx){
 function closeModal(){document.getElementById('caseModal').classList.remove('open');document.body.style.overflow='';}
 
 // ===== EXIT POPUP =====
-var exitShown=false;
-document.addEventListener('mouseleave',function(e){if(e.clientY<=0&&!exitShown){exitShown=true;document.getElementById('exitPopup').classList.add('show');}});
-function closeExit(){document.getElementById('exitPopup').classList.remove('show');}
+var exitShown = true;
+function closeExit(){}
 
 // ===== CHATBOT =====
 
