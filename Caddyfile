@@ -10,7 +10,7 @@ http://2.27.54.185 {
   }
 }
 
-1636330.xorek.cloud {
+i-zone.pro {
   encode zstd gzip
 
   reverse_proxy app:4000
