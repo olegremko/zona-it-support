@@ -895,6 +895,30 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   outline: none; margin-bottom: 10px; transition: border-color .2s;
 }
 .helper-input:focus { border-color: var(--green); }
+.helper-form .consent-row{
+  align-items:flex-start; gap:10px; margin:8px 0 8px; padding:10px 12px;
+  border:1px solid rgba(0,168,107,.14); border-radius:14px; background:rgba(0,168,107,.04);
+}
+.helper-form .consent-box{
+  width:18px; height:18px; margin-top:1px; border-radius:5px;
+  border:2px solid rgba(11,30,51,.22); background:#fff;
+  box-shadow:0 2px 8px rgba(11,30,51,.06);
+}
+.helper-form .consent-box.checked{
+  background:var(--green); border-color:var(--green);
+}
+.helper-form .consent-text{
+  font-size:11px; line-height:1.45; color:var(--text-light);
+}
+.helper-form .consent-text a{
+  color:var(--green-dark); font-weight:600;
+}
+.helper-form .consent-error{
+  margin:-2px 0 10px; font-size:11px; line-height:1.35;
+}
+.helper-form .btn{
+  margin-top:2px;
+}
 
 /* ===== FOOTER ===== */
 footer {
