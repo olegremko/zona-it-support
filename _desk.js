@@ -317,10 +317,10 @@
     var sub = document.querySelector('.sidebar-sub');
     if (state.mode === 'livechat') {
       title.textContent = 'Живые чаты';
-      sub.textContent = 'Очередь обращений с сайта для superuser и поддержки: новые диалоги, ответы и быстрый переход в задачу.';
+      if (sub) sub.textContent = 'Очередь обращений с сайта для superuser и поддержки: новые диалоги, ответы и быстрый переход в задачу.';
     } else {
       title.textContent = hasPermission('ticket.view.all') || (state.user && state.user.isGlobalAdmin) ? 'Все тикеты' : 'Мои тикеты';
-      sub.textContent = 'Легкий рабочий режим: список заявок, переписка по задаче и быстрые обновления без полного портала.';
+      if (sub) sub.textContent = 'Легкий рабочий режим: список заявок, переписка по задаче и быстрые обновления без полного портала.';
     }
   }
 
