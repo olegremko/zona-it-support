@@ -71,6 +71,43 @@ docker compose --env-file .env.production -f docker-compose.postgres.production.
 docker compose --env-file .env.production -f docker-compose.postgres.production.yml logs -f caddy
 ```
 
+## Firewall
+
+Open ports currently used:
+
+- `22/tcp` with `limit`
+- `80/tcp`
+- `443/tcp`
+- `443/udp`
+- `4020/tcp` for staging
+
+Check firewall:
+
+```sh
+ufw status verbose
+```
+
+## Fail2Ban
+
+List current bans:
+
+```sh
+zona-list-bans
+```
+
+Unban IP:
+
+```sh
+zona-unban-ip 1.2.3.4
+```
+
+Whitelist IP or subnet:
+
+```sh
+zona-whitelist-ip 1.2.3.4
+zona-whitelist-ip 1.2.3.0/24
+```
+
 ## Restart Services
 
 ```sh
