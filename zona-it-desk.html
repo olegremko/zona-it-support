@@ -66,9 +66,11 @@
     .bubble.other{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:8px} .bubble.system{max-width:100%;background:rgba(127,195,255,.08);border:1px dashed rgba(127,195,255,.22);color:#cfe5ff;font-size:13px}
     .bubble-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:11px;color:rgba(255,255,255,.7);font-weight:700;text-transform:uppercase;letter-spacing:1px}
     .bubble.other .bubble-meta,.bubble.system .bubble-meta{color:#8fb0d3}.composer-row{padding:18px 20px;border-top:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;background:rgba(6,15,26,.62)}
-    .aside{width:320px;flex-shrink:0;padding:22px;display:grid;gap:14px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(127,195,255,.03))}
+    .aside{width:320px;flex-shrink:0;padding:22px;display:grid;gap:14px;align-content:start;align-items:start;grid-auto-rows:min-content;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(127,195,255,.03));overflow:auto}
     .aside-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:16px}.aside-card h3{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#8ea7c1}
+    .aside-card:last-child{display:flex;flex-direction:column;min-height:0}
     .kv{display:grid;gap:10px}.kv-row{display:flex;justify-content:space-between;gap:10px;font-size:13px}.kv-row span:first-child{color:var(--muted)}
+    .history{gap:10px;max-height:280px;overflow:auto;align-content:start;padding-right:4px}
     .history-item{padding:12px;border-radius:16px;background:rgba(255,255,255,.04);font-size:13px;line-height:1.45}.history-item strong{display:block;margin-bottom:6px}
     .modal{position:fixed;inset:0;background:rgba(4,10,18,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.open{display:flex}
     .modal-card{width:min(620px,100%);background:#0d1a2b;border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:24px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
