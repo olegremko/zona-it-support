@@ -33,25 +33,25 @@
     .btn-secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line)} .btn-ghost{background:transparent;color:var(--muted);border:1px dashed rgba(255,255,255,.12)}
     .error{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.22);color:#ffd4d4;font-size:13px}.error.show{display:block}
     .hidden{display:none!important}.desk-shell{display:flex;min-height:100vh;padding:24px;gap:20px}
-    .sidebar{width:320px;flex-shrink:0;background:rgba(10,19,31,.88);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
-    .sidebar-head{padding:22px 22px 16px;border-bottom:1px solid var(--line)} .sidebar-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .sidebar-title h2{margin:0;font-size:20px;font-family:'Montserrat',sans-serif}.sidebar-sub{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.55}
-    .user-chip{margin-top:16px;padding:14px;border-radius:18px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.14)}
-    .user-chip strong{display:block;font-size:15px}.user-chip span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-    .mode-switch{display:flex;gap:8px;margin-top:14px}
-    .mode-btn{flex:1;height:40px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#b9cae0;cursor:pointer;font-weight:700;transition:border-color .18s, background .18s, color .18s}
+    .sidebar{width:292px;flex-shrink:0;background:rgba(10,19,31,.88);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+    .sidebar-head{padding:16px 16px 12px;border-bottom:1px solid var(--line)} .sidebar-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .sidebar-title h2{margin:0;font-size:17px;font-family:'Montserrat',sans-serif}
+    .user-chip{margin-top:12px;padding:11px 12px;border-radius:16px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.14)}
+    .user-chip strong{display:block;font-size:14px;line-height:1.2}.user-chip span{display:block;color:var(--muted);font-size:11px;margin-top:3px;line-height:1.35}
+    .mode-switch{display:flex;gap:6px;margin-top:12px}
+    .mode-btn{flex:1;height:36px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#b9cae0;cursor:pointer;font-weight:700;font-size:13px;transition:border-color .18s, background .18s, color .18s}
     .mode-btn:hover{border-color:rgba(0,168,107,.22);color:#eef6ff}
     .mode-btn.active{background:linear-gradient(135deg,rgba(0,168,107,.18),rgba(127,195,255,.1));border-color:rgba(0,168,107,.34);color:#fff}
     .browser-note{margin-bottom:16px;padding:12px 14px;border-radius:16px;background:rgba(127,195,255,.08);border:1px solid rgba(127,195,255,.18);color:#d2e6ff;font-size:13px;line-height:1.55}
-    .search-box{padding:16px 22px 14px;border-bottom:1px solid var(--line)}
-    .quick-ticket-panel{margin-top:12px;padding:12px;border-radius:18px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.12)}
-    .quick-ticket-label{display:block;margin-bottom:8px;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:#88a8c9;font-weight:800}
-    .ticket-list{padding:12px;display:grid;gap:10px;overflow:auto;min-height:0}
-    .ticket-card{background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:18px;padding:14px 14px 12px;cursor:pointer;transition:border-color .18s, background .18s}
+    .search-box{padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+    .quick-ticket-panel{margin-top:10px;padding:10px;border-radius:16px;background:linear-gradient(180deg,rgba(127,195,255,.08),rgba(255,255,255,.02));border:1px solid rgba(127,195,255,.12)}
+    .quick-ticket-label{display:block;margin-bottom:6px;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#88a8c9;font-weight:800}
+    .ticket-list{padding:10px;display:grid;gap:8px;overflow:auto;min-height:0}
+    .ticket-card{background:rgba(255,255,255,.03);border:1px solid transparent;border-radius:16px;padding:10px 11px;cursor:pointer;transition:border-color .18s, background .18s}
     .ticket-card:hover{background:rgba(255,255,255,.05);border-color:rgba(0,168,107,.2)} .ticket-card.active{background:linear-gradient(180deg,rgba(0,168,107,.14),rgba(127,195,255,.05));border-color:rgba(0,168,107,.34)}
-    .ticket-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.ticket-no{font-size:12px;color:#86a0bb;font-weight:700;letter-spacing:.8px}
-    .ticket-subject{font-weight:700;line-height:1.35}.ticket-preview{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .ticket-meta{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent;white-space:nowrap}
+    .ticket-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.ticket-no{font-size:11px;color:#86a0bb;font-weight:700;letter-spacing:.5px}
+    .ticket-subject{font-weight:700;font-size:14px;line-height:1.3}.ticket-preview{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.38;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .ticket-meta{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid transparent;white-space:nowrap}
     .pill.open{background:var(--orange-soft);color:#ffb347;border-color:rgba(255,179,71,.22)} .pill.progress{background:rgba(186,104,255,.16);color:#cf8eff;border-color:rgba(186,104,255,.24)}
     .pill.done{background:var(--green-soft);color:#35d596;border-color:rgba(0,168,107,.24)} .pill.closed{background:rgba(255,255,255,.08);color:#c5d2e0;border-color:rgba(255,255,255,.1)}
     .pill.low{background:rgba(127,195,255,.14);color:#9fd2ff;border-color:rgba(127,195,255,.2)} .pill.normal{background:rgba(255,255,255,.08);color:#c7d5e4;border-color:rgba(255,255,255,.1)}
@@ -118,29 +118,28 @@
   <div id="deskApp" class="desk-shell hidden">
     <aside class="sidebar">
       <div class="sidebar-head">
-        <div class="sidebar-title"><h2>Мои тикеты</h2><button id="deskNewTicketBtn" class="btn btn-primary" type="button" style="height:42px;padding:0 16px">Новый</button></div>
-        <div class="sidebar-sub">Легкий рабочий режим для клиентов: список заявок, переписка по задаче и быстрые обновления без полного портала.</div>
-        <div class="user-chip"><strong id="deskUserName">Пользователь</strong><span id="deskUserMeta">Компания</span></div>
+        <div class="sidebar-title"><h2>Мои тикеты</h2><button id="deskNewTicketBtn" class="btn btn-primary" type="button" style="height:38px;padding:0 14px;border-radius:13px;font-size:13px">Новый</button></div>
+                <div class="user-chip"><strong id="deskUserName">Пользователь</strong><span id="deskUserMeta">Компания</span></div>
         <div id="deskModeTabs" class="mode-switch hidden">
           <button id="deskModeTickets" class="mode-btn active" type="button">Тикеты</button>
           <button id="deskModeChats" class="mode-btn" type="button">Чаты</button>
         </div>
       </div>
       <div class="search-box">
-        <input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:48px;margin-bottom:10px">
-        <select id="deskStatusFilter" class="input native-select" style="height:44px;margin-bottom:10px">
+        <input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:40px;margin-bottom:8px;border-radius:14px;font-size:13px">
+        <select id="deskStatusFilter" class="input native-select" style="height:40px;margin-bottom:8px">
           <option value="">Все статусы</option>
           <option value="open">Открытые</option>
           <option value="progress">В работе</option>
           <option value="done">Решенные</option>
           <option value="closed">Закрытые</option>
         </select>
-        <select id="deskCompanyFilter" class="input native-select hidden" style="height:44px">
+        <select id="deskCompanyFilter" class="input native-select hidden" style="height:40px">
           <option value="">Все компании</option>
         </select>
         <div id="deskQuickStatusWrap" class="quick-ticket-panel hidden">
           <label class="quick-ticket-label" for="deskQuickStatus">Быстрый статус</label>
-          <select id="deskQuickStatus" class="input native-select" style="height:44px">
+          <select id="deskQuickStatus" class="input native-select" style="height:40px">
             <option value="open">Открыт</option>
             <option value="progress">В работе</option>
             <option value="done">Решен</option>
