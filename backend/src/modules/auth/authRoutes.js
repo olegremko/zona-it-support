@@ -22,13 +22,13 @@ const registerSchema = z.object({
 router.post('/login', asyncHandler(async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
-  res.json(login(parsed.data.email, parsed.data.password));
+  res.json(await login(parsed.data.email, parsed.data.password));
 }));
 
 router.post('/register', asyncHandler(async (req, res) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
-  res.status(201).json(register(parsed.data));
+  res.status(201).json(await register(parsed.data));
 }));
 
 router.get('/me', requireAuth, asyncHandler(async (req, res) => {
