@@ -17,6 +17,9 @@ import { errorHandler } from './middleware/errorHandler.js';
 export async function createApp() {
   const app = express();
   const siteRoot = path.resolve(process.cwd(), '..');
+  const mainPage = path.join(siteRoot, 'zona-it-main.html');
+  const portalPage = path.join(siteRoot, 'zona-it-portal.html');
+  const chatPage = path.join(siteRoot, 'zona-it-chat.html');
   const schemaFile = env.dbClient === 'postgres' ? 'schema.postgres.sql' : 'schema.sql';
   const schemaPath = path.resolve(process.cwd(), 'sql', schemaFile);
 
@@ -55,6 +58,7 @@ export async function createApp() {
   }));
   app.use(express.json({ limit: '2mb' }));
   app.use(cookieParser());
+  app.disable('x-powered-by');
   app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -74,7 +78,31 @@ export async function createApp() {
   app.use('/api/live-chat', liveChatRoutes);
 
   app.get('/', (req, res) => {
-    res.redirect('/zona-it-main.html');
+    res.sendFile(mainPage);
+  });
+
+  app.get('/portal', (req, res) => {
+    res.sendFile(portalPage);
+  });
+
+  app.get('/chat', (req, res) => {
+    res.sendFile(chatPage);
+  });
+
+  app.get('/zona-it-main.html', (req, res) => {
+    res.redirect(301, '/');
+  });
+
+  app.get('/zona-it-portal.html', (req, res) => {
+    const queryIndex = req.originalUrl.indexOf('?');
+    const suffix = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : '';
+    res.redirect(301, `/portal${suffix}`);
+  });
+
+  app.get('/zona-it-chat.html', (req, res) => {
+    const queryIndex = req.originalUrl.indexOf('?');
+    const suffix = queryIndex >= 0 ? req.originalUrl.slice(queryIndex) : '';
+    res.redirect(301, `/chat${suffix}`);
   });
 
   app.use(express.static(siteRoot));

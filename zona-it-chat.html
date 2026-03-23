@@ -414,7 +414,7 @@ var CU=null,cTid=null,pri='normal',ntFs=[],mcFs=[],wOpen=false;
 
 function tog(){if(EMBED){wOpen=true;document.getElementById('win').classList.add('open');CU=ZIT.getSession();sw(CU?'t':'g');try{parent.postMessage({type:'chatToggle',open:true},'*');}catch(e){}return;}wOpen=!wOpen;document.getElementById('win').classList.toggle('open',wOpen);document.getElementById('fI').className=wOpen?'fas fa-times':'fas fa-comments';if(wOpen){CU=ZIT.getSession();sw(CU?'t':'g');}try{parent.postMessage({type:'chatToggle',open:wOpen},'*');}catch(e){}}
 function closeW(){if(EMBED){try{parent.postMessage({type:'closeChat'},'*');}catch(e){}return;}wOpen=false;document.getElementById('win').classList.remove('open');document.getElementById('fI').className='fas fa-comments';}
-function oP(){if(EMBED&&window.parent!==window){try{parent.postMessage({type:'openPortal'},'*');}catch(e){}return;}window.open('zona-it-portal.html','_blank');}
+function oP(){if(EMBED&&window.parent!==window){try{parent.postMessage({type:'openPortal'},'*');}catch(e){}return;}window.open('/portal','_blank');}
 
 function sw(m){
   CU=ZIT.getSession();

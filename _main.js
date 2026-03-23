@@ -1,10 +1,14 @@
 
 const PAGES=['home','service-pc','service-servers','service-network','service-1c','service-security','service-kassa','about','team','cases','blog','vacancies','partners','faq','privacy','terms'];
 
+function cleanUrlForRoute(route){
+  return route && route !== 'home' ? '/#' + route : '/';
+}
+
 function nav(route,anchor){
   PAGES.forEach(function(p){var el=document.getElementById('page-'+p);if(el)el.style.display='none';});
   var t=document.getElementById('page-'+route);
-  if(t){t.style.display='block';window.scrollTo(0,0);try{history.pushState(null,'','#'+route);}catch(e){}
+  if(t){t.style.display='block';window.scrollTo(0,0);try{history.pushState(null,'',cleanUrlForRoute(route));}catch(e){}
     if(anchor){setTimeout(function(){var a=document.getElementById(anchor);if(a)a.scrollIntoView({behavior:'smooth'});},120);}
   }
 }
@@ -246,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== CHAT BUTTON =====
 function openChat() {
-  window.open('zona-it-chat.html', '_blank',
+  window.open('/chat', '_blank',
     'width=400,height=640,left=' + (screen.width - 420) +
     ',top=' + (screen.height - 680) +
     ',resizable=yes,scrollbars=no');

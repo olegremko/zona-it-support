@@ -260,7 +260,7 @@ var CU=null,cTid=null,pri='normal',ntFs=[],mcFs=[],wOpen=false;
 
 function tog(){wOpen=!wOpen;document.getElementById('win').classList.toggle('open',wOpen);document.getElementById('fI').className=wOpen?'fas fa-times':'fas fa-comments';if(wOpen){CU=ZIT.getSession();sw(CU?'t':'g');}try{parent.postMessage({type:'chatToggle',open:wOpen},'*');}catch(e){}}
 function closeW(){wOpen=false;document.getElementById('win').classList.remove('open');document.getElementById('fI').className='fas fa-comments';}
-function oP(){window.open('zona-it-portal.html','_blank');}
+function oP(){window.open('/portal','_blank');}
 
 function sw(m){
   CU=ZIT.getSession();

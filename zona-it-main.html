@@ -4012,6 +4012,24 @@ footer {
 </div>
 
 <script>
+function cleanUrlForRoute(route){
+  return route && route !== 'home' ? '/#' + route : '/';
+}
+
+function normalizePublicUrl(){
+  try{
+    var path = location.pathname || '/';
+    if(path === '/zona-it-main.html'){
+      history.replaceState(null, '', location.hash ? '/' + location.hash : '/');
+    }else if(path === '/zona-it-portal.html'){
+      history.replaceState(null, '', '/portal' + (location.search || '') + (location.hash || ''));
+    }else if(path === '/zona-it-chat.html'){
+      history.replaceState(null, '', '/chat' + (location.search || '') + (location.hash || ''));
+    }
+  }catch(e){}
+}
+
+normalizePublicUrl();
 const PAGES=['home','service-pc','service-servers','service-network','service-1c','service-security','service-kassa','about','team','cases','blog','vacancies','partners','faq','privacy','terms'];
 var supportChatLoaded=false,supportPortalLoaded=false,pendingChatMessage=null;
 var guestSupportMessages=[];
@@ -4190,7 +4208,7 @@ function setSupportMode(mode){
 }
 function ensureChatFrame(mode,forceReload){
   var frame=document.getElementById('supportChatFrame');
-  var src='zona-it-portal.html?compact=1&entry='+(mode||'default')+'&v=20260318';
+  var src='/portal?compact=1&entry='+(mode||'default')+'&v=20260318';
   if(!frame)return;
   if(forceReload){
     supportChatLoaded=false;
@@ -4214,7 +4232,7 @@ function ensurePortalFrame(){
   var frame=document.getElementById('supportPortalFrame');
   if(!frame||supportPortalLoaded)return;
   frame.onload=function(){supportPortalLoaded=true;};
-  frame.src='zona-it-portal.html?v=20260320b';
+  frame.src='/portal?v=20260320b';
 }
 function sendChatMessage(msg){
   var frame=document.getElementById('supportChatFrame');
@@ -4274,7 +4292,7 @@ window.addEventListener('message',function(e){
 function nav(route,anchor){
   PAGES.forEach(function(p){var el=document.getElementById('page-'+p);if(el)el.style.display='none';});
   var t=document.getElementById('page-'+route);
-  if(t){t.style.display='block';window.scrollTo(0,0);try{history.pushState(null,'','#'+route);}catch(e){}
+  if(t){t.style.display='block';window.scrollTo(0,0);try{history.pushState(null,'',cleanUrlForRoute(route));}catch(e){}
     if(anchor){setTimeout(function(){var a=document.getElementById(anchor);if(a)a.scrollIntoView({behavior:'smooth'});},120);}
   }
 }
