@@ -419,9 +419,9 @@
           '<div class="remote-row"><span>Ключ</span><span>' + escapeHtml(runtime.server_key ? (String(runtime.server_key).slice(0, 14) + '...') : 'не задан') + '</span></div>' +
           '<div class="remote-note">' + escapeHtml(state.desktopRemote.installed
             ? (state.desktopRemote.clientId
-              ? 'RustDesk установлен. ID этого ПК: ' + state.desktopRemote.clientId
-              : 'RustDesk установлен, но ID пока не прочитан. Нажмите «Открыть RustDesk».')
-            : 'Для реального подключения нужен RustDesk. Его можно установить и открыть прямо из клиента.') + '</div>' +
+              ? 'Модуль удаленной помощи готов. ID этого ПК: ' + state.desktopRemote.clientId
+              : 'Модуль удаленной помощи загружен, но ID пока не прочитан. Нажмите «Открыть модуль».')
+            : 'Для удаленной помощи нужен встроенный модуль. Его можно загрузить и открыть прямо из клиента.') + '</div>' +
         '</div>'
       );
     }
@@ -463,7 +463,7 @@
       buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended">\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f</button>');
     }
     if (runtime && runtime.enabled && hasDesktopBridge()) {
-      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'Открыть RustDesk' : 'Установить RustDesk') + '</button>');
+      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'Открыть модуль' : 'Загрузить модуль') + '</button>');
       buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-host">Скопировать хост</button>');
       if (runtime.server_key) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-key">Скопировать ключ</button>');
       if (device && device.remote_client_id) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID ПК</button>');
