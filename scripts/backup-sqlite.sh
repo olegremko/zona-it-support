@@ -3,28 +3,26 @@ set -eu
 
 APP_DIR="${APP_DIR:-/opt/zona-it-support/current}"
 BACKUP_DIR="${BACKUP_DIR:-/opt/zona-it-support/backups}"
-VOLUME_NAME="${VOLUME_NAME:-}"
+APP_CONTAINER="${APP_CONTAINER:-zona-it-app}"
 
 mkdir -p "$BACKUP_DIR"
 
-if [ -z "$VOLUME_NAME" ]; then
-  VOLUME_NAME="$(docker volume ls --format '{{.Name}}' | grep '_zona_it_data$' | head -n 1 || true)"
-fi
-
-if [ -z "$VOLUME_NAME" ]; then
-  echo "SQLite volume not found" >&2
+if ! docker inspect "$APP_CONTAINER" >/dev/null 2>&1; then
+  echo "App container not found: $APP_CONTAINER" >&2
   exit 1
 fi
 
 STAMP="$(date +%Y%m%d-%H%M%S)"
 TARGET_FILE="$BACKUP_DIR/zona-it-$STAMP.db"
-FILE_NAME="$(basename "$TARGET_FILE")"
+TMP_FILE="/tmp/$(basename "$TARGET_FILE")"
 
-docker run --rm \
-  -v "$VOLUME_NAME:/data:ro" \
-  -v "$BACKUP_DIR:/backup" \
-  alpine:3.20 \
-  sh -c "cp /data/zona-it.db /backup/$FILE_NAME"
+docker exec \
+  -e TARGET_FILE="$TMP_FILE" \
+  "$APP_CONTAINER" \
+  node --input-type=module -e "import Database from 'better-sqlite3'; const db = new Database('/app/backend/data/zona-it.db', { fileMustExist: true }); await db.backup(process.env.TARGET_FILE); db.close();"
+
+docker cp "$APP_CONTAINER:$TMP_FILE" "$TARGET_FILE" >/dev/null
+docker exec "$APP_CONTAINER" rm -f "$TMP_FILE" >/dev/null
 
 ls -1t "$BACKUP_DIR"/zona-it-*.db 2>/dev/null | awk 'NR>10 { print }' | xargs -r rm -f
 
