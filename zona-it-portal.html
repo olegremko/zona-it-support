@@ -571,8 +571,8 @@ body.compact-portal .compact-support{display:grid;gap:14px}
       <div class="act" onclick="aTab('r',this)">Регистрация</div>
     </div>
     <div id="fL">
-      <div class="acf"><label>Email</label><input type="email" id="lEm" placeholder="your@company.ru" value="demo@company.ru"></div>
-      <div class="acf"><label>Пароль</label><input type="password" id="lPw" placeholder="..." value="demo1234" onkeypress="if(event.key==='Enter')dL()"></div>
+      <div class="acf"><label>Email</label><input type="email" id="lEm" placeholder="your@company.ru" autocomplete="username"></div>
+      <div class="acf"><label>Пароль</label><input type="password" id="lPw" placeholder="Введите пароль" autocomplete="current-password" onkeypress="if(event.key==='Enter')dL()"></div>
 
       <button class="acb" onclick="dL()"><i class="fas fa-sign-in-alt"></i> Войти</button>
     </div>
@@ -587,7 +587,7 @@ body.compact-portal .compact-support{display:grid;gap:14px}
     </div>
     <div class="ace" id="acE"></div>
     <div class="ach">Нужен доступ в портал поддержки? Обратитесь к администратору вашей компании.</div>
-    <div class="ach">Демо: demo@company.ru / demo1234</div>
+      <div class="ach" style="display:none"></div>
   </div>
   <div class="lb">
     <div class="ld"></div>

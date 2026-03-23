@@ -180,8 +180,8 @@ html.embed .h-x{display:none}
           <div class="at" id="atR" onclick="aT('r')">Регистрация</div>
         </div>
         <div id="fL">
-          <div class="af"><label>Email</label><input type="email" id="lEm" placeholder="your@company.ru" value="demo@company.ru"></div>
-          <div class="af"><label>Пароль</label><input type="password" id="lPw" placeholder="..." value="demo1234" onkeypress="if(event.key==='Enter')dL()"></div>
+      <div class="af"><label>Email</label><input type="email" id="lEm" placeholder="your@company.ru" autocomplete="username"></div>
+      <div class="af"><label>Пароль</label><input type="password" id="lPw" placeholder="Введите пароль" autocomplete="current-password" onkeypress="if(event.key==='Enter')dL()"></div>
           <button class="a-bt" onclick="dL()"><i class="fas fa-sign-in-alt"></i>Войти</button>
         </div>
         <div id="fR" style="display:none">
@@ -192,7 +192,7 @@ html.embed .h-x{display:none}
           <button class="a-bt" onclick="dR()"><i class="fas fa-user-plus"></i>Создать аккаунт</button>
         </div>
         <div class="a-er" id="aEr"></div>
-        <div class="a-hn">Демо: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b2d6d7dfddf2d1dddfc2d3dccb9cc0c7">[email&#160;protected]</a> / demo1234<br><span onclick="sw('g')">Вернуться</span></div>
+      <div class="a-hn"><span onclick="sw('g')">Вернуться</span></div>
       </div>
     </div>
     <!-- Ticket -->
