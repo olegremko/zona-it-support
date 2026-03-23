@@ -23,6 +23,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
+    volumes:
+      - zona_it_data:/app/backend/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -44,6 +46,7 @@ services:
       - caddy_config:/config
 
 volumes:
+  zona_it_data:
   zona_it_pg_data:
   caddy_data:
   caddy_config:
