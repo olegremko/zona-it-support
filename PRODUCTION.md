@@ -100,3 +100,14 @@ cd C:\Users\user\Desktop\codex
 - keep application containerized
 - keep reverse proxy and release flow unchanged
 - later move app layer to Kubernetes without changing external domain setup
+
+## PostgreSQL Foundation
+
+Prepared files:
+
+- [docker-compose.postgres.production.yml](C:\Users\user\Desktop\codex\docker-compose.postgres.production.yml)
+- [.env.postgres.example](C:\Users\user\Desktop\codex\.env.postgres.example)
+- [schema.postgres.sql](C:\Users\user\Desktop\codex\backend\sql\schema.postgres.sql)
+- [postgresql-migration.md](C:\Users\user\Desktop\codex\backend\docs\postgresql-migration.md)
+
+These files are the foundation for the upcoming backend rewrite from SQLite to PostgreSQL.
