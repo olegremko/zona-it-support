@@ -2,14 +2,14 @@ import { unauthorized, forbidden } from '../lib/errors.js';
 import { verifyToken } from '../modules/auth/authService.js';
 import { getUserContext, hasPermission } from '../modules/permissions/permissionService.js';
 
-export function requireAuth(req, res, next) {
+export async function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   if (!token) return next(unauthorized('Missing bearer token'));
 
   try {
     const payload = verifyToken(token);
-    const context = getUserContext(payload.sub);
+    const context = await getUserContext(payload.sub);
     if (!context) return next(unauthorized('User not found'));
     req.auth = { userId: payload.sub, context };
     next();

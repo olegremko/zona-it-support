@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import fs from 'fs';
 import path from 'path';
-import { db } from './db/client.js';
+import { db, execSchema } from './db/client.js';
 import { env } from './config/env.js';
 import authRoutes from './modules/auth/authRoutes.js';
 import companyRoutes from './modules/companies/companyRoutes.js';
@@ -14,27 +14,31 @@ import ticketRoutes from './modules/tickets/ticketRoutes.js';
 import liveChatRoutes from './modules/livechat/liveChatRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-export function createApp() {
+export async function createApp() {
   const app = express();
   const siteRoot = path.resolve(process.cwd(), '..');
-  const schemaPath = path.resolve(process.cwd(), 'sql', 'schema.sql');
+  const schemaFile = env.dbClient === 'postgres' ? 'schema.postgres.sql' : 'schema.sql';
+  const schemaPath = path.resolve(process.cwd(), 'sql', schemaFile);
 
   if (fs.existsSync(schemaPath)) {
-    db.exec(fs.readFileSync(schemaPath, 'utf8'));
+    await execSchema(fs.readFileSync(schemaPath, 'utf8'));
   }
-  const companyColumns = db.prepare(`PRAGMA table_info(companies)`).all();
-  const ensureCompanyColumn = (name, sql) => {
-    if (companyColumns.length && !companyColumns.some((col) => col.name === name)) {
-      db.exec(sql);
+
+  if (env.dbClient !== 'postgres') {
+    const companyColumns = db.prepare(`PRAGMA table_info(companies)`).all();
+    const ensureCompanyColumn = (name, sql) => {
+      if (companyColumns.length && !companyColumns.some((col) => col.name === name)) {
+        db.exec(sql);
+      }
+    };
+    ensureCompanyColumn('description', 'ALTER TABLE companies ADD COLUMN description TEXT');
+    ensureCompanyColumn('contact_email', 'ALTER TABLE companies ADD COLUMN contact_email TEXT');
+    ensureCompanyColumn('contact_phone', 'ALTER TABLE companies ADD COLUMN contact_phone TEXT');
+    ensureCompanyColumn('address', 'ALTER TABLE companies ADD COLUMN address TEXT');
+    const liveChatColumns = db.prepare(`PRAGMA table_info(live_chat_conversations)`).all();
+    if (liveChatColumns.length && !liveChatColumns.some((col) => col.name === 'ticket_id')) {
+      db.exec('ALTER TABLE live_chat_conversations ADD COLUMN ticket_id TEXT');
     }
-  };
-  ensureCompanyColumn('description', 'ALTER TABLE companies ADD COLUMN description TEXT');
-  ensureCompanyColumn('contact_email', 'ALTER TABLE companies ADD COLUMN contact_email TEXT');
-  ensureCompanyColumn('contact_phone', 'ALTER TABLE companies ADD COLUMN contact_phone TEXT');
-  ensureCompanyColumn('address', 'ALTER TABLE companies ADD COLUMN address TEXT');
-  const liveChatColumns = db.prepare(`PRAGMA table_info(live_chat_conversations)`).all();
-  if (liveChatColumns.length && !liveChatColumns.some((col) => col.name === 'ticket_id')) {
-    db.exec('ALTER TABLE live_chat_conversations ADD COLUMN ticket_id TEXT');
   }
 
   app.use(helmet({
