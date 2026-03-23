@@ -1,4 +1,4 @@
-1636330.xorek.cloud {
+http://2.27.54.185, http://1636330.xorek.cloud, https://1636330.xorek.cloud {
   encode zstd gzip
 
   reverse_proxy app:4000
