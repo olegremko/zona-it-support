@@ -57,16 +57,16 @@
     .pill.done{background:var(--green-soft);color:#35d596;border-color:rgba(0,168,107,.24)} .pill.closed{background:rgba(255,255,255,.08);color:#c5d2e0;border-color:rgba(255,255,255,.1)}
     .pill.low{background:rgba(127,195,255,.14);color:#9fd2ff;border-color:rgba(127,195,255,.2)} .pill.normal{background:rgba(255,255,255,.08);color:#c7d5e4;border-color:rgba(255,255,255,.1)}
     .pill.high{background:var(--orange-soft);color:#ffb347;border-color:rgba(255,179,71,.22)} .pill.critical{background:var(--red-soft);color:#ff8787;border-color:rgba(255,107,107,.24)}
-    .empty{padding:24px;color:var(--muted);font-size:14px;line-height:1.6}.main{flex:1;min-width:0;background:rgba(10,19,31,.74);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+    .empty{padding:24px;color:var(--muted);font-size:14px;line-height:1.6}.main{flex:1;min-width:0;height:calc(100vh - 48px);background:rgba(10,19,31,.74);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
     .main-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px}
     .main-head-copy h2{margin:0;font-size:24px;font-family:'Montserrat',sans-serif}.main-head-copy p{margin:8px 0 0;color:var(--muted);font-size:13px}
-    .main-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.content{display:flex;min-height:0;flex:1}
-    .thread{flex:1;min-width:0;display:flex;flex-direction:column;border-right:1px solid var(--line)} .thread-stream{padding:20px 24px;display:grid;gap:14px;overflow:auto;min-height:0;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01)),radial-gradient(circle at top right, rgba(0,168,107,.08), transparent 22%)}
+    .main-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.content{display:flex;min-height:0;flex:1;overflow:hidden}
+    .thread{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden} .thread-stream{padding:20px 24px;display:grid;gap:14px;overflow:auto;min-height:0;flex:1;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01)),radial-gradient(circle at top right, rgba(0,168,107,.08), transparent 22%)}
     .bubble{max-width:min(78%,760px);padding:14px 16px;border-radius:20px;line-height:1.55;position:relative}
     .bubble.me{margin-left:auto;background:linear-gradient(135deg,#00a86b,#1ac987);color:#fff;border-bottom-right-radius:8px;box-shadow:0 12px 28px rgba(0,168,107,.22)}
     .bubble.other{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:8px} .bubble.system{max-width:100%;background:rgba(127,195,255,.08);border:1px dashed rgba(127,195,255,.22);color:#cfe5ff;font-size:13px}
     .bubble-meta{display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:11px;color:rgba(255,255,255,.7);font-weight:700;text-transform:uppercase;letter-spacing:1px}
-    .bubble.other .bubble-meta,.bubble.system .bubble-meta{color:#8fb0d3}.composer-row{padding:18px 20px;border-top:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;background:rgba(6,15,26,.62)}
+    .bubble.other .bubble-meta,.bubble.system .bubble-meta{color:#8fb0d3}.composer-row{padding:16px 18px calc(16px + env(safe-area-inset-bottom, 0px));border-top:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;background:rgba(6,15,26,.86);backdrop-filter:blur(12px);position:sticky;bottom:0;z-index:5}
     .aside{width:320px;flex-shrink:0;padding:22px;display:grid;gap:14px;align-content:start;align-items:start;grid-auto-rows:min-content;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(127,195,255,.03));overflow:auto}
     .aside-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:16px}.aside-card h3{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#8ea7c1}
     .aside-card:last-child{display:flex;flex-direction:column;min-height:0}
