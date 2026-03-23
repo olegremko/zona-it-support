@@ -65,6 +65,23 @@
     .modal{position:fixed;inset:0;background:rgba(4,10,18,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.open{display:flex}
     .modal-card{width:min(620px,100%);background:#0d1a2b;border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:24px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
     .modal-head h3{margin:0;font-family:'Montserrat',sans-serif;font-size:22px}.modal-grid{display:grid;gap:14px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+    .native-select{display:none!important}
+    .desk-select{position:relative}
+    .desk-select.hidden{display:none!important}
+    .desk-select-trigger{width:100%;height:44px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.025));color:var(--text);padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 20px rgba(0,0,0,.12);transition:border-color .18s, box-shadow .18s}
+    .desk-select-trigger:hover{border-color:rgba(0,168,107,.32)}
+    .desk-select.open .desk-select-trigger{border-color:rgba(0,168,107,.48);box-shadow:0 0 0 4px rgba(0,168,107,.12), inset 0 1px 0 rgba(255,255,255,.05)}
+    .desk-select-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+    .desk-select-caret{width:24px;height:24px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(0,168,107,.12);color:#8de0be;font-size:12px;flex-shrink:0;transition:transform .18s ease, background .18s ease}
+    .desk-select.open .desk-select-caret{transform:rotate(180deg);background:rgba(0,168,107,.2)}
+    .desk-select-menu{position:absolute;left:0;right:0;top:calc(100% + 8px);padding:8px;display:grid;gap:6px;background:linear-gradient(180deg,#122237,#0c1727);border:1px solid rgba(127,195,255,.14);border-radius:18px;box-shadow:0 28px 60px rgba(0,0,0,.38);z-index:40;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .16s ease, transform .16s ease}
+    .desk-select.open .desk-select-menu{opacity:1;pointer-events:auto;transform:translateY(0)}
+    .desk-select-option{width:100%;border:none;border-radius:14px;background:transparent;color:var(--text);text-align:left;padding:11px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;transition:background .14s ease, color .14s ease}
+    .desk-select-option:hover{background:rgba(255,255,255,.06)}
+    .desk-select-option.active{background:rgba(0,168,107,.14);color:#dffbee}
+    .desk-select-option:disabled{opacity:.38;cursor:not-allowed}
+    .desk-select-check{font-size:12px;color:#8de0be;opacity:0}
+    .desk-select-option.active .desk-select-check{opacity:1}
     @media (max-width:1220px){.aside{display:none}} @media (max-width:960px){.desk-shell{padding:14px;gap:14px}.sidebar{width:290px}.main-head{padding:18px}.thread-stream{padding:16px}}
     @media (max-width:820px){.desk-shell{display:block;padding:0}.sidebar,.main{border-radius:0;border-left:none;border-right:none}.sidebar{width:100%;height:42vh}.main{height:58vh}.content{display:block}.thread{border-right:none;height:calc(58vh - 92px)}.aside{display:none}}
   </style>
@@ -96,14 +113,14 @@
       </div>
       <div class="search-box">
         <input id="deskTicketSearch" class="input" type="text" placeholder="Поиск по тикетам..." style="height:48px;margin-bottom:10px">
-        <select id="deskStatusFilter" class="input" style="height:44px;margin-bottom:10px">
+        <select id="deskStatusFilter" class="input native-select" style="height:44px;margin-bottom:10px">
           <option value="">Все статусы</option>
           <option value="open">Открытые</option>
           <option value="progress">В работе</option>
           <option value="done">Решенные</option>
           <option value="closed">Закрытые</option>
         </select>
-        <select id="deskCompanyFilter" class="input hidden" style="height:44px">
+        <select id="deskCompanyFilter" class="input native-select hidden" style="height:44px">
           <option value="">Все компании</option>
         </select>
       </div>
@@ -131,7 +148,7 @@
       <div class="modal-head"><h3>Новый тикет</h3><button id="deskCloseModalBtn" class="btn btn-secondary" type="button" style="height:42px;padding:0 14px">Закрыть</button></div>
       <div class="modal-grid">
         <div class="field"><label for="deskTicketSubject">Тема</label><input id="deskTicketSubject" class="input" type="text" placeholder="Коротко сформулируйте задачу"></div>
-        <div class="field"><label for="deskTicketPriority">Приоритет</label><select id="deskTicketPriority" class="input"><option value="low">Низкий</option><option value="normal" selected>Средний</option><option value="high">Высокий</option><option value="critical">Критичный</option></select></div>
+        <div class="field"><label for="deskTicketPriority">Приоритет</label><select id="deskTicketPriority" class="input native-select"><option value="low">Низкий</option><option value="normal" selected>Средний</option><option value="high">Высокий</option><option value="critical">Критичный</option></select></div>
         <div class="field"><label for="deskTicketDescription">Первое сообщение</label><textarea id="deskTicketDescription" class="textarea" placeholder="Опишите проблему, цель или вопрос в формате обычного чата."></textarea></div>
       </div>
       <div id="deskModalError" class="error"></div>

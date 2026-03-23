@@ -68,6 +68,74 @@
   function showError(id, message) { var box = $(id); box.textContent = message; box.classList.add('show'); }
   function clearErrors() { $('deskAuthError').classList.remove('show'); $('deskModalError').classList.remove('show'); }
   function renderAuthState(isAuthed) { $('deskAuth').classList.toggle('hidden', isAuthed); $('deskApp').classList.toggle('hidden', !isAuthed); }
+  function closeAllCustomSelects(exceptSelectId) {
+    Array.prototype.forEach.call(document.querySelectorAll('.desk-select'), function (node) {
+      if (exceptSelectId && node.getAttribute('data-select-id') === exceptSelectId) return;
+      node.classList.remove('open');
+    });
+  }
+  function buildCustomSelectOptions(select, menu, label) {
+    var selectedValue = select.value;
+    menu.innerHTML = '';
+    Array.prototype.forEach.call(select.options, function (option) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'desk-select-option' + (option.value === selectedValue ? ' active' : '');
+      btn.disabled = !!option.disabled;
+      btn.setAttribute('data-value', option.value);
+      btn.innerHTML = '<span>' + escapeHtml(option.textContent || '') + '</span><span class="desk-select-check">✓</span>';
+      btn.addEventListener('click', function (event) {
+        event.preventDefault();
+        if (option.disabled) return;
+        select.value = option.value;
+        label.textContent = option.textContent || '';
+        buildCustomSelectOptions(select, menu, label);
+        closeAllCustomSelects();
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      menu.appendChild(btn);
+    });
+    label.textContent = select.options[select.selectedIndex] ? (select.options[select.selectedIndex].textContent || '') : '';
+  }
+  function ensureCustomSelect(select) {
+    if (!select) return null;
+    var existing = document.querySelector('.desk-select[data-select-id="' + select.id + '"]');
+    if (existing) return existing;
+    var wrapper = document.createElement('div');
+    wrapper.className = 'desk-select' + (select.classList.contains('hidden') ? ' hidden' : '');
+    wrapper.setAttribute('data-select-id', select.id);
+    var trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'desk-select-trigger';
+    trigger.innerHTML = '<span class="desk-select-label"></span><span class="desk-select-caret">▾</span>';
+    var menu = document.createElement('div');
+    menu.className = 'desk-select-menu';
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(menu);
+    select.insertAdjacentElement('afterend', wrapper);
+    trigger.addEventListener('click', function (event) {
+      event.preventDefault();
+      var isOpen = wrapper.classList.contains('open');
+      closeAllCustomSelects();
+      if (!isOpen) wrapper.classList.add('open');
+    });
+    return wrapper;
+  }
+  function refreshCustomSelect(selectOrId) {
+    var select = typeof selectOrId === 'string' ? $(selectOrId) : selectOrId;
+    if (!select) return;
+    var wrapper = ensureCustomSelect(select);
+    if (!wrapper) return;
+    wrapper.classList.toggle('hidden', select.classList.contains('hidden'));
+    var triggerLabel = wrapper.querySelector('.desk-select-label');
+    var menu = wrapper.querySelector('.desk-select-menu');
+    buildCustomSelectOptions(select, menu, triggerLabel);
+  }
+  function refreshAllCustomSelects() {
+    Array.prototype.forEach.call(document.querySelectorAll('select.native-select'), function (select) {
+      refreshCustomSelect(select);
+    });
+  }
   function ticketPreview(ticket) {
     var message = ticket.messages && ticket.messages.length ? ticket.messages[ticket.messages.length - 1].body : ticket.description;
     return message || 'Без сообщений';
@@ -148,6 +216,7 @@
     if (!showCompanyContext()) {
       select.classList.add('hidden');
       select.innerHTML = '<option value="">Все компании</option>';
+      refreshCustomSelect(select);
       return;
     }
     var current = select.value;
@@ -157,6 +226,7 @@
     }).join('');
     if (companies.indexOf(current) >= 0) select.value = current;
     select.classList.remove('hidden');
+    refreshCustomSelect(select);
   }
   async function fetchTickets() {
     var data = await api('/api/tickets');
@@ -187,10 +257,11 @@
       state.token = data.token; state.user = data.user; saveSession(); bootDesk();
     } catch (error) { showError('deskAuthError', error.message); }
   }
-  function openModal() { clearErrors(); $('deskNewTicketModal').classList.add('open'); }
+  function openModal() { clearErrors(); $('deskNewTicketModal').classList.add('open'); refreshCustomSelect('deskTicketPriority'); }
   function closeModal() {
     $('deskNewTicketModal').classList.remove('open');
     $('deskTicketSubject').value = ''; $('deskTicketDescription').value = ''; $('deskTicketPriority').value = 'normal'; clearErrors();
+    refreshCustomSelect('deskTicketPriority');
   }
   async function createTicket() {
     clearErrors();
@@ -240,6 +311,7 @@
     $('deskSendBtn').addEventListener('click', sendMessage);
     $('deskComposer').addEventListener('keydown', function (event) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } });
     $('deskNewTicketModal').addEventListener('click', function (event) { if (event.target === $('deskNewTicketModal')) closeModal(); });
+    document.addEventListener('click', function (event) { if (!event.target.closest('.desk-select')) closeAllCustomSelects(); });
   }
-  document.addEventListener('DOMContentLoaded', function () { bindEvents(); restoreSession(); bootDesk(); });
+  document.addEventListener('DOMContentLoaded', function () { bindEvents(); refreshAllCustomSelects(); restoreSession(); bootDesk(); });
 })();
