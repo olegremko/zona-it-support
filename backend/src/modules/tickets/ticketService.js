@@ -434,6 +434,13 @@ export async function getTicketById(ticketId, context) {
     history: await getTicketHistory(ticketId),
     remote_devices: await getRemoteDevices(ticketId),
     remote_sessions: await getRemoteSessions(ticketId),
+    remote_runtime: {
+      enabled: Boolean(env.remoteServerHost),
+      provider: 'rustdesk',
+      server_host: env.remoteServerHost || null,
+      server_key: env.remoteServerKey || null,
+      download_url: env.remoteDownloadUrl || 'https://rustdesk.com/'
+    },
     assignable_users: hasPermission(context, 'ticket.assign') || context.is_global_admin ? await getAssignableSupportUsers() : [],
     messages
   };

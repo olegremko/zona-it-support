@@ -11,12 +11,18 @@
     filteredConversations: [],
     selectedConversationId: null,
     selectedConversation: null,
-    pollTimer: null
+    pollTimer: null,
+    desktopRemote: {
+      installed: false,
+      clientId: '',
+      busy: false
+    }
   };
 
   var TOKEN_KEY = 'zit_desk_token';
   var USER_KEY = 'zit_desk_user';
   var IS_DESKTOP_RUNTIME = !!(window.zonaDeskEnv && window.zonaDeskEnv.platform === 'windows-electron');
+  var DESK_BRIDGE = window.zonaDeskBridge || null;
   var utf8Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { fatal: false }) : null;
 
   function $(id) { return document.getElementById(id); }
@@ -145,6 +151,44 @@
 
   function authHeaders() {
     return state.token ? { Authorization: 'Bearer ' + state.token } : {};
+  }
+
+  function remoteRuntime() {
+    return state.selectedTicket && state.selectedTicket.remote_runtime ? state.selectedTicket.remote_runtime : null;
+  }
+
+  function hasDesktopBridge() {
+    return !!(IS_DESKTOP_RUNTIME && DESK_BRIDGE);
+  }
+
+  async function copyDeskText(value) {
+    if (!value) return false;
+    try {
+      if (hasDesktopBridge() && DESK_BRIDGE.copyText) {
+        await DESK_BRIDGE.copyText(value);
+        return true;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(value);
+        return true;
+      }
+    } catch (error) {}
+    return false;
+  }
+
+  async function refreshDesktopRemoteState() {
+    if (!hasDesktopBridge() || !DESK_BRIDGE.getRustDeskStatus) return;
+    try {
+      state.desktopRemote.busy = true;
+      var info = await DESK_BRIDGE.getRustDeskStatus();
+      state.desktopRemote.installed = !!(info && info.installed);
+      state.desktopRemote.clientId = info && info.clientId ? String(info.clientId).trim() : '';
+    } catch (error) {
+      state.desktopRemote.installed = false;
+      state.desktopRemote.clientId = '';
+    } finally {
+      state.desktopRemote.busy = false;
+    }
   }
 
   async function api(path, options) {
@@ -362,9 +406,25 @@
 
     var session = latestRemoteSession();
     var device = latestRemoteDevice();
+    var runtime = remoteRuntime();
     var canManage = canManageRemoteDesk();
     var canRequest = !!state.user;
     var parts = [];
+
+    if (runtime && runtime.enabled) {
+      parts.push(
+        '<div class="remote-card">' +
+          '<strong>Сервер подключения</strong>' +
+          '<div class="remote-row"><span>Хост</span><span>' + escapeHtml(runtime.server_host || 'не задан') + '</span></div>' +
+          '<div class="remote-row"><span>Ключ</span><span>' + escapeHtml(runtime.server_key ? (String(runtime.server_key).slice(0, 14) + '...') : 'не задан') + '</span></div>' +
+          '<div class="remote-note">' + escapeHtml(state.desktopRemote.installed
+            ? (state.desktopRemote.clientId
+              ? 'RustDesk установлен. ID этого ПК: ' + state.desktopRemote.clientId
+              : 'RustDesk установлен, но ID пока не прочитан. Нажмите «Открыть RustDesk».')
+            : 'Для реального подключения нужен RustDesk. Его можно установить и открыть прямо из клиента.') + '</div>' +
+        '</div>'
+      );
+    }
 
     if (device) {
       parts.push(
@@ -401,6 +461,12 @@
     }
     if (canManage && device && device.unattended_enabled) {
       buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended">\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f</button>');
+    }
+    if (runtime && runtime.enabled && hasDesktopBridge()) {
+      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'Открыть RustDesk' : 'Установить RustDesk') + '</button>');
+      buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-host">Скопировать хост</button>');
+      if (runtime.server_key) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-key">Скопировать ключ</button>');
+      if (device && device.remote_client_id) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID ПК</button>');
     }
 
     parts.push('<div class="remote-actions">' + buttons.join('') + '</div>');
@@ -775,37 +841,60 @@
   async function handleRemoteAction(action) {
     if (!state.selectedTicketId || !state.selectedTicket) return;
     try {
+      var runtime = remoteRuntime();
+      var currentDevice = latestRemoteDevice();
+      var currentSession = latestRemoteSession();
+      var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
+
       if (action === 'request') {
         await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
           method: 'POST',
-          body: JSON.stringify({ accessMode: 'interactive', deviceLabel: 'Рабочее место клиента' })
+          body: JSON.stringify({
+            accessMode: 'interactive',
+            deviceLabel: 'Рабочее место клиента',
+            remoteClientId: localClientId
+          })
         });
       } else if (action === 'unattended') {
         await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
           method: 'POST',
-          body: JSON.stringify({ accessMode: 'unattended', deviceLabel: 'Рабочее место клиента' })
+          body: JSON.stringify({
+            accessMode: 'unattended',
+            deviceLabel: 'Рабочее место клиента',
+            remoteClientId: localClientId
+          })
         });
       } else if (action === 'connect') {
-        var connectSession = latestRemoteSession();
-        if (!connectSession) return;
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(connectSession.id), {
+        if (!currentSession) return;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
           method: 'PATCH',
           body: JSON.stringify({ status: 'active' })
         });
+        if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) await DESK_BRIDGE.launchRustDesk();
+        if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
       } else if (action === 'finish') {
-        var finishSession = latestRemoteSession();
-        if (!finishSession) return;
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(finishSession.id), {
+        if (!currentSession) return;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
           method: 'PATCH',
           body: JSON.stringify({ status: 'ended', endedReason: 'Сеанс завершен инженером' })
         });
       } else if (action === 'disable-unattended') {
-        var unattendedSession = latestRemoteSession();
-        if (!unattendedSession) return;
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(unattendedSession.id), {
+        if (!currentSession) return;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
           method: 'PATCH',
           body: JSON.stringify({ unattendedEnabled: false })
         });
+      } else if (action === 'launch-rustdesk') {
+        if (!hasDesktopBridge()) return;
+        if (state.desktopRemote.installed) await DESK_BRIDGE.launchRustDesk();
+        else await DESK_BRIDGE.installRustDesk();
+        await refreshDesktopRemoteState();
+      } else if (action === 'copy-host') {
+        if (runtime && runtime.server_host) await copyDeskText(runtime.server_host);
+      } else if (action === 'copy-key') {
+        if (runtime && runtime.server_key) await copyDeskText(runtime.server_key);
+      } else if (action === 'copy-device-id') {
+        if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
       }
 
       await fetchTickets();
@@ -876,6 +965,7 @@
       updateSelectedTicketStatus();
     });
     $('deskRefreshBtn').addEventListener('click', async function () {
+      await refreshDesktopRemoteState();
       await fetchTickets();
       if (hasLiveChatAccess()) await fetchConversations();
     });

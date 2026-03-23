@@ -12,5 +12,8 @@ export const env = {
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   postgresDb: process.env.POSTGRES_DB || 'zona_it',
   postgresUser: process.env.POSTGRES_USER || 'zona_it',
-  postgresPassword: process.env.POSTGRES_PASSWORD || ''
+  postgresPassword: process.env.POSTGRES_PASSWORD || '',
+  remoteServerHost: process.env.REMOTE_SERVER_HOST || '',
+  remoteServerKey: process.env.REMOTE_SERVER_KEY || '',
+  remoteDownloadUrl: process.env.REMOTE_DOWNLOAD_URL || 'https://rustdesk.com/'
 };
