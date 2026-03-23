@@ -9,6 +9,24 @@ function sql(pgSql, sqliteSql = pgSql) {
   return env.dbClient === 'postgres' ? pgSql : sqliteSql;
 }
 
+function ticketStatusLabel(code) {
+  return ({
+    open: 'Открыт',
+    progress: 'В работе',
+    done: 'Решен',
+    closed: 'Закрыт'
+  }[code] || code || '—');
+}
+
+function ticketPriorityLabel(code) {
+  return ({
+    low: 'Низкий',
+    normal: 'Средний',
+    high: 'Высокий',
+    critical: 'Критичный'
+  }[code] || code || '—');
+}
+
 async function nextTicketNumber() {
   const row = await queryOne('SELECT COALESCE(MAX(number), 0) + 1 AS next_number FROM tickets');
   return Number(row?.next_number || 1);
@@ -385,10 +403,10 @@ export async function updateTicket(ticketId, context, input) {
   );
 
   if (input.priority && input.priority !== ticket.priority) {
-    await addSystemTicketEvent(ticketId, context.id, `Приоритет изменен: ${ticket.priority} -> ${input.priority}`, now);
+    await addSystemTicketEvent(ticketId, context.id, `Приоритет изменен: ${ticketPriorityLabel(ticket.priority)} -> ${ticketPriorityLabel(input.priority)}`, now);
   }
   if (canUpdateCompany && input.status && input.status !== ticket.status) {
-    await addSystemTicketEvent(ticketId, context.id, `Статус изменен: ${ticket.status} -> ${input.status}`, now);
+    await addSystemTicketEvent(ticketId, context.id, `Статус изменен: ${ticketStatusLabel(ticket.status)} -> ${ticketStatusLabel(input.status)}`, now);
   }
   if (canAssign && input.assigneeUserId !== undefined) {
     const currentAssignee = await queryOne(
