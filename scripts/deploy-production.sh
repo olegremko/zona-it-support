@@ -6,11 +6,22 @@ REF="${1:-origin/main}"
 
 cd "$APP_DIR"
 
-./scripts/backup-sqlite.sh
+if [ -f ".env.production" ]; then
+  set -a
+  . ./.env.production
+  set +a
+fi
+
+COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.production.yml}"
+if [ "${DB_CLIENT:-sqlite}" = "postgres" ]; then
+  COMPOSE_FILE="docker-compose.postgres.production.yml"
+fi
+
+/bin/sh ./scripts/backup-production.sh
 
 git fetch --all --tags
 git reset --hard "$REF"
 
-docker compose -f docker-compose.production.yml up -d --build
+docker compose --env-file .env.production -f "$COMPOSE_FILE" up -d --build
 
 echo "Deployed ref: $REF"

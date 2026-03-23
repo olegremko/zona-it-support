@@ -54,7 +54,7 @@ Example:
 
 ```sh
 cd /opt/zona-it-support/current
-./scripts/backup-sqlite.sh
+./scripts/backup-production.sh
 ```
 
 ## View Backups
@@ -100,6 +100,13 @@ cd C:\Users\user\Desktop\codex
 - keep application containerized
 - keep reverse proxy and release flow unchanged
 - later move app layer to Kubernetes without changing external domain setup
+
+## PostgreSQL Cutover Files
+
+- [docker-compose.postgres.production.yml](C:\Users\user\Desktop\codex\docker-compose.postgres.production.yml)
+- [backup-postgres.sh](C:\Users\user\Desktop\codex\scripts\backup-postgres.sh)
+- [backup-production.sh](C:\Users\user\Desktop\codex\scripts\backup-production.sh)
+- [postgresql-cutover.md](C:\Users\user\Desktop\codex\backend\docs\postgresql-cutover.md)
 
 ## PostgreSQL Foundation
 
