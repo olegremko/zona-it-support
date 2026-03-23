@@ -1,4 +1,16 @@
-http://2.27.54.185, http://1636330.xorek.cloud, https://1636330.xorek.cloud {
+http://2.27.54.185 {
+  encode zstd gzip
+
+  reverse_proxy app:4000
+
+  header {
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+}
+
+1636330.xorek.cloud {
   encode zstd gzip
 
   reverse_proxy app:4000
