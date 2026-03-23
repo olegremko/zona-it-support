@@ -3,7 +3,16 @@ import { z } from 'zod';
 import { asyncHandler } from '../../middleware/asyncHandler.js';
 import { requireAuth } from '../../middleware/auth.js';
 import { badRequest } from '../../lib/errors.js';
-import { addTicketMessage, createTicket, createTicketFromLiveChat, getTicketById, listVisibleTickets, updateTicket } from './ticketService.js';
+import {
+  addTicketMessage,
+  createRemoteSession,
+  createTicket,
+  createTicketFromLiveChat,
+  getTicketById,
+  listVisibleTickets,
+  updateRemoteSession,
+  updateTicket
+} from './ticketService.js';
 
 const router = Router();
 
@@ -29,6 +38,24 @@ const updateSchema = z.object({
   priority: z.enum(['low', 'normal', 'high', 'critical']).optional(),
   status: z.enum(['open', 'progress', 'done', 'closed']).optional(),
   assigneeUserId: z.string().nullable().optional()
+}).refine((value) => Object.keys(value).length > 0, {
+  message: 'At least one field is required'
+});
+
+const remoteSessionCreateSchema = z.object({
+  accessMode: z.enum(['interactive', 'unattended']).default('interactive'),
+  deviceLabel: z.string().min(1).max(120).optional(),
+  remoteClientId: z.string().min(1).max(120).optional(),
+  joinCode: z.string().min(3).max(64).optional()
+});
+
+const remoteSessionUpdateSchema = z.object({
+  status: z.enum(['requested', 'ready', 'active', 'ended', 'cancelled']).optional(),
+  engineerUserId: z.string().nullable().optional(),
+  remoteClientId: z.string().nullable().optional(),
+  joinCode: z.string().nullable().optional(),
+  endedReason: z.string().nullable().optional(),
+  unattendedEnabled: z.boolean().optional()
 }).refine((value) => Object.keys(value).length > 0, {
   message: 'At least one field is required'
 });
@@ -63,6 +90,18 @@ router.patch('/:ticketId', requireAuth, asyncHandler(async (req, res) => {
   const parsed = updateSchema.safeParse(req.body);
   if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
   res.json({ ticket: await updateTicket(req.params.ticketId, req.auth.context, parsed.data) });
+}));
+
+router.post('/:ticketId/remote-sessions', requireAuth, asyncHandler(async (req, res) => {
+  const parsed = remoteSessionCreateSchema.safeParse(req.body);
+  if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
+  res.status(201).json({ ticket: await createRemoteSession(req.params.ticketId, req.auth.context, parsed.data) });
+}));
+
+router.patch('/:ticketId/remote-sessions/:sessionId', requireAuth, asyncHandler(async (req, res) => {
+  const parsed = remoteSessionUpdateSchema.safeParse(req.body);
+  if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
+  res.json({ ticket: await updateRemoteSession(req.params.ticketId, req.params.sessionId, req.auth.context, parsed.data) });
 }));
 
 export default router;

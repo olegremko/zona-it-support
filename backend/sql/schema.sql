@@ -156,3 +156,44 @@ CREATE TABLE IF NOT EXISTS live_chat_messages (
   FOREIGN KEY (conversation_id) REFERENCES live_chat_conversations(id) ON DELETE CASCADE,
   FOREIGN KEY (author_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS remote_devices (
+  id TEXT PRIMARY KEY,
+  company_id TEXT NOT NULL,
+  ticket_id TEXT,
+  user_id TEXT,
+  label TEXT NOT NULL,
+  platform TEXT NOT NULL DEFAULT 'windows',
+  remote_client_id TEXT,
+  unattended_enabled INTEGER NOT NULL DEFAULT 0,
+  unattended_password_set INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  last_seen_at TEXT,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+  FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE SET NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS remote_sessions (
+  id TEXT PRIMARY KEY,
+  ticket_id TEXT NOT NULL,
+  company_id TEXT NOT NULL,
+  device_id TEXT,
+  requested_by_user_id TEXT,
+  engineer_user_id TEXT,
+  access_mode TEXT NOT NULL CHECK(access_mode IN ('interactive','unattended')),
+  status TEXT NOT NULL CHECK(status IN ('requested','ready','active','ended','cancelled')) DEFAULT 'requested',
+  join_code TEXT,
+  remote_client_id TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  started_at TEXT,
+  ended_at TEXT,
+  ended_reason TEXT,
+  FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+  FOREIGN KEY (device_id) REFERENCES remote_devices(id) ON DELETE SET NULL,
+  FOREIGN KEY (requested_by_user_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (engineer_user_id) REFERENCES users(id) ON DELETE SET NULL
+);

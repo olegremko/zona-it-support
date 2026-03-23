@@ -139,3 +139,36 @@ CREATE TABLE IF NOT EXISTS live_chat_messages (
   body TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS remote_devices (
+  id TEXT PRIMARY KEY,
+  company_id TEXT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  ticket_id TEXT REFERENCES tickets(id) ON DELETE SET NULL,
+  user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  label TEXT NOT NULL,
+  platform TEXT NOT NULL DEFAULT 'windows',
+  remote_client_id TEXT,
+  unattended_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  unattended_password_set BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  last_seen_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS remote_sessions (
+  id TEXT PRIMARY KEY,
+  ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  device_id TEXT REFERENCES remote_devices(id) ON DELETE SET NULL,
+  requested_by_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  engineer_user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  access_mode TEXT NOT NULL CHECK (access_mode IN ('interactive', 'unattended')),
+  status TEXT NOT NULL CHECK (status IN ('requested', 'ready', 'active', 'ended', 'cancelled')) DEFAULT 'requested',
+  join_code TEXT,
+  remote_client_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL,
+  started_at TIMESTAMPTZ,
+  ended_at TIMESTAMPTZ,
+  ended_reason TEXT
+);

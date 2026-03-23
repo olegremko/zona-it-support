@@ -120,6 +120,179 @@ async function getTicketHistory(ticketId) {
   }));
 }
 
+function generateJoinCode() {
+  return 'RMT-' + Math.random().toString(36).slice(2, 6).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
+
+function canManageRemote(context) {
+  return Boolean(context?.is_global_admin) || hasPermission(context, 'ticket.assign') || hasPermission(context, 'ticket.view.all');
+}
+
+async function getRemoteDevices(ticketId) {
+  return await queryMany(
+    sql(
+      `
+        SELECT rd.*
+        FROM remote_devices rd
+        WHERE rd.ticket_id = $1
+        ORDER BY rd.updated_at DESC, rd.created_at DESC
+      `,
+      `
+        SELECT rd.*
+        FROM remote_devices rd
+        WHERE rd.ticket_id = ?
+        ORDER BY rd.updated_at DESC, rd.created_at DESC
+      `
+    ),
+    [ticketId]
+  );
+}
+
+async function getRemoteSessions(ticketId) {
+  return await queryMany(
+    sql(
+      `
+        SELECT
+          rs.*,
+          requester.full_name AS requested_by_name,
+          engineer.full_name AS engineer_name,
+          rd.label AS device_label
+        FROM remote_sessions rs
+        LEFT JOIN users requester ON requester.id = rs.requested_by_user_id
+        LEFT JOIN users engineer ON engineer.id = rs.engineer_user_id
+        LEFT JOIN remote_devices rd ON rd.id = rs.device_id
+        WHERE rs.ticket_id = $1
+        ORDER BY rs.created_at DESC
+      `,
+      `
+        SELECT
+          rs.*,
+          requester.full_name AS requested_by_name,
+          engineer.full_name AS engineer_name,
+          rd.label AS device_label
+        FROM remote_sessions rs
+        LEFT JOIN users requester ON requester.id = rs.requested_by_user_id
+        LEFT JOIN users engineer ON engineer.id = rs.engineer_user_id
+        LEFT JOIN remote_devices rd ON rd.id = rs.device_id
+        WHERE rs.ticket_id = ?
+        ORDER BY rs.created_at DESC
+      `
+    ),
+    [ticketId]
+  );
+}
+
+async function upsertRemoteDevice(ticket, context, input, createdAt) {
+  const label = (input.deviceLabel || '').trim() || 'Рабочее место клиента';
+  const remoteClientId = input.remoteClientId?.trim() || null;
+
+  let existing = null;
+  if (remoteClientId) {
+    existing = await queryOne(
+      sql(
+        `
+          SELECT *
+          FROM remote_devices
+          WHERE ticket_id = $1 AND remote_client_id = $2
+          LIMIT 1
+        `,
+        `
+          SELECT *
+          FROM remote_devices
+          WHERE ticket_id = ? AND remote_client_id = ?
+          LIMIT 1
+        `
+      ),
+      [ticket.id, remoteClientId]
+    );
+  }
+
+  if (!existing) {
+    existing = await queryOne(
+      sql(
+        `
+          SELECT *
+          FROM remote_devices
+          WHERE ticket_id = $1
+          ORDER BY updated_at DESC
+          LIMIT 1
+        `,
+        `
+          SELECT *
+          FROM remote_devices
+          WHERE ticket_id = ?
+          ORDER BY updated_at DESC
+          LIMIT 1
+        `
+      ),
+      [ticket.id]
+    );
+  }
+
+  if (existing) {
+    await execute(
+      sql(
+        `
+          UPDATE remote_devices
+          SET label = $1,
+              remote_client_id = COALESCE($2, remote_client_id),
+              unattended_enabled = $3,
+              unattended_password_set = $4,
+              updated_at = $5,
+              last_seen_at = $6
+          WHERE id = $7
+        `,
+        `
+          UPDATE remote_devices
+          SET label = ?,
+              remote_client_id = COALESCE(?, remote_client_id),
+              unattended_enabled = ?,
+              unattended_password_set = ?,
+              updated_at = ?,
+              last_seen_at = ?
+          WHERE id = ?
+        `
+      ),
+      [label, remoteClientId, input.accessMode === 'unattended', input.accessMode === 'unattended', createdAt, createdAt, existing.id]
+    );
+    return existing.id;
+  }
+
+  const deviceId = createId('rdev');
+  await execute(
+    sql(
+      `
+        INSERT INTO remote_devices (
+          id, company_id, ticket_id, user_id, label, platform, remote_client_id,
+          unattended_enabled, unattended_password_set, created_at, updated_at, last_seen_at
+        )
+        VALUES ($1, $2, $3, $4, $5, 'windows', $6, $7, $8, $9, $10, $11)
+      `,
+      `
+        INSERT INTO remote_devices (
+          id, company_id, ticket_id, user_id, label, platform, remote_client_id,
+          unattended_enabled, unattended_password_set, created_at, updated_at, last_seen_at
+        )
+        VALUES (?, ?, ?, ?, ?, 'windows', ?, ?, ?, ?, ?, ?)
+      `
+    ),
+    [
+      deviceId,
+      ticket.company_id,
+      ticket.id,
+      ticket.created_by_user_id || context.id,
+      label,
+      remoteClientId,
+      input.accessMode === 'unattended',
+      input.accessMode === 'unattended',
+      createdAt,
+      createdAt,
+      createdAt
+    ]
+  );
+  return deviceId;
+}
+
 async function addSystemTicketEvent(ticketId, actorUserId, body, createdAt = nowIso()) {
   await execute(
     sql(
@@ -259,6 +432,8 @@ export async function getTicketById(ticketId, context) {
     assignee_user_id: assignee?.user_id || null,
     assignee_name: assignee?.full_name || null,
     history: await getTicketHistory(ticketId),
+    remote_devices: await getRemoteDevices(ticketId),
+    remote_sessions: await getRemoteSessions(ticketId),
     assignable_users: hasPermission(context, 'ticket.assign') || context.is_global_admin ? await getAssignableSupportUsers() : [],
     messages
   };
@@ -483,6 +658,165 @@ export async function updateTicket(ticketId, context, input) {
     } else if (currentAssignee) {
       await addSystemTicketEvent(ticketId, context.id, `Исполнитель снят: ${currentAssignee.full_name}`, now);
     }
+  }
+
+  return await getTicketById(ticketId, context);
+}
+
+export async function createRemoteSession(ticketId, context, input) {
+  const ticket = await getTicketById(ticketId, context);
+  const now = nowIso();
+  const accessMode = input.accessMode === 'unattended' ? 'unattended' : 'interactive';
+  const deviceId = await upsertRemoteDevice(ticket, context, input, now);
+  const sessionId = createId('rsess');
+  const status = accessMode === 'unattended' ? 'ready' : 'requested';
+  const joinCode = input.joinCode?.trim() || generateJoinCode();
+  const remoteClientId = input.remoteClientId?.trim() || null;
+
+  await execute(
+    sql(
+      `
+        INSERT INTO remote_sessions (
+          id, ticket_id, company_id, device_id, requested_by_user_id, engineer_user_id,
+          access_mode, status, join_code, remote_client_id, created_at, updated_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      `,
+      `
+        INSERT INTO remote_sessions (
+          id, ticket_id, company_id, device_id, requested_by_user_id, engineer_user_id,
+          access_mode, status, join_code, remote_client_id, created_at, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `
+    ),
+    [
+      sessionId,
+      ticket.id,
+      ticket.company_id,
+      deviceId,
+      context.id,
+      canManageRemote(context) ? context.id : null,
+      accessMode,
+      status,
+      joinCode,
+      remoteClientId,
+      now,
+      now
+    ]
+  );
+
+  if (accessMode === 'unattended') {
+    await addSystemTicketEvent(ticket.id, context.id, `Разрешен постоянный удаленный доступ. Код подключения: ${joinCode}`, now);
+  } else {
+    await addSystemTicketEvent(ticket.id, context.id, `Запрошена удаленная помощь. Код подключения: ${joinCode}`, now);
+  }
+
+  return await getTicketById(ticketId, context);
+}
+
+export async function updateRemoteSession(ticketId, sessionId, context, input) {
+  const ticket = await getTicketById(ticketId, context);
+  const session = await queryOne(
+    sql(
+      `
+        SELECT *
+        FROM remote_sessions
+        WHERE id = $1 AND ticket_id = $2
+      `,
+      `
+        SELECT *
+        FROM remote_sessions
+        WHERE id = ? AND ticket_id = ?
+      `
+    ),
+    [sessionId, ticketId]
+  );
+  if (!session) throw notFound('Remote session not found');
+
+  const canManage = canManageRemote(context) || session.requested_by_user_id === context.id;
+  if (!canManage) throw forbidden('You cannot manage remote access for this ticket');
+
+  const now = nowIso();
+  const nextStatus = input.status || session.status;
+  const nextEngineerUserId = input.engineerUserId === undefined
+    ? (canManageRemote(context) && !session.engineer_user_id ? context.id : session.engineer_user_id)
+    : (input.engineerUserId || null);
+  const nextJoinCode = input.joinCode?.trim() || session.join_code || generateJoinCode();
+  const nextRemoteClientId = input.remoteClientId?.trim() || session.remote_client_id || null;
+  const startedAt = nextStatus === 'active' ? (session.started_at || now) : session.started_at;
+  const endedAt = ['ended', 'cancelled'].includes(nextStatus) ? (session.ended_at || now) : null;
+  const endedReason = ['ended', 'cancelled'].includes(nextStatus) ? (input.endedReason?.trim() || session.ended_reason || null) : null;
+
+  await execute(
+    sql(
+      `
+        UPDATE remote_sessions
+        SET engineer_user_id = $1,
+            status = $2,
+            join_code = $3,
+            remote_client_id = $4,
+            updated_at = $5,
+            started_at = $6,
+            ended_at = $7,
+            ended_reason = $8
+        WHERE id = $9
+      `,
+      `
+        UPDATE remote_sessions
+        SET engineer_user_id = ?,
+            status = ?,
+            join_code = ?,
+            remote_client_id = ?,
+            updated_at = ?,
+            started_at = ?,
+            ended_at = ?,
+            ended_reason = ?
+        WHERE id = ?
+      `
+    ),
+    [nextEngineerUserId, nextStatus, nextJoinCode, nextRemoteClientId, now, startedAt, endedAt, endedReason, sessionId]
+  );
+
+  if (nextStatus !== session.status) {
+    const eventMap = {
+      ready: 'Удаленная сессия подготовлена',
+      active: 'Инженер подключился к удаленной сессии',
+      ended: `Удаленная сессия завершена${endedReason ? ': ' + endedReason : ''}`,
+      cancelled: `Удаленная сессия отменена${endedReason ? ': ' + endedReason : ''}`
+    };
+    if (eventMap[nextStatus]) {
+      await addSystemTicketEvent(ticket.id, context.id, eventMap[nextStatus], now);
+    }
+  }
+
+  if (input.unattendedEnabled !== undefined && session.device_id) {
+    await execute(
+      sql(
+        `
+          UPDATE remote_devices
+          SET unattended_enabled = $1,
+              unattended_password_set = CASE WHEN $1 = TRUE THEN TRUE ELSE unattended_password_set END,
+              updated_at = $2
+          WHERE id = $3
+        `,
+        `
+          UPDATE remote_devices
+          SET unattended_enabled = ?,
+              unattended_password_set = CASE WHEN ? = 1 THEN 1 ELSE unattended_password_set END,
+              updated_at = ?
+          WHERE id = ?
+        `
+      ),
+      [Boolean(input.unattendedEnabled), Boolean(input.unattendedEnabled), now, session.device_id]
+    );
+
+    await addSystemTicketEvent(
+      ticket.id,
+      context.id,
+      input.unattendedEnabled ? 'Постоянный удаленный доступ включен' : 'Постоянный удаленный доступ отключен',
+      now
+    );
   }
 
   return await getTicketById(ticketId, context);

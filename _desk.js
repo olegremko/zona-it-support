@@ -298,6 +298,35 @@
     return hasPermission('ticket.update.own') && state.user && state.selectedTicket.created_by_user_id === state.user.id;
   }
 
+  function canManageRemoteDesk() {
+    return !!(state.user && (state.user.isGlobalAdmin || hasPermission('ticket.assign') || hasPermission('ticket.view.all')));
+  }
+
+  function ensureRemotePanel() {
+    var panel = $('deskRemotePanel');
+    if (panel) return panel;
+    var historyCard = $('deskHistory');
+    if (!historyCard || !historyCard.closest) return null;
+    var historyAsideCard = historyCard.closest('.aside-card');
+    if (!historyAsideCard || !historyAsideCard.parentNode) return null;
+
+    var remoteCard = document.createElement('div');
+    remoteCard.className = 'aside-card';
+    remoteCard.innerHTML = '<h3>Удаленная помощь</h3><div id="deskRemotePanel" class="history"><div class="empty" style="padding:0">Выберите тикет, чтобы запросить или запустить удаленную помощь.</div></div>';
+    historyAsideCard.parentNode.insertBefore(remoteCard, historyAsideCard);
+    return $('deskRemotePanel');
+  }
+
+  function latestRemoteSession() {
+    if (!state.selectedTicket || !state.selectedTicket.remote_sessions || !state.selectedTicket.remote_sessions.length) return null;
+    return state.selectedTicket.remote_sessions[0];
+  }
+
+  function latestRemoteDevice() {
+    if (!state.selectedTicket || !state.selectedTicket.remote_devices || !state.selectedTicket.remote_devices.length) return null;
+    return state.selectedTicket.remote_devices[0];
+  }
+
   function syncQuickStatusPanel() {
     var wrap = $('deskQuickStatusWrap');
     var select = $('deskQuickStatus');
@@ -310,6 +339,68 @@
     }
     select.value = state.selectedTicket.status || 'open';
     refreshCustomSelect(select);
+  }
+
+  function renderRemotePanel() {
+    var panel = ensureRemotePanel();
+    if (!panel) return;
+
+    if (!state.selectedTicket || state.mode !== 'tickets') {
+      panel.innerHTML = '<div class="empty" style="padding:0">Выберите тикет, чтобы запросить или запустить удаленную помощь.</div>';
+      return;
+    }
+
+    var ticket = state.selectedTicket;
+    var session = latestRemoteSession();
+    var device = latestRemoteDevice();
+    var canManage = canManageRemoteDesk();
+    var canRequest = !!state.user;
+    var parts = [];
+
+    if (device) {
+      parts.push(
+        '<div class="history-item">' +
+          '<strong>' + escapeHtml(device.label || 'Устройство клиента') + '</strong>' +
+          '<div>' + escapeHtml(device.remote_client_id || 'ID еще не передан') + '</div>' +
+          '<div style="margin-top:6px;color:#9eb0c6;font-size:12px">Постоянный доступ: ' + escapeHtml(device.unattended_enabled ? 'включен' : 'выключен') + '</div>' +
+        '</div>'
+      );
+    }
+
+    if (session) {
+      parts.push(
+        '<div class="history-item">' +
+          '<strong>Последняя сессия</strong>' +
+          '<div>Режим: ' + escapeHtml(session.access_mode === 'unattended' ? 'постоянный доступ' : 'разовая помощь') + '</div>' +
+          '<div>Статус: ' + escapeHtml(session.status) + '</div>' +
+          '<div>Код: ' + escapeHtml(session.join_code || '—') + '</div>' +
+          '<div style="margin-top:6px;color:#9eb0c6;font-size:12px">Инженер: ' + escapeHtml(session.engineer_name || 'не назначен') + '</div>' +
+        '</div>'
+      );
+    } else {
+      parts.push('<div class="history-item"><strong>Сессий пока нет</strong><div>Можно запросить разовое подключение или включить постоянный доступ для этой задачи.</div></div>');
+    }
+
+    var buttons = [];
+    if (canRequest) {
+      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="request" style="height:40px;padding:0 14px;font-size:13px">Запросить помощь</button>');
+      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="unattended" style="height:40px;padding:0 14px;font-size:13px">Постоянный доступ</button>');
+    }
+    if (canManage && session) {
+      if (session.status !== 'active') buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect" style="height:40px;padding:0 14px;font-size:13px">Подключиться</button>');
+      if (session.status === 'active' || session.status === 'ready' || session.status === 'requested') buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="finish" style="height:40px;padding:0 14px;font-size:13px">Завершить</button>');
+    }
+    if (canManage && device && device.unattended_enabled) {
+      buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended" style="height:40px;padding:0 14px;font-size:13px">Отключить доступ</button>');
+    }
+
+    parts.push('<div style="display:flex;flex-wrap:wrap;gap:8px">' + buttons.join('') + '</div>');
+    panel.innerHTML = parts.join('');
+    Array.prototype.forEach.call(panel.querySelectorAll('[data-remote-action]'), function (button) {
+      button.addEventListener('click', function () {
+        handleRemoteAction(button.getAttribute('data-remote-action'));
+      });
+    });
   }
 
   function renderSidebarHeader() {
@@ -378,6 +469,7 @@
       composer.disabled = true;
       sendBtn.disabled = true;
       syncQuickStatusPanel();
+      renderRemotePanel();
       return;
     }
     var ticket = state.selectedTicket;
@@ -403,6 +495,7 @@
     composer.disabled = false;
     sendBtn.disabled = false;
     syncQuickStatusPanel();
+    renderRemotePanel();
   }
 
   function renderSelectedConversation() {
@@ -420,6 +513,7 @@
       composer.disabled = true;
       sendBtn.disabled = true;
       syncQuickStatusPanel();
+      renderRemotePanel();
       return;
     }
     var conversation = state.selectedConversation;
@@ -443,6 +537,7 @@
     composer.disabled = false;
     sendBtn.disabled = false;
     syncQuickStatusPanel();
+    renderRemotePanel();
   }
 
   function renderSelectedEntity() {
@@ -666,6 +761,47 @@
     } catch (error) {
       $('deskComposer').value = body;
     }
+  }
+
+  async function handleRemoteAction(action) {
+    if (!state.selectedTicketId || !state.selectedTicket) return;
+    try {
+      if (action === 'request') {
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
+          method: 'POST',
+          body: JSON.stringify({ accessMode: 'interactive', deviceLabel: 'Рабочее место клиента' })
+        });
+      } else if (action === 'unattended') {
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
+          method: 'POST',
+          body: JSON.stringify({ accessMode: 'unattended', deviceLabel: 'Рабочее место клиента' })
+        });
+      } else if (action === 'connect') {
+        var connectSession = latestRemoteSession();
+        if (!connectSession) return;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(connectSession.id), {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'active' })
+        });
+      } else if (action === 'finish') {
+        var finishSession = latestRemoteSession();
+        if (!finishSession) return;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(finishSession.id), {
+          method: 'PATCH',
+          body: JSON.stringify({ status: 'ended', endedReason: 'Сеанс завершен инженером' })
+        });
+      } else if (action === 'disable-unattended') {
+        var unattendedSession = latestRemoteSession();
+        if (!unattendedSession) return;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(unattendedSession.id), {
+          method: 'PATCH',
+          body: JSON.stringify({ unattendedEnabled: false })
+        });
+      }
+
+      await fetchTickets();
+      await selectTicket(state.selectedTicketId, true);
+    } catch (error) {}
   }
 
   function stopPolling() {
