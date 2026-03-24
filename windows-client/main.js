@@ -69,6 +69,15 @@ async function applyRustDeskConfig(executable, options) {
   }
 }
 
+async function installRustDeskService(executable) {
+  try {
+    await execFileAsync(executable, ['--install-service']);
+    return { installed: true };
+  } catch (error) {
+    return { installed: false, error: error.message };
+  }
+}
+
 function httpsGetJson(url) {
   return new Promise(function (resolve, reject) {
     https.get(url, {
@@ -207,12 +216,16 @@ async function installRustDesk(options) {
       return { started: false, installed: false, error: 'Не удалось завершить тихую установку модуля.' };
     }
 
+    const serviceResult = await installRustDeskService(executable);
+    await sleep(2000);
     const configResult = await applyRustDeskConfig(executable, options);
     return {
       started: true,
       installed: true,
       executable: executable,
       managed: false,
+      serviceInstalled: !!serviceResult.installed,
+      serviceError: serviceResult.error || null,
       configured: !!configResult.applied,
       configError: configResult.error || null
     };
