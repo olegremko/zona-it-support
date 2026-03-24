@@ -12,12 +12,30 @@ function managedRustDeskDir() {
   return path.join(app.getPath('userData'), 'runtime', 'rustdesk');
 }
 
-function managedRustDeskInstaller() {
-  return path.join(managedRustDeskDir(), 'rustdesk-installer.exe');
+function sanitizeRustDeskFileValue(value) {
+  return String(value || '')
+    .replace(/[<>:"/\\|?*]/g, '')
+    .trim();
 }
 
-function rustDeskCandidates() {
+function managedRustDeskFileName(options) {
+  const host = sanitizeRustDeskFileValue(options && options.host ? options.host : '');
+  const key = sanitizeRustDeskFileValue(options && options.key ? options.key : '');
+  if (host && key) return `rustdesk-host=${host},key=${key},.exe`;
+  return 'rustdesk.exe';
+}
+
+function managedRustDeskExecutable(options) {
+  return path.join(managedRustDeskDir(), managedRustDeskFileName(options));
+}
+
+function managedRustDeskInstaller(options) {
+  return path.join(managedRustDeskDir(), 'rustdesk-installer-' + managedRustDeskFileName(options));
+}
+
+function rustDeskCandidates(options) {
   return [
+    managedRustDeskExecutable(options),
     path.join(process.env.ProgramFiles || 'C:\\Program Files', 'RustDesk', 'rustdesk.exe'),
     path.join(process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'RustDesk', 'rustdesk.exe'),
     path.join(os.homedir(), 'AppData', 'Local', 'Programs', 'RustDesk', 'RustDesk.exe'),
@@ -25,8 +43,8 @@ function rustDeskCandidates() {
   ];
 }
 
-function findRustDesk() {
-  return rustDeskCandidates().find(function (candidate) {
+function findRustDesk(options) {
+  return rustDeskCandidates(options).find(function (candidate) {
     try {
       return fs.existsSync(candidate);
     } catch (error) {
@@ -169,18 +187,18 @@ async function getRustDeskStatus() {
     installed: true,
     executable: executable,
     clientId: clientId,
-    managed: false
+    managed: path.resolve(executable).startsWith(path.resolve(managedRustDeskDir()))
   };
 }
 
 async function launchRustDesk(options) {
-  let executable = findRustDesk();
+  let executable = findRustDesk(options);
   if (!executable) {
     const installResult = await installRustDesk(options);
     if (!installResult.installed) {
       return { launched: false, installed: false, error: installResult.error || 'Не удалось подготовить модуль удаленной помощи.' };
     }
-    executable = findRustDesk();
+    executable = findRustDesk(options);
     if (!executable) {
       return { launched: false, installed: false, error: 'Модуль удаленной помощи установлен, но клиент не найден.' };
     }
@@ -199,15 +217,15 @@ async function launchRustDesk(options) {
 
 async function installRustDesk(options) {
   try {
-    let executable = findRustDesk();
+    let executable = findRustDesk(options);
     if (!executable) {
-      const installerPath = managedRustDeskInstaller();
+      const installerPath = managedRustDeskInstaller(options);
       const assetUrl = await latestRustDeskAssetUrl();
       await downloadFile(assetUrl, installerPath);
       await execFileAsync(installerPath, ['--silent-install']);
       for (let attempt = 0; attempt < 20; attempt += 1) {
         await sleep(1500);
-        executable = findRustDesk();
+        executable = findRustDesk(options);
         if (executable) break;
       }
     }
