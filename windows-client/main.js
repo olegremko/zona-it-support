@@ -43,8 +43,22 @@ function rustDeskCandidates(options) {
   ];
 }
 
+function managedRustDeskOnlyCandidates(options) {
+  return [managedRustDeskExecutable(options)];
+}
+
 function findRustDesk(options) {
   return rustDeskCandidates(options).find(function (candidate) {
+    try {
+      return fs.existsSync(candidate);
+    } catch (error) {
+      return false;
+    }
+  }) || null;
+}
+
+function findManagedRustDesk(options) {
+  return managedRustDeskOnlyCandidates(options).find(function (candidate) {
     try {
       return fs.existsSync(candidate);
     } catch (error) {
@@ -161,7 +175,7 @@ async function latestRustDeskAssetUrl() {
   const release = await httpsGetJson('https://api.github.com/repos/rustdesk/rustdesk/releases/latest');
   const assets = Array.isArray(release.assets) ? release.assets : [];
   const preferred = assets.find(function (asset) {
-    return /x86_64\\.exe$/i.test(asset.name || '');
+    return /portable.*x86_64\.exe$/i.test(asset.name || '') || /x86_64\.exe$/i.test(asset.name || '');
   }) || assets.find(function (asset) {
     return /\\.exe$/i.test(asset.name || '');
   });
@@ -172,7 +186,7 @@ async function latestRustDeskAssetUrl() {
 }
 
 async function getRustDeskStatus() {
-  const executable = findRustDesk();
+  const executable = findManagedRustDesk() || findRustDesk();
   if (!executable) {
     return { installed: false, executable: null, clientId: '', managed: false };
   }
@@ -194,13 +208,13 @@ async function getRustDeskStatus() {
 }
 
 async function launchRustDesk(options) {
-  let executable = findRustDesk(options);
+  let executable = findManagedRustDesk(options);
   if (!executable) {
     const installResult = await installRustDesk(options);
     if (!installResult.installed) {
       return { launched: false, installed: false, error: installResult.error || 'Не удалось подготовить модуль удаленной помощи.' };
     }
-    executable = findRustDesk(options);
+    executable = findManagedRustDesk(options);
     if (!executable) {
       return { launched: false, installed: false, error: 'Модуль удаленной помощи установлен, но клиент не найден.' };
     }
@@ -219,21 +233,16 @@ async function launchRustDesk(options) {
 
 async function installRustDesk(options) {
   try {
-    let executable = findRustDesk(options);
+    let executable = findManagedRustDesk(options);
     if (!executable) {
-      const installerPath = managedRustDeskInstaller(options);
+      const installerPath = managedRustDeskExecutable(options);
       const assetUrl = await latestRustDeskAssetUrl();
       await downloadFile(assetUrl, installerPath);
-      await execFileAsync(installerPath, ['--silent-install']);
-      for (let attempt = 0; attempt < 20; attempt += 1) {
-        await sleep(1500);
-        executable = findRustDesk(options);
-        if (executable) break;
-      }
+      executable = installerPath;
     }
 
     if (!executable) {
-      return { started: false, installed: false, error: 'Не удалось завершить тихую установку модуля.' };
+      return { started: false, installed: false, error: 'Не удалось подготовить встроенный модуль.' };
     }
 
     const serviceResult = await installRustDeskService(executable);
