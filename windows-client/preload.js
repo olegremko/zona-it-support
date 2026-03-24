@@ -8,11 +8,11 @@ contextBridge.exposeInMainWorld('zonaDeskBridge', {
   getRustDeskStatus: function () {
     return ipcRenderer.invoke('rustdesk:status');
   },
-  launchRustDesk: function () {
-    return ipcRenderer.invoke('rustdesk:launch');
+  launchRustDesk: function (options) {
+    return ipcRenderer.invoke('rustdesk:launch', options || {});
   },
-  installRustDesk: function () {
-    return ipcRenderer.invoke('rustdesk:install');
+  installRustDesk: function (options) {
+    return ipcRenderer.invoke('rustdesk:install', options || {});
   },
   copyText: function (value) {
     return ipcRenderer.invoke('desk:copy', value);

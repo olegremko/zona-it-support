@@ -870,7 +870,12 @@
           method: 'PATCH',
           body: JSON.stringify({ status: 'active' })
         });
-        if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) await DESK_BRIDGE.launchRustDesk();
+        if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
+          await DESK_BRIDGE.launchRustDesk({
+            host: runtime && runtime.server_host,
+            key: runtime && runtime.server_key
+          });
+        }
         if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
       } else if (action === 'finish') {
         if (!currentSession) return;
@@ -886,8 +891,12 @@
         });
       } else if (action === 'launch-rustdesk') {
         if (!hasDesktopBridge()) return;
-        if (state.desktopRemote.installed) await DESK_BRIDGE.launchRustDesk();
-        else await DESK_BRIDGE.installRustDesk();
+        var remoteOptions = {
+          host: runtime && runtime.server_host,
+          key: runtime && runtime.server_key
+        };
+        if (state.desktopRemote.installed) await DESK_BRIDGE.launchRustDesk(remoteOptions);
+        else await DESK_BRIDGE.installRustDesk(remoteOptions);
         await refreshDesktopRemoteState();
       } else if (action === 'copy-host') {
         if (runtime && runtime.server_host) await copyDeskText(runtime.server_host);

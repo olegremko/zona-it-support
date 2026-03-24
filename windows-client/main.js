@@ -45,6 +45,25 @@ function execFileAsync(file, args) {
   });
 }
 
+function buildRustDeskConfigString(host, key) {
+  if (!host || !key) return '';
+  const payload = JSON.stringify({ host: host, key: key });
+  return Buffer.from(payload, 'utf8').toString('base64').split('').reverse().join('');
+}
+
+async function applyRustDeskConfig(executable, options) {
+  const host = options && options.host ? String(options.host).trim() : '';
+  const key = options && options.key ? String(options.key).trim() : '';
+  const configString = buildRustDeskConfigString(host, key);
+  if (!configString) return { applied: false };
+  try {
+    await execFileAsync(executable, ['--config', configString]);
+    return { applied: true };
+  } catch (error) {
+    return { applied: false, error: error.message };
+  }
+}
+
 function httpsGetJson(url) {
   return new Promise(function (resolve, reject) {
     https.get(url, {
@@ -140,12 +159,14 @@ async function getRustDeskStatus() {
   };
 }
 
-async function launchRustDesk() {
+async function launchRustDesk(options) {
   const executable = findRustDesk();
   if (!executable) {
     await shell.openExternal('https://rustdesk.com/');
     return { launched: false, installed: false, redirectedToDownload: true };
   }
+
+  await applyRustDeskConfig(executable, options);
 
   const child = spawn(executable, [], {
     detached: true,
@@ -156,13 +177,14 @@ async function launchRustDesk() {
   return { launched: true, installed: true };
 }
 
-async function installRustDesk() {
+async function installRustDesk(options) {
   try {
     const target = managedRustDeskExecutable();
     if (!fs.existsSync(target)) {
       const assetUrl = await latestRustDeskAssetUrl();
       await downloadFile(assetUrl, target);
     }
+    await applyRustDeskConfig(target, options);
     return { started: true, installed: true, executable: target, managed: true };
   } catch (error) {
     await shell.openExternal('https://rustdesk.com/');
@@ -204,12 +226,12 @@ ipcMain.handle('rustdesk:status', async function () {
   return await getRustDeskStatus();
 });
 
-ipcMain.handle('rustdesk:launch', async function () {
-  return await launchRustDesk();
+ipcMain.handle('rustdesk:launch', async function (_event, options) {
+  return await launchRustDesk(options || {});
 });
 
-ipcMain.handle('rustdesk:install', async function () {
-  return await installRustDesk();
+ipcMain.handle('rustdesk:install', async function (_event, options) {
+  return await installRustDesk(options || {});
 });
 
 ipcMain.handle('desk:copy', async function (_event, value) {
