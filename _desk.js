@@ -894,6 +894,7 @@
             await DESK_BRIDGE.launchRustDesk({
               host: runtime && runtime.server_host,
               key: runtime && runtime.server_key,
+              configString: runtime && runtime.server_config,
               peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
             });
           }
@@ -913,7 +914,8 @@
         if (!hasDesktopBridge()) return;
         var remoteOptions = {
           host: runtime && runtime.server_host,
-          key: runtime && runtime.server_key
+          key: runtime && runtime.server_key,
+          configString: runtime && runtime.server_config
         };
         if (state.desktopRemote.installed) await DESK_BRIDGE.launchRustDesk(remoteOptions);
         else await DESK_BRIDGE.installRustDesk(remoteOptions);

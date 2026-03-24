@@ -453,6 +453,7 @@ export async function getTicketById(ticketId, context) {
       provider: 'rustdesk',
       server_host: env.remoteServerHost || null,
       server_key: env.remoteServerKey || null,
+      server_config: env.remoteServerConfig || null,
       download_url: env.remoteDownloadUrl || 'https://rustdesk.com/'
     },
     assignable_users: hasPermission(context, 'ticket.assign') || context.is_global_admin ? await getAssignableSupportUsers() : [],

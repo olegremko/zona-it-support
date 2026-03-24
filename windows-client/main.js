@@ -62,7 +62,11 @@ function execFileAsync(file, args) {
   });
 }
 
-function buildRustDeskConfigString(host, key) {
+function buildRustDeskConfigString(options) {
+  const directConfig = options && options.configString ? String(options.configString).trim() : '';
+  if (directConfig) return directConfig;
+  const host = options && options.host ? String(options.host).trim() : '';
+  const key = options && options.key ? String(options.key).trim() : '';
   if (!host || !key) return '';
   const payload = JSON.stringify({ host: host, key: key });
   return Buffer.from(payload, 'utf8').toString('base64').split('').reverse().join('');
@@ -75,9 +79,7 @@ function sleep(ms) {
 }
 
 async function applyRustDeskConfig(executable, options) {
-  const host = options && options.host ? String(options.host).trim() : '';
-  const key = options && options.key ? String(options.key).trim() : '';
-  const configString = buildRustDeskConfigString(host, key);
+  const configString = buildRustDeskConfigString(options || {});
   if (!configString) return { applied: false };
   try {
     await execFileAsync(executable, ['--config', configString]);

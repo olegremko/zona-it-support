@@ -15,5 +15,6 @@ export const env = {
   postgresPassword: process.env.POSTGRES_PASSWORD || '',
   remoteServerHost: process.env.REMOTE_SERVER_HOST || '',
   remoteServerKey: process.env.REMOTE_SERVER_KEY || '',
+  remoteServerConfig: process.env.REMOTE_SERVER_CONFIG || '',
   remoteDownloadUrl: process.env.REMOTE_DOWNLOAD_URL || 'https://rustdesk.com/'
 };
