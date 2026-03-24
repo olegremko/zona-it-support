@@ -63,16 +63,16 @@
       radial-gradient(circle at top left, rgba(127,195,255,.04), transparent 26%)}
     .main-head-copy h2{margin:0;font-size:18px;font-family:'Montserrat',sans-serif;letter-spacing:-.025em}.main-head-copy p{margin:4px 0 0;color:rgba(158,176,198,.92);font-size:11px}
     .main-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.content{display:flex;min-height:0;flex:1;overflow:hidden}
-    .thread{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden} .thread-stream{padding:16px 22px;display:grid;gap:9px;overflow:auto;min-height:0;flex:1;background:
-      radial-gradient(circle at 18% 16%, rgba(127,195,255,.022) 0 1px, transparent 1.7px),
-      radial-gradient(circle at 76% 24%, rgba(0,168,107,.018) 0 1px, transparent 1.7px),
-      radial-gradient(circle at 34% 72%, rgba(127,195,255,.018) 0 1px, transparent 1.7px),
-      linear-gradient(180deg,rgba(255,255,255,.014),rgba(255,255,255,.006)),
-      radial-gradient(circle at top right, rgba(0,168,107,.04), transparent 22%)}
-    .bubble{max-width:min(64%,560px);padding:8px 11px;border-radius:15px;line-height:1.36;position:relative;font-size:12px}
-    .bubble.me{margin-left:auto;background:linear-gradient(135deg,rgba(30,194,135,.84),rgba(23,176,121,.86));color:#f7fffb;border-bottom-right-radius:5px;box-shadow:0 6px 14px rgba(0,168,107,.085)}
-    .bubble.other{background:linear-gradient(180deg,rgba(255,255,255,.042),rgba(255,255,255,.032));color:#e6eff9;border:1px solid rgba(255,255,255,.05);border-bottom-left-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
-    .bubble.system{max-width:min(58%,520px);margin:0 auto;padding:6px 10px;border-radius:12px;background:rgba(127,195,255,.045);border:1px dashed rgba(127,195,255,.12);color:#cfe5ff;font-size:10px;line-height:1.32;box-shadow:none}
+    .thread{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden} .thread-stream{padding:16px 22px;display:grid;justify-items:start;gap:9px;overflow:auto;min-height:0;flex:1;background:
+        radial-gradient(circle at 18% 16%, rgba(127,195,255,.022) 0 1px, transparent 1.7px),
+        radial-gradient(circle at 76% 24%, rgba(0,168,107,.018) 0 1px, transparent 1.7px),
+        radial-gradient(circle at 34% 72%, rgba(127,195,255,.018) 0 1px, transparent 1.7px),
+        linear-gradient(180deg,rgba(255,255,255,.014),rgba(255,255,255,.006)),
+        radial-gradient(circle at top right, rgba(0,168,107,.04), transparent 22%)}
+    .bubble{display:inline-block;justify-self:start;width:fit-content;max-width:min(58%,500px);padding:7px 10px;border-radius:15px;line-height:1.32;position:relative;font-size:11px}
+    .bubble.me{justify-self:end;background:linear-gradient(135deg,rgba(30,194,135,.8),rgba(23,176,121,.82));color:#f7fffb;border-bottom-right-radius:5px;box-shadow:0 6px 14px rgba(0,168,107,.07)}
+    .bubble.other{background:linear-gradient(180deg,rgba(255,255,255,.042),rgba(255,255,255,.032));color:#e6eff9;border:1px solid rgba(255,255,255,.05);border-bottom-left-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.06)}
+    .bubble.system{justify-self:center;max-width:min(48%,420px);padding:6px 10px;border-radius:12px;background:rgba(127,195,255,.045);border:1px dashed rgba(127,195,255,.12);color:#cfe5ff;font-size:10px;line-height:1.28;box-shadow:none}
     .bubble-meta{display:flex;gap:6px;align-items:center;margin-bottom:4px;font-size:8px;color:rgba(255,255,255,.6);font-weight:700;text-transform:uppercase;letter-spacing:.68px}
     .bubble.system .bubble-meta{margin-bottom:2px;justify-content:center;font-size:7px;letter-spacing:.58px}
     .bubble.other .bubble-meta,.bubble.system .bubble-meta{color:#8fb0d3}.composer-row{padding:16px 18px calc(16px + env(safe-area-inset-bottom, 0px));border-top:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;background:rgba(6,15,26,.86);backdrop-filter:blur(12px);position:sticky;bottom:0;z-index:5}
