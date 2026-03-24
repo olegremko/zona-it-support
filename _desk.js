@@ -567,15 +567,17 @@
       return;
     }
     var ticket = state.selectedTicket;
-    $('deskThreadTitle').textContent = '#' + ticket.number + ' • ' + ticket.subject;
-    $('deskThreadMeta').textContent = 'Статус: ' + statusLabel(ticket.status) + ' • Приоритет: ' + priorityLabel(ticket.priority);
-    stream.innerHTML = (ticket.messages || []).map(function (message) {
-      var kind = 'other';
-      if (message.message_type === 'system' || message.message_type === 'internal_note') kind = 'system';
-      else if (messageBelongsToViewerSide(message)) kind = 'me';
-      var author = message.author_name || (kind === 'me' ? 'Вы' : message.message_type === 'system' ? 'Система' : 'Поддержка');
-      return '<div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.created_at)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div>';
-    }).join('') || '<div class="empty">В этом тикете пока нет сообщений.</div>';
+      $('deskThreadTitle').textContent = '#' + ticket.number + ' • ' + ticket.subject;
+      $('deskThreadMeta').textContent = 'Статус: ' + statusLabel(ticket.status) + ' • Приоритет: ' + priorityLabel(ticket.priority);
+      stream.innerHTML = (ticket.messages || []).map(function (message) {
+        if (message.message_type === 'system' || message.message_type === 'internal_note') {
+          var systemAuthor = message.author_name || 'Система';
+          return '<div class="system-event"><div class="system-event-meta"><span>' + escapeHtml(systemAuthor) + ' • ' + escapeHtml(formatDate(message.created_at)) + '</span></div><div class="system-event-body">' + escapeHtml(message.body) + '</div></div>';
+        }
+        var kind = messageBelongsToViewerSide(message) ? 'me' : 'other';
+        var author = message.author_name || (kind === 'me' ? 'Вы' : 'Поддержка');
+        return '<div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.created_at)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div>';
+      }).join('') || '<div class="empty">В этом тикете пока нет сообщений.</div>';
     stream.scrollTop = stream.scrollHeight;
     facts.innerHTML =
       '<div class="kv-row"><span>Статус</span><span><span class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</span></span></div>' +
