@@ -356,6 +356,25 @@
     return !!(state.user && (state.user.isGlobalAdmin || hasPermission('ticket.assign') || hasPermission('ticket.view.all')));
   }
 
+  function viewerIsSupportSide() {
+    return !!(state.user && (
+      state.user.isGlobalAdmin ||
+      hasPermission('ticket.view.all') ||
+      hasPermission('ticket.assign') ||
+      String(state.user.role || '').indexOf('support_') === 0
+    ));
+  }
+
+  function messageBelongsToViewerSide(message) {
+    if (!message || !state.user) return false;
+    if (message.author_user_id && message.author_user_id === state.user.id) return true;
+    if (viewerIsSupportSide()) return !!message.author_is_support;
+    if (message.author_user_id && state.user.companyId && message.author_company_id) {
+      return String(message.author_company_id) === String(state.user.companyId);
+    }
+    return false;
+  }
+
   function ensureRemotePanel() {
     var panel = $('deskRemotePanel');
     if (panel) return panel;
@@ -553,7 +572,7 @@
     stream.innerHTML = (ticket.messages || []).map(function (message) {
       var kind = 'other';
       if (message.message_type === 'system' || message.message_type === 'internal_note') kind = 'system';
-      else if (message.author_user_id && state.user && message.author_user_id === state.user.id) kind = 'me';
+      else if (messageBelongsToViewerSide(message)) kind = 'me';
       var author = message.author_name || (kind === 'me' ? 'Вы' : message.message_type === 'system' ? 'Система' : 'Поддержка');
       return '<div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.created_at)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div>';
     }).join('') || '<div class="empty">В этом тикете пока нет сообщений.</div>';

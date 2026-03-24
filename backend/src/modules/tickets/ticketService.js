@@ -383,16 +383,30 @@ export async function getTicketById(ticketId, context) {
   const messages = await queryMany(
     sql(
       `
-        SELECT tm.*, u.full_name AS author_name
+        SELECT
+          tm.*,
+          u.full_name AS author_name,
+          membership.company_id AS author_company_id,
+          COALESCE(author_role.code, '') AS author_role_code,
+          COALESCE(u.is_global_admin, FALSE) AS author_is_global_admin
         FROM ticket_messages tm
         LEFT JOIN users u ON u.id = tm.author_user_id
+        LEFT JOIN user_company_memberships membership ON membership.user_id = u.id
+        LEFT JOIN roles author_role ON author_role.id = membership.role_id
         WHERE tm.ticket_id = $1
         ORDER BY tm.created_at ASC
       `,
       `
-        SELECT tm.*, u.full_name AS author_name
+        SELECT
+          tm.*,
+          u.full_name AS author_name,
+          membership.company_id AS author_company_id,
+          COALESCE(author_role.code, '') AS author_role_code,
+          COALESCE(u.is_global_admin, 0) AS author_is_global_admin
         FROM ticket_messages tm
         LEFT JOIN users u ON u.id = tm.author_user_id
+        LEFT JOIN user_company_memberships membership ON membership.user_id = u.id
+        LEFT JOIN roles author_role ON author_role.id = membership.role_id
         WHERE tm.ticket_id = ?
         ORDER BY tm.created_at ASC
       `
@@ -442,7 +456,14 @@ export async function getTicketById(ticketId, context) {
       download_url: env.remoteDownloadUrl || 'https://rustdesk.com/'
     },
     assignable_users: hasPermission(context, 'ticket.assign') || context.is_global_admin ? await getAssignableSupportUsers() : [],
-    messages
+    messages: messages.map((message) => ({
+      ...message,
+      author_is_support: Boolean(
+        message.author_is_global_admin ||
+        String(message.author_role_code || '').startsWith('support_') ||
+        String(message.author_role_code || '') === 'platform_admin'
+      )
+    }))
   };
 }
 
