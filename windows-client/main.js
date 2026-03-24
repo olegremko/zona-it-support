@@ -12,13 +12,12 @@ function managedRustDeskDir() {
   return path.join(app.getPath('userData'), 'runtime', 'rustdesk');
 }
 
-function managedRustDeskExecutable() {
-  return path.join(managedRustDeskDir(), 'rustdesk.exe');
+function managedRustDeskInstaller() {
+  return path.join(managedRustDeskDir(), 'rustdesk-installer.exe');
 }
 
 function rustDeskCandidates() {
   return [
-    managedRustDeskExecutable(),
     path.join(process.env.ProgramFiles || 'C:\\Program Files', 'RustDesk', 'rustdesk.exe'),
     path.join(process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'RustDesk', 'rustdesk.exe'),
     path.join(os.homedir(), 'AppData', 'Local', 'Programs', 'RustDesk', 'RustDesk.exe'),
@@ -49,6 +48,12 @@ function buildRustDeskConfigString(host, key) {
   if (!host || !key) return '';
   const payload = JSON.stringify({ host: host, key: key });
   return Buffer.from(payload, 'utf8').toString('base64').split('').reverse().join('');
+}
+
+function sleep(ms) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  });
 }
 
 async function applyRustDeskConfig(executable, options) {
@@ -155,15 +160,21 @@ async function getRustDeskStatus() {
     installed: true,
     executable: executable,
     clientId: clientId,
-    managed: path.resolve(executable) === path.resolve(managedRustDeskExecutable())
+    managed: false
   };
 }
 
 async function launchRustDesk(options) {
-  const executable = findRustDesk();
+  let executable = findRustDesk();
   if (!executable) {
-    await shell.openExternal('https://rustdesk.com/');
-    return { launched: false, installed: false, redirectedToDownload: true };
+    const installResult = await installRustDesk(options);
+    if (!installResult.installed) {
+      return { launched: false, installed: false, error: installResult.error || 'Не удалось подготовить модуль удаленной помощи.' };
+    }
+    executable = findRustDesk();
+    if (!executable) {
+      return { launched: false, installed: false, error: 'Модуль удаленной помощи установлен, но клиент не найден.' };
+    }
   }
 
   await applyRustDeskConfig(executable, options);
@@ -179,16 +190,34 @@ async function launchRustDesk(options) {
 
 async function installRustDesk(options) {
   try {
-    const target = managedRustDeskExecutable();
-    if (!fs.existsSync(target)) {
+    let executable = findRustDesk();
+    if (!executable) {
+      const installerPath = managedRustDeskInstaller();
       const assetUrl = await latestRustDeskAssetUrl();
-      await downloadFile(assetUrl, target);
+      await downloadFile(assetUrl, installerPath);
+      await execFileAsync(installerPath, ['--silent-install']);
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        await sleep(1500);
+        executable = findRustDesk();
+        if (executable) break;
+      }
     }
-    await applyRustDeskConfig(target, options);
-    return { started: true, installed: true, executable: target, managed: true };
+
+    if (!executable) {
+      return { started: false, installed: false, error: 'Не удалось завершить тихую установку модуля.' };
+    }
+
+    const configResult = await applyRustDeskConfig(executable, options);
+    return {
+      started: true,
+      installed: true,
+      executable: executable,
+      managed: false,
+      configured: !!configResult.applied,
+      configError: configResult.error || null
+    };
   } catch (error) {
-    await shell.openExternal('https://rustdesk.com/');
-    return { started: false, installed: false, redirectedToDownload: true, error: error.message };
+    return { started: false, installed: false, error: error.message };
   }
 }
 

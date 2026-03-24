@@ -478,15 +478,15 @@
       if (session.status !== 'active') buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect">\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u0441\u044f</button>');
       if (session.status === 'active' || session.status === 'ready' || session.status === 'requested') buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="finish">\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c</button>');
     }
-    if (canManage && device && device.unattended_enabled) {
-      buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended">\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f</button>');
-    }
-    if (runtime && runtime.enabled && hasDesktopBridge()) {
-      buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'Открыть модуль' : 'Загрузить модуль') + '</button>');
-      buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-host">Скопировать хост</button>');
-      if (runtime.server_key) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-key">Скопировать ключ</button>');
-      if (device && device.remote_client_id) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID ПК</button>');
-    }
+      if (canManage && device && device.unattended_enabled) {
+        buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended">\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f</button>');
+      }
+      if (runtime && runtime.enabled && hasDesktopBridge()) {
+        buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'Открыть модуль' : 'Подготовить модуль') + '</button>');
+        buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-host">Скопировать хост</button>');
+        if (runtime.server_key) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-key">Скопировать ключ</button>');
+        if (device && device.remote_client_id) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID ПК</button>');
+      }
 
     parts.push('<div class="remote-actions">' + buttons.join('') + '</div>');
     panel.innerHTML = parts.join('');
@@ -883,20 +883,21 @@
             remoteClientId: localClientId
           })
         });
-      } else if (action === 'connect') {
-        if (!currentSession) return;
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'active' })
-        });
-        if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
-          await DESK_BRIDGE.launchRustDesk({
-            host: runtime && runtime.server_host,
-            key: runtime && runtime.server_key
+        } else if (action === 'connect') {
+          if (!currentSession) return;
+          await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'active' })
           });
-        }
-        if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
-      } else if (action === 'finish') {
+          if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
+          if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
+            await DESK_BRIDGE.launchRustDesk({
+              host: runtime && runtime.server_host,
+              key: runtime && runtime.server_key,
+              peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
+            });
+          }
+        } else if (action === 'finish') {
         if (!currentSession) return;
         await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
           method: 'PATCH',
@@ -925,10 +926,12 @@
         if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
       }
 
-      await fetchTickets();
-      await selectTicket(state.selectedTicketId, true);
-    } catch (error) {}
-  }
+        await fetchTickets();
+        await selectTicket(state.selectedTicketId, true);
+      } catch (error) {
+        alert(error && error.message ? error.message : 'Не удалось выполнить действие удаленной помощи.');
+      }
+    }
 
   function stopPolling() {
     if (state.pollTimer) {
