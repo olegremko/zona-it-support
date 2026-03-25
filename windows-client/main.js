@@ -5,7 +5,7 @@ const os = require('os');
 const https = require('https');
 const { execFile, spawn } = require('child_process');
 
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.15';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.16';
 app.commandLine.appendSwitch('disable-http-cache');
 let mainWindow = null;
 let tray = null;

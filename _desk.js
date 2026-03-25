@@ -7,10 +7,12 @@
     filteredTickets: [],
     selectedTicketId: null,
     selectedTicket: null,
+    selectedTicketUnreadCount: 0,
     conversations: [],
     filteredConversations: [],
     selectedConversationId: null,
     selectedConversation: null,
+    selectedConversationUnreadCount: 0,
     pollTimer: null,
     unreadTickets: {},
     unreadConversations: {},
@@ -270,10 +272,12 @@
     state.filteredTickets = [];
     state.selectedTicketId = null;
     state.selectedTicket = null;
+    state.selectedTicketUnreadCount = 0;
     state.conversations = [];
     state.filteredConversations = [];
     state.selectedConversationId = null;
     state.selectedConversation = null;
+    state.selectedConversationUnreadCount = 0;
     state.unreadTickets = {};
     state.unreadConversations = {};
     state.lastTicketSignatures = {};
@@ -654,11 +658,11 @@
       stream.innerHTML = (ticket.messages || []).map(function (message) {
         if (message.message_type === 'system' || message.message_type === 'internal_note') {
           var systemAuthor = message.author_name || 'Система';
-          return '<div class="system-event"><div class="system-event-meta"><span>' + escapeHtml(systemAuthor) + ' • ' + escapeHtml(formatDate(message.created_at)) + '</span></div><div class="system-event-body">' + escapeHtml(message.body) + '</div></div>';
+          return '<div class="message-row system"><div class="system-event"><div class="system-event-meta"><span>' + escapeHtml(systemAuthor) + ' • ' + escapeHtml(formatDate(message.created_at)) + '</span></div><div class="system-event-body">' + escapeHtml(message.body) + '</div></div></div>';
         }
         var kind = messageBelongsToViewerSide(message) ? 'me' : 'other';
         var author = message.author_name || (kind === 'me' ? 'Вы' : 'Поддержка');
-        return '<div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.created_at)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div>';
+        return '<div class="message-row ' + kind + '"><div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.created_at)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div></div>';
       }).join('') || '<div class="empty">В этом тикете пока нет сообщений.</div>';
     stream.scrollTop = stream.scrollHeight;
     facts.innerHTML =
@@ -700,7 +704,7 @@
     stream.innerHTML = (conversation.messages || []).map(function (message) {
       var kind = message.authorType === 'operator' ? 'me' : 'other';
       var author = message.authorName || (message.authorType === 'operator' ? 'Поддержка' : 'Посетитель');
-      return '<div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.createdAt)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div>';
+      return '<div class="message-row ' + kind + '"><div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.createdAt)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div></div>';
     }).join('') || '<div class="empty">В этом чате пока нет сообщений.</div>';
     stream.scrollTop = stream.scrollHeight;
     facts.innerHTML =
@@ -845,6 +849,7 @@
     try {
       var data = await api('/api/tickets/' + encodeURIComponent(ticketId));
       state.selectedTicket = data.ticket;
+      state.selectedTicketUnreadCount = Number(state.unreadTickets[ticketId] || 0);
       markTicketRead(ticketId);
       renderSelectedTicket();
     } catch (error) {
@@ -869,6 +874,7 @@
         updatedAt: data.conversation.updatedAt,
         messages: data.messages || []
       };
+      state.selectedConversationUnreadCount = Number(state.unreadConversations[conversationId] || 0);
       markConversationRead(conversationId);
       renderSelectedConversation();
     } catch (error) {
