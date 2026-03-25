@@ -44,6 +44,23 @@ export async function createApp() {
     if (liveChatColumns.length && !liveChatColumns.some((col) => col.name === 'ticket_id')) {
       db.exec('ALTER TABLE live_chat_conversations ADD COLUMN ticket_id TEXT');
     }
+    const remoteDeviceColumns = db.prepare(`PRAGMA table_info(remote_devices)`).all();
+    const ensureRemoteDeviceColumn = (name, sql) => {
+      if (remoteDeviceColumns.length && !remoteDeviceColumns.some((col) => col.name === name)) {
+        db.exec(sql);
+      }
+    };
+    ensureRemoteDeviceColumn('device_name', 'ALTER TABLE remote_devices ADD COLUMN device_name TEXT');
+    ensureRemoteDeviceColumn('local_ip', 'ALTER TABLE remote_devices ADD COLUMN local_ip TEXT');
+    ensureRemoteDeviceColumn('public_ip', 'ALTER TABLE remote_devices ADD COLUMN public_ip TEXT');
+    ensureRemoteDeviceColumn('gateway_ip', 'ALTER TABLE remote_devices ADD COLUMN gateway_ip TEXT');
+  } else {
+    await execSchema(`
+      ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS device_name TEXT;
+      ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS local_ip TEXT;
+      ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS public_ip TEXT;
+      ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS gateway_ip TEXT;
+    `);
   }
 
   app.use(helmet({

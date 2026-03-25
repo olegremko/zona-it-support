@@ -239,6 +239,16 @@
     }
   }
 
+  async function getDesktopSystemInfo() {
+    if (!hasDesktopBridge() || !DESK_BRIDGE.getSystemInfo) return null;
+    try {
+      var info = await DESK_BRIDGE.getSystemInfo();
+      return info || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
   async function api(path, options) {
     var request = Object.assign({
       headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders())
@@ -537,6 +547,17 @@
           '<div class="remote-row"><span>\u0414\u043e\u0441\u0442\u0443\u043f</span><span>' + escapeHtml(device.unattended_enabled ? '\u043f\u043e\u0441\u0442\u043e\u044f\u043d\u043d\u044b\u0439' : '\u043f\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0443') + '</span></div>' +
         '</div>'
       );
+      if (canManage && (device.device_name || device.local_ip || device.public_ip || device.gateway_ip)) {
+        parts.push(
+          '<div class="remote-card">' +
+            '<strong>Данные ПК клиента</strong>' +
+            '<div class="remote-row"><span>Имя ПК</span><span>' + escapeHtml(device.device_name || 'не определено') + '</span></div>' +
+            '<div class="remote-row"><span>IP локальный</span><span>' + escapeHtml(device.local_ip || 'не определен') + '</span></div>' +
+            '<div class="remote-row"><span>IP внешний</span><span>' + escapeHtml(device.public_ip || 'не определен') + '</span></div>' +
+            '<div class="remote-row"><span>Шлюз</span><span>' + escapeHtml(device.gateway_ip || 'не определен') + '</span></div>' +
+          '</div>'
+        );
+      }
     }
 
     if (session) {
@@ -1001,21 +1022,31 @@
       var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
 
       if (action === 'request') {
+        var systemInfo = await getDesktopSystemInfo();
         await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
           method: 'POST',
           body: JSON.stringify({
             accessMode: 'interactive',
             deviceLabel: 'Рабочее место клиента',
-            remoteClientId: localClientId
+            remoteClientId: localClientId,
+            deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
+            localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
+            publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
+            gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
           })
         });
       } else if (action === 'unattended') {
+        var unattendedSystemInfo = await getDesktopSystemInfo();
         await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
           method: 'POST',
           body: JSON.stringify({
             accessMode: 'unattended',
             deviceLabel: 'Рабочее место клиента',
-            remoteClientId: localClientId
+            remoteClientId: localClientId,
+            deviceName: unattendedSystemInfo && unattendedSystemInfo.deviceName ? unattendedSystemInfo.deviceName : '',
+            localIp: unattendedSystemInfo && unattendedSystemInfo.localIp ? unattendedSystemInfo.localIp : '',
+            publicIp: unattendedSystemInfo && unattendedSystemInfo.publicIp ? unattendedSystemInfo.publicIp : '',
+            gatewayIp: unattendedSystemInfo && unattendedSystemInfo.gatewayIp ? unattendedSystemInfo.gatewayIp : ''
           })
         });
         } else if (action === 'connect') {

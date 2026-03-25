@@ -22,5 +22,8 @@ contextBridge.exposeInMainWorld('zonaDeskBridge', {
   },
   setUnreadCount: function (count) {
     return ipcRenderer.invoke('desk:set-unread-count', Number(count || 0));
+  },
+  getSystemInfo: function () {
+    return ipcRenderer.invoke('desk:get-system-info');
   }
 });

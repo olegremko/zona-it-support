@@ -185,6 +185,10 @@ async function getRemoteSessions(ticketId) {
 async function upsertRemoteDevice(ticket, context, input, createdAt) {
   const label = (input.deviceLabel || '').trim() || 'Рабочее место клиента';
   const remoteClientId = input.remoteClientId?.trim() || null;
+  const deviceName = input.deviceName?.trim() || null;
+  const localIp = input.localIp?.trim() || null;
+  const publicIp = input.publicIp?.trim() || null;
+  const gatewayIp = input.gatewayIp?.trim() || null;
 
   let existing = null;
   if (remoteClientId) {
@@ -236,16 +240,24 @@ async function upsertRemoteDevice(ticket, context, input, createdAt) {
           UPDATE remote_devices
           SET label = $1,
               remote_client_id = COALESCE($2, remote_client_id),
-              unattended_enabled = $3,
-              unattended_password_set = $4,
-              updated_at = $5,
-              last_seen_at = $6
-          WHERE id = $7
+              device_name = COALESCE($3, device_name),
+              local_ip = COALESCE($4, local_ip),
+              public_ip = COALESCE($5, public_ip),
+              gateway_ip = COALESCE($6, gateway_ip),
+              unattended_enabled = $7,
+              unattended_password_set = $8,
+              updated_at = $9,
+              last_seen_at = $10
+          WHERE id = $11
         `,
         `
           UPDATE remote_devices
           SET label = ?,
               remote_client_id = COALESCE(?, remote_client_id),
+              device_name = COALESCE(?, device_name),
+              local_ip = COALESCE(?, local_ip),
+              public_ip = COALESCE(?, public_ip),
+              gateway_ip = COALESCE(?, gateway_ip),
               unattended_enabled = ?,
               unattended_password_set = ?,
               updated_at = ?,
@@ -253,7 +265,7 @@ async function upsertRemoteDevice(ticket, context, input, createdAt) {
           WHERE id = ?
         `
       ),
-      [label, remoteClientId, input.accessMode === 'unattended', input.accessMode === 'unattended', createdAt, createdAt, existing.id]
+      [label, remoteClientId, deviceName, localIp, publicIp, gatewayIp, input.accessMode === 'unattended', input.accessMode === 'unattended', createdAt, createdAt, existing.id]
     );
     return existing.id;
   }
@@ -264,16 +276,18 @@ async function upsertRemoteDevice(ticket, context, input, createdAt) {
       `
         INSERT INTO remote_devices (
           id, company_id, ticket_id, user_id, label, platform, remote_client_id,
+          device_name, local_ip, public_ip, gateway_ip,
           unattended_enabled, unattended_password_set, created_at, updated_at, last_seen_at
         )
-        VALUES ($1, $2, $3, $4, $5, 'windows', $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5, 'windows', $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       `,
       `
         INSERT INTO remote_devices (
           id, company_id, ticket_id, user_id, label, platform, remote_client_id,
+          device_name, local_ip, public_ip, gateway_ip,
           unattended_enabled, unattended_password_set, created_at, updated_at, last_seen_at
         )
-        VALUES (?, ?, ?, ?, ?, 'windows', ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, 'windows', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `
     ),
     [
@@ -283,6 +297,10 @@ async function upsertRemoteDevice(ticket, context, input, createdAt) {
       ticket.created_by_user_id || context.id,
       label,
       remoteClientId,
+      deviceName,
+      localIp,
+      publicIp,
+      gatewayIp,
       input.accessMode === 'unattended',
       input.accessMode === 'unattended',
       createdAt,

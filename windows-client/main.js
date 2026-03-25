@@ -187,6 +187,51 @@ function httpsGetJson(url) {
   });
 }
 
+function pickLocalIpv4() {
+  var interfaces = os.networkInterfaces();
+  var fallback = '';
+  Object.keys(interfaces || {}).forEach(function (name) {
+    (interfaces[name] || []).forEach(function (entry) {
+      if (!entry || entry.internal || entry.family !== 'IPv4') return;
+      if (!fallback) fallback = entry.address || '';
+      if (/ethernet|wi-?fi|wlan|lan/i.test(name)) fallback = entry.address || fallback;
+    });
+  });
+  return fallback;
+}
+
+function getGatewayIp() {
+  return new Promise(function (resolve) {
+    execFile('powershell.exe', [
+      '-NoProfile',
+      '-ExecutionPolicy', 'Bypass',
+      '-Command',
+      "(Get-NetRoute -DestinationPrefix '0.0.0.0/0' | Sort-Object RouteMetric, InterfaceMetric | Select-Object -First 1 -ExpandProperty NextHop) -as [string]"
+    ], { windowsHide: true }, function (_error, stdout) {
+      resolve(String(stdout || '').trim());
+    });
+  });
+}
+
+async function getExternalIp() {
+  try {
+    var data = await httpsGetJson('https://api.ipify.org?format=json');
+    return data && data.ip ? String(data.ip).trim() : '';
+  } catch (_error) {
+    return '';
+  }
+}
+
+async function getSystemInfo() {
+  var values = await Promise.all([getGatewayIp(), getExternalIp()]);
+  return {
+    deviceName: os.hostname() || '',
+    localIp: pickLocalIpv4() || '',
+    gatewayIp: values[0] || '',
+    publicIp: values[1] || ''
+  };
+}
+
 function downloadFile(url, destination) {
   return new Promise(function (resolve, reject) {
     fs.mkdirSync(path.dirname(destination), { recursive: true });
@@ -385,6 +430,10 @@ ipcMain.handle('desk:set-unread-count', async function (_event, count) {
   ensureTray();
   updateTrayTooltip(Number(count || 0));
   return { ok: true };
+});
+
+ipcMain.handle('desk:get-system-info', async function () {
+  return await getSystemInfo();
 });
 
 app.whenReady().then(() => {

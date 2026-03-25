@@ -47,6 +47,10 @@ const remoteSessionCreateSchema = z.object({
   accessMode: z.enum(['interactive', 'unattended']).default('interactive'),
   deviceLabel: z.string().min(1).max(120).optional(),
   remoteClientId: z.string().min(1).max(120).optional(),
+  deviceName: z.string().min(1).max(255).optional(),
+  localIp: z.string().min(1).max(120).optional(),
+  publicIp: z.string().min(1).max(120).optional(),
+  gatewayIp: z.string().min(1).max(120).optional(),
   joinCode: z.string().min(3).max(64).optional()
 });
 
