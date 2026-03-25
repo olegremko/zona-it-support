@@ -1094,3 +1094,59 @@ export async function syncLiveChatMessageToTicket(conversationId, body, authorUs
     [now, conversation.ticket_id]
   );
 }
+
+export async function syncTicketMessageToLiveChat(ticketId, context, body, createdAt = nowIso()) {
+  if (!body?.trim()) return;
+
+  const conversation = await queryOne(
+    sql(
+      'SELECT id, status FROM live_chat_conversations WHERE ticket_id = $1 ORDER BY updated_at DESC LIMIT 1',
+      'SELECT id, status FROM live_chat_conversations WHERE ticket_id = ? ORDER BY updated_at DESC LIMIT 1'
+    ),
+    [ticketId]
+  );
+  if (!conversation?.id) return;
+
+  const supportSide = Boolean(context?.is_global_admin) ||
+    hasPermission(context, 'livechat.reply') ||
+    hasPermission(context, 'ticket.view.all') ||
+    String(context?.role || '').startsWith('support_') ||
+    String(context?.role || '') === 'platform_admin';
+
+  const authorType = supportSide ? 'operator' : 'visitor';
+  const authorName = context?.full_name || context?.name || (supportSide ? 'Поддержка' : 'Клиент');
+
+  await execute(
+    sql(
+      `
+        INSERT INTO live_chat_messages (id, conversation_id, author_type, author_user_id, author_name, body, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `,
+      `
+        INSERT INTO live_chat_messages (id, conversation_id, author_type, author_user_id, author_name, body, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `
+    ),
+    [createId('lcm'), conversation.id, authorType, context?.id || null, authorName, body.trim(), createdAt]
+  );
+
+  await execute(
+    sql(
+      `
+        UPDATE live_chat_conversations
+        SET status = CASE WHEN status = 'closed' THEN 'active' ELSE status END,
+            updated_at = $1,
+            last_message_at = $2
+        WHERE id = $3
+      `,
+      `
+        UPDATE live_chat_conversations
+        SET status = CASE WHEN status = 'closed' THEN 'active' ELSE status END,
+            updated_at = ?,
+            last_message_at = ?
+        WHERE id = ?
+      `
+    ),
+    [createdAt, createdAt, conversation.id]
+  );
+}

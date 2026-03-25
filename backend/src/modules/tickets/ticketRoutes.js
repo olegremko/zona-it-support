@@ -10,6 +10,7 @@ import {
   createTicketFromLiveChat,
   getTicketById,
   listVisibleTickets,
+  syncTicketMessageToLiveChat,
   updateRemoteSession,
   updateTicket
 } from './ticketService.js';
@@ -83,7 +84,9 @@ router.post('/from-live-chat', requireAuth, asyncHandler(async (req, res) => {
 router.post('/:ticketId/messages', requireAuth, asyncHandler(async (req, res) => {
   const parsed = messageSchema.safeParse(req.body);
   if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
-  res.status(201).json({ ticket: await addTicketMessage(req.params.ticketId, req.auth.context, parsed.data.body) });
+  const ticket = await addTicketMessage(req.params.ticketId, req.auth.context, parsed.data.body);
+  await syncTicketMessageToLiveChat(req.params.ticketId, req.auth.context, parsed.data.body);
+  res.status(201).json({ ticket });
 }));
 
 router.patch('/:ticketId', requireAuth, asyncHandler(async (req, res) => {
