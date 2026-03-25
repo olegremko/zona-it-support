@@ -228,6 +228,28 @@
     localStorage.removeItem(USER_KEY);
   }
 
+  async function refreshCurrentUser() {
+    if (!state.token) return false;
+    try {
+      var data = await api('/api/auth/me', { method: 'GET' });
+      if (!data || !data.user) return false;
+      state.user = {
+        id: data.user.user_id || data.user.id || (state.user && state.user.id) || null,
+        email: data.user.email || (state.user && state.user.email) || '',
+        fullName: data.user.full_name || data.user.fullName || (state.user && state.user.fullName) || '',
+        companyId: data.user.company_id || data.user.companyId || null,
+        companyName: data.user.company_name || data.user.companyName || '',
+        role: data.user.role_code || data.user.role || '',
+        isGlobalAdmin: Boolean(data.user.is_global_admin || data.user.isGlobalAdmin),
+        permissions: data.user.permissions || []
+      };
+      saveSession();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   function showError(id, message) {
     var box = $(id);
     box.textContent = message;
@@ -964,6 +986,7 @@
 
   async function bootDesk() {
     if (!state.token || !state.user) return renderAuthState(false);
+    await refreshCurrentUser();
     renderAuthState(true);
     $('deskUserName').textContent = state.user.fullName || state.user.email || 'Пользователь';
     $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', roleLabel()].join(' • ');
@@ -1000,6 +1023,7 @@
       updateSelectedTicketStatus();
     });
     $('deskRefreshBtn').addEventListener('click', async function () {
+      await refreshCurrentUser();
       await refreshDesktopRemoteState();
       await fetchTickets();
       if (hasLiveChatAccess()) await fetchConversations();
