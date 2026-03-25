@@ -19,6 +19,7 @@
     lastTicketSignatures: {},
     lastConversationSignatures: {},
     remotePasswords: {},
+    remotePreparedTickets: {},
     desktopRemote: {
       installed: false,
       clientId: '',
@@ -346,6 +347,7 @@
     state.lastTicketSignatures = {};
     state.lastConversationSignatures = {};
     state.remotePasswords = {};
+    state.remotePreparedTickets = {};
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(UNREAD_TICKETS_KEY);
@@ -554,14 +556,22 @@
     if (!hasDesktopBridge() || canManageRemoteDesk() || !state.selectedTicketId || !state.selectedTicket) return;
     var runtime = remoteRuntime();
     if (!runtime || !runtime.enabled) return;
+    if (state.desktopRemote.busy) return;
 
+    var ticketId = state.selectedTicketId;
     var remoteOptions = remoteOptionsForTicket(state.selectedTicket);
     try {
-      await DESK_BRIDGE.installRustDesk(remoteOptions);
+      var lastPreparedAt = Number(state.remotePreparedTickets[ticketId] || 0);
+      var preparedRecently = lastPreparedAt && (Date.now() - lastPreparedAt) < 300000;
+      var shouldPrepareRuntime = !!settings.force || !!settings.createSession || (!state.desktopRemote.installed && !preparedRecently) || !state.remotePreparedTickets[ticketId];
+      if (shouldPrepareRuntime) {
+        await DESK_BRIDGE.installRustDesk(remoteOptions);
+      }
       await refreshDesktopRemoteState();
       await syncCurrentDeviceInfo(remoteOptions.password);
+      state.remotePreparedTickets[ticketId] = Date.now();
       await fetchTickets();
-      await selectTicket(state.selectedTicketId, true);
+      await selectTicket(ticketId, true);
 
       if (settings.createSession && !latestRemoteSession()) {
         var systemInfo = await getDesktopSystemInfo();
@@ -581,7 +591,7 @@
           body: JSON.stringify(sessionPayload)
         });
         await fetchTickets();
-        await selectTicket(state.selectedTicketId, true);
+        await selectTicket(ticketId, true);
       }
     } catch (error) {
       if (!settings.background) throw error;
