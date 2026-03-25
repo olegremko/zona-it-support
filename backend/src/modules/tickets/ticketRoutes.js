@@ -10,6 +10,7 @@ import {
   createTicketFromLiveChat,
   getTicketById,
   listVisibleTickets,
+  syncRemoteDevice,
   syncTicketMessageToLiveChat,
   updateRemoteSession,
   updateTicket
@@ -52,6 +53,17 @@ const remoteSessionCreateSchema = z.object({
   publicIp: z.string().min(1).max(120).optional(),
   gatewayIp: z.string().min(1).max(120).optional(),
   joinCode: z.string().min(3).max(64).optional()
+});
+
+const remoteDeviceSyncSchema = z.object({
+  deviceLabel: z.string().min(1).max(120).optional(),
+  remoteClientId: z.string().min(1).max(120).optional(),
+  deviceName: z.string().min(1).max(255).optional(),
+  localIp: z.string().min(1).max(120).optional(),
+  publicIp: z.string().min(1).max(120).optional(),
+  gatewayIp: z.string().min(1).max(120).optional()
+}).refine((value) => Object.keys(value).length > 0, {
+  message: 'At least one field is required'
 });
 
 const remoteSessionUpdateSchema = z.object({
@@ -103,6 +115,12 @@ router.post('/:ticketId/remote-sessions', requireAuth, asyncHandler(async (req, 
   const parsed = remoteSessionCreateSchema.safeParse(req.body);
   if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
   res.status(201).json({ ticket: await createRemoteSession(req.params.ticketId, req.auth.context, parsed.data) });
+}));
+
+router.post('/:ticketId/remote-device', requireAuth, asyncHandler(async (req, res) => {
+  const parsed = remoteDeviceSyncSchema.safeParse(req.body);
+  if (!parsed.success) throw badRequest('Validation failed', parsed.error.flatten());
+  res.status(200).json({ ticket: await syncRemoteDevice(req.params.ticketId, req.auth.context, parsed.data) });
 }));
 
 router.patch('/:ticketId/remote-sessions/:sessionId', requireAuth, asyncHandler(async (req, res) => {

@@ -137,6 +137,45 @@ function sleep(ms) {
   });
 }
 
+async function startRustDeskProcess(executable, args) {
+  var launchArgs = Array.isArray(args) ? args : [];
+  var lastError = null;
+
+  for (var attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      var child = spawn(executable, launchArgs, {
+        detached: true,
+        stdio: 'ignore',
+        windowsHide: false
+      });
+      child.unref();
+      return { launched: true };
+    } catch (error) {
+      lastError = error;
+      if (!error || !['EBUSY', 'EPERM', 'EACCES'].includes(error.code)) break;
+      await sleep(700 * (attempt + 1));
+    }
+  }
+
+  try {
+    var escapedPath = '"' + String(executable).replace(/"/g, '""') + '"';
+    var escapedArgs = launchArgs.map(function (part) {
+      return '"' + String(part || '').replace(/"/g, '""') + '"';
+    }).join(' ');
+    var cmdChild = spawn('cmd.exe', ['/d', '/s', '/c', 'start "" ' + escapedPath + (escapedArgs ? ' ' + escapedArgs : '')], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true
+    });
+    cmdChild.unref();
+    return { launched: true, fallback: true };
+  } catch (fallbackError) {
+    lastError = fallbackError || lastError;
+  }
+
+  throw lastError || new Error('Unable to start RustDesk runtime');
+}
+
 async function applyRustDeskConfig(executable, options) {
   const configString = buildRustDeskConfigString(options || {});
   if (!configString) return { applied: false };
@@ -311,13 +350,11 @@ async function launchRustDesk(options) {
   }
 
   await applyRustDeskConfig(executable, options);
-
-  const child = spawn(executable, [], {
-    detached: true,
-    stdio: 'ignore',
-    windowsHide: false
-  });
-  child.unref();
+  var launchArgs = [];
+  if (options && options.peerId) {
+    launchArgs.push(String(options.peerId));
+  }
+  await startRustDeskProcess(executable, launchArgs);
   return { launched: true, installed: true };
 }
 

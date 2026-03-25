@@ -249,6 +249,24 @@
     }
   }
 
+  async function syncCurrentDeviceInfo() {
+    if (!state.selectedTicketId) return;
+    var systemInfo = await getDesktopSystemInfo();
+    var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
+    if (!systemInfo && !localClientId) return;
+    await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-device', {
+      method: 'POST',
+      body: JSON.stringify({
+        deviceLabel: 'Рабочее место клиента',
+        remoteClientId: localClientId || '',
+        deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
+        localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
+        publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
+        gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
+      })
+    });
+  }
+
   async function api(path, options) {
     var request = Object.assign({
       headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders())
@@ -1078,6 +1096,9 @@
         });
       } else if (action === 'launch-rustdesk') {
         if (!hasDesktopBridge()) return;
+        if (!canManage) {
+          await syncCurrentDeviceInfo();
+        }
         var remoteOptions = {
           host: runtime && runtime.server_host,
           key: runtime && runtime.server_key,

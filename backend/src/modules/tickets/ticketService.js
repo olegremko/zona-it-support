@@ -762,6 +762,21 @@ export async function createRemoteSession(ticketId, context, input) {
   return await getTicketById(ticketId, context);
 }
 
+export async function syncRemoteDevice(ticketId, context, input) {
+  const ticket = await getTicketById(ticketId, context);
+  const now = nowIso();
+  await upsertRemoteDevice(ticket, context, {
+    accessMode: 'interactive',
+    deviceLabel: input.deviceLabel,
+    remoteClientId: input.remoteClientId,
+    deviceName: input.deviceName,
+    localIp: input.localIp,
+    publicIp: input.publicIp,
+    gatewayIp: input.gatewayIp
+  }, now);
+  return await getTicketById(ticketId, context);
+}
+
 export async function updateRemoteSession(ticketId, sessionId, context, input) {
   const ticket = await getTicketById(ticketId, context);
   const session = await queryOne(
