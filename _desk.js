@@ -12,6 +12,10 @@
     selectedConversationId: null,
     selectedConversation: null,
     pollTimer: null,
+    unreadTickets: {},
+    unreadConversations: {},
+    lastTicketSignatures: {},
+    lastConversationSignatures: {},
     desktopRemote: {
       installed: false,
       clientId: '',
@@ -21,6 +25,8 @@
 
   var TOKEN_KEY = 'zit_desk_token';
   var USER_KEY = 'zit_desk_user';
+  var UNREAD_TICKETS_KEY = 'zit_desk_unread_tickets';
+  var UNREAD_CONVERSATIONS_KEY = 'zit_desk_unread_conversations';
   var IS_DESKTOP_RUNTIME = !!(window.zonaDeskEnv && window.zonaDeskEnv.platform === 'windows-electron');
   var DESK_BRIDGE = window.zonaDeskBridge || null;
   var utf8Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { fatal: false }) : null;
@@ -116,6 +122,18 @@
     return ({ new: 'Новый', active: 'Активный', closed: 'Закрыт' }[code] || code || '—');
   }
 
+  function ticketMessageSignature(ticket) {
+    var last = ticket && ticket.messages && ticket.messages.length ? ticket.messages[ticket.messages.length - 1] : null;
+    if (!last) return String(ticket && ticket.updated_at || '');
+    return [last.id || '', last.created_at || '', last.author_user_id || '', last.body || ''].join('|');
+  }
+
+  function conversationMessageSignature(conversation) {
+    var last = conversation && conversation.messages && conversation.messages.length ? conversation.messages[conversation.messages.length - 1] : null;
+    if (!last) return String((conversation && (conversation.lastMessageAt || conversation.updatedAt)) || '');
+    return [last.id || '', last.createdAt || '', last.authorType || '', last.body || ''].join('|');
+  }
+
   function remoteSessionStatusLabel(code) {
     return ({
       requested: 'Ожидает',
@@ -159,6 +177,34 @@
 
   function hasDesktopBridge() {
     return !!(IS_DESKTOP_RUNTIME && DESK_BRIDGE);
+  }
+
+  function updateUnreadIndicator() {
+    var ticketCount = Object.keys(state.unreadTickets || {}).filter(function (id) { return !!state.unreadTickets[id]; }).length;
+    var conversationCount = Object.keys(state.unreadConversations || {}).filter(function (id) { return !!state.unreadConversations[id]; }).length;
+    if (hasDesktopBridge() && DESK_BRIDGE.setUnreadCount) {
+      DESK_BRIDGE.setUnreadCount(ticketCount + conversationCount);
+    }
+    saveSession();
+  }
+
+  async function notifyDesk(title, body) {
+    if (!hasDesktopBridge() || !DESK_BRIDGE.notify) return;
+    try {
+      await DESK_BRIDGE.notify({ title: title, body: body });
+    } catch (error) {}
+  }
+
+  function markTicketRead(ticketId) {
+    if (!ticketId) return;
+    delete state.unreadTickets[ticketId];
+    updateUnreadIndicator();
+  }
+
+  function markConversationRead(conversationId) {
+    if (!conversationId) return;
+    delete state.unreadConversations[conversationId];
+    updateUnreadIndicator();
   }
 
   async function copyDeskText(value) {
@@ -205,11 +251,15 @@
   function saveSession() {
     localStorage.setItem(TOKEN_KEY, state.token || '');
     localStorage.setItem(USER_KEY, JSON.stringify(state.user || null));
+    localStorage.setItem(UNREAD_TICKETS_KEY, JSON.stringify(state.unreadTickets || {}));
+    localStorage.setItem(UNREAD_CONVERSATIONS_KEY, JSON.stringify(state.unreadConversations || {}));
   }
 
   function restoreSession() {
     state.token = localStorage.getItem(TOKEN_KEY) || '';
     try { state.user = JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch (error) { state.user = null; }
+    try { state.unreadTickets = JSON.parse(localStorage.getItem(UNREAD_TICKETS_KEY) || '{}') || {}; } catch (error) { state.unreadTickets = {}; }
+    try { state.unreadConversations = JSON.parse(localStorage.getItem(UNREAD_CONVERSATIONS_KEY) || '{}') || {}; } catch (error) { state.unreadConversations = {}; }
   }
 
   function clearSession() {
@@ -224,8 +274,14 @@
     state.filteredConversations = [];
     state.selectedConversationId = null;
     state.selectedConversation = null;
+    state.unreadTickets = {};
+    state.unreadConversations = {};
+    state.lastTicketSignatures = {};
+    state.lastConversationSignatures = {};
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(UNREAD_TICKETS_KEY);
+    localStorage.removeItem(UNREAD_CONVERSATIONS_KEY);
   }
 
   async function refreshCurrentUser() {
@@ -360,9 +416,11 @@
     $('deskModeTickets').classList.toggle('active', !isChatMode);
     $('deskModeChats').classList.toggle('active', isChatMode);
     $('deskStatusFilter').classList.toggle('hidden', isChatMode);
+    $('deskSortFilter').classList.toggle('hidden', false);
     $('deskCompanyFilter').classList.toggle('hidden', isChatMode || !showCompanyContext());
     $('deskNewTicketBtn').classList.toggle('hidden', isChatMode);
     refreshCustomSelect('deskStatusFilter');
+    refreshCustomSelect('deskSortFilter');
     refreshCustomSelect('deskCompanyFilter');
     $('deskTicketSearch').placeholder = isChatMode ? 'Поиск по живым чатам...' : 'Поиск по тикетам...';
   }
@@ -538,8 +596,9 @@
       return;
     }
     container.innerHTML = state.filteredTickets.map(function (ticket) {
-      return '<div class="ticket-card' + (ticket.id === state.selectedTicketId ? ' active' : '') + '" data-ticket-id="' + escapeHtml(ticket.id) + '">' +
-        '<div class="ticket-top"><div class="ticket-no">#' + escapeHtml(ticket.number) + '</div><div class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</div></div>' +
+      var unreadCount = Number(state.unreadTickets[ticket.id] || 0);
+      return '<div class="ticket-card' + (ticket.id === state.selectedTicketId ? ' active' : '') + (unreadCount ? ' unread' : '') + '" data-ticket-id="' + escapeHtml(ticket.id) + '">' +
+        '<div class="ticket-top"><div class="ticket-top-main">' + (unreadCount ? '<span class="ticket-unread-dot"></span>' : '') + '<div class="ticket-no">#' + escapeHtml(ticket.number) + '</div></div><div style="display:flex;align-items:center;gap:6px">' + (unreadCount ? '<div class="ticket-unread-badge">' + escapeHtml(unreadCount) + '</div>' : '') + '<div class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</div></div></div>' +
         '<div class="ticket-subject">' + escapeHtml(ticket.subject) + '</div>' +
         (showCompanyContext() ? '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(ticket.company_name || 'Без компании') + (ticket.created_by_name ? ' • ' + escapeHtml(ticket.created_by_name) : '') + '</div>' : '') +
         '<div class="ticket-preview">' + escapeHtml(ticketPreview(ticket)) + '</div>' +
@@ -558,8 +617,9 @@
       return;
     }
     container.innerHTML = state.filteredConversations.map(function (conversation) {
-      return '<div class="ticket-card' + (conversation.id === state.selectedConversationId ? ' active' : '') + '" data-conversation-id="' + escapeHtml(conversation.id) + '">' +
-        '<div class="ticket-top"><div class="ticket-no">' + escapeHtml(conversationStatusLabel(conversation.status)) + '</div><div class="pill ' + escapeHtml(conversation.status === 'closed' ? 'closed' : conversation.status === 'new' ? 'high' : 'progress') + '">' + escapeHtml(relativeDate(conversation.lastMessageAt || conversation.updatedAt)) + '</div></div>' +
+      var unreadCount = Number(state.unreadConversations[conversation.id] || 0);
+      return '<div class="ticket-card' + (conversation.id === state.selectedConversationId ? ' active' : '') + (unreadCount ? ' unread' : '') + '" data-conversation-id="' + escapeHtml(conversation.id) + '">' +
+        '<div class="ticket-top"><div class="ticket-top-main">' + (unreadCount ? '<span class="ticket-unread-dot"></span>' : '') + '<div class="ticket-no">' + escapeHtml(conversationStatusLabel(conversation.status)) + '</div></div><div style="display:flex;align-items:center;gap:6px">' + (unreadCount ? '<div class="ticket-unread-badge">' + escapeHtml(unreadCount) + '</div>' : '') + '<div class="pill ' + escapeHtml(conversation.status === 'closed' ? 'closed' : conversation.status === 'new' ? 'high' : 'progress') + '">' + escapeHtml(relativeDate(conversation.lastMessageAt || conversation.updatedAt)) + '</div></div></div>' +
         '<div class="ticket-subject">' + escapeHtml(conversation.visitorName || 'Посетитель') + '</div>' +
         '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(conversation.assignedUserName || 'Без исполнителя') + (conversation.ticketId ? ' • тикет связан' : '') + '</div>' +
         '<div class="ticket-preview">' + escapeHtml(conversationPreview(conversation)) + '</div>' +
@@ -666,6 +726,7 @@
 
   function applySearch() {
     var query = ($('deskTicketSearch').value || '').trim().toLowerCase();
+    var sortMode = $('deskSortFilter') ? $('deskSortFilter').value || 'unread' : 'unread';
     if (state.mode === 'livechat') {
       state.filteredConversations = state.conversations.filter(function (conversation) {
         if (!query) return true;
@@ -677,6 +738,11 @@
         ].filter(Boolean).some(function (value) {
           return String(value).toLowerCase().indexOf(query) >= 0;
         });
+      });
+      state.filteredConversations.sort(function (a, b) {
+        var unreadDiff = Number(state.unreadConversations[b.id] || 0) - Number(state.unreadConversations[a.id] || 0);
+        if (sortMode === 'unread' && unreadDiff !== 0) return unreadDiff;
+        return new Date(b.lastMessageAt || b.updatedAt || 0).getTime() - new Date(a.lastMessageAt || a.updatedAt || 0).getTime();
       });
       return;
     }
@@ -690,6 +756,11 @@
       return [ticket.subject, ticket.description, String(ticket.number), ticket.company_name].filter(Boolean).some(function (value) {
         return String(value).toLowerCase().indexOf(query) >= 0;
       });
+    });
+    state.filteredTickets.sort(function (a, b) {
+      var unreadDiff = Number(state.unreadTickets[b.id] || 0) - Number(state.unreadTickets[a.id] || 0);
+      if (sortMode === 'unread' && unreadDiff !== 0) return unreadDiff;
+      return new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime();
     });
   }
 
@@ -721,8 +792,25 @@
   }
 
   async function fetchTickets() {
+    var previous = {};
+    state.tickets.forEach(function (ticket) {
+      previous[ticket.id] = ticketMessageSignature(ticket);
+    });
     var data = await api('/api/tickets');
     state.tickets = data.tickets || [];
+    state.tickets.forEach(function (ticket) {
+      var signature = ticketMessageSignature(ticket);
+      var prevSignature = previous[ticket.id] || state.lastTicketSignatures[ticket.id];
+      var lastMessage = ticket.messages && ticket.messages.length ? ticket.messages[ticket.messages.length - 1] : null;
+      var fromOtherSide = lastMessage && !messageBelongsToViewerSide(lastMessage);
+      var selectedNow = state.mode === 'tickets' && String(state.selectedTicketId || '') === String(ticket.id || '');
+      if (prevSignature && prevSignature !== signature && fromOtherSide && !selectedNow) {
+        state.unreadTickets[ticket.id] = Number(state.unreadTickets[ticket.id] || 0) + 1;
+        notifyDesk('Новый ответ по тикету #' + ticket.number, (ticket.subject || '').slice(0, 120));
+      }
+      state.lastTicketSignatures[ticket.id] = signature;
+    });
+    updateUnreadIndicator();
     syncCompanyFilter();
     renderList();
     if (state.selectedTicketId && state.mode === 'tickets') await selectTicket(state.selectedTicketId, true);
@@ -730,8 +818,23 @@
 
   async function fetchConversations() {
     if (!hasLiveChatAccess()) return;
+    var previous = {};
+    state.conversations.forEach(function (conversation) {
+      previous[conversation.id] = conversationMessageSignature(conversation);
+    });
     var data = await api('/api/live-chat/conversations');
     state.conversations = data.conversations || [];
+    state.conversations.forEach(function (conversation) {
+      var signature = conversationMessageSignature(conversation);
+      var prevSignature = previous[conversation.id] || state.lastConversationSignatures[conversation.id];
+      var selectedNow = state.mode === 'livechat' && String(state.selectedConversationId || '') === String(conversation.id || '');
+      if (prevSignature && prevSignature !== signature && !selectedNow) {
+        state.unreadConversations[conversation.id] = Number(state.unreadConversations[conversation.id] || 0) + 1;
+        notifyDesk('Новый чат сайта', ((conversation.visitorName || 'Посетитель') + ': ' + (conversation.lastMessagePreview || '')).slice(0, 140));
+      }
+      state.lastConversationSignatures[conversation.id] = signature;
+    });
+    updateUnreadIndicator();
     renderList();
     if (state.selectedConversationId && state.mode === 'livechat') await selectConversation(state.selectedConversationId, true);
   }
@@ -742,6 +845,7 @@
     try {
       var data = await api('/api/tickets/' + encodeURIComponent(ticketId));
       state.selectedTicket = data.ticket;
+      markTicketRead(ticketId);
       renderSelectedTicket();
     } catch (error) {
       if (!silent) {
@@ -765,6 +869,7 @@
         updatedAt: data.conversation.updatedAt,
         messages: data.messages || []
       };
+      markConversationRead(conversationId);
       renderSelectedConversation();
     } catch (error) {
       if (!silent) {
@@ -1014,6 +1119,9 @@
       renderList();
     });
     $('deskStatusFilter').addEventListener('change', function () {
+      renderList();
+    });
+    $('deskSortFilter').addEventListener('change', function () {
       renderList();
     });
     $('deskCompanyFilter').addEventListener('change', function () {

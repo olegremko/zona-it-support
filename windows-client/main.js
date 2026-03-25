@@ -1,12 +1,54 @@
-const { app, BrowserWindow, shell, ipcMain, clipboard } = require('electron');
+const { app, BrowserWindow, shell, ipcMain, clipboard, Tray, Menu, Notification, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const https = require('https');
 const { execFile, spawn } = require('child_process');
 
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.14';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.15';
 app.commandLine.appendSwitch('disable-http-cache');
+let mainWindow = null;
+let tray = null;
+let isQuitting = false;
+
+function trayIcon() {
+  const icon = nativeImage.createFromPath(process.execPath);
+  return icon.isEmpty() ? nativeImage.createEmpty() : icon;
+}
+
+function updateTrayTooltip(unreadCount) {
+  if (!tray) return;
+  const suffix = unreadCount > 0 ? ` (${unreadCount} непрочитанных)` : '';
+  tray.setToolTip('Zona IT Desk' + suffix);
+}
+
+function showMainWindow() {
+  if (!mainWindow) return;
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+function ensureTray() {
+  if (tray) return tray;
+  tray = new Tray(trayIcon());
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: 'Открыть Zona IT Desk', click: function () { showMainWindow(); } },
+    { type: 'separator' },
+    {
+      label: 'Выход',
+      click: function () {
+        isQuitting = true;
+        app.quit();
+      }
+    }
+  ]));
+  tray.on('click', function () {
+    showMainWindow();
+  });
+  updateTrayTooltip(0);
+  return tray;
+}
 
 function managedRustDeskDir() {
   return path.join(app.getPath('userData'), 'runtime', 'rustdesk');
@@ -279,6 +321,8 @@ function createWindow() {
       sandbox: true
     }
   });
+  mainWindow = win;
+  ensureTray();
 
   var deskUrl = new URL(DESK_URL);
   deskUrl.searchParams.set('platform', 'windows');
@@ -290,6 +334,11 @@ function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
+  });
+  win.on('close', function (event) {
+    if (isQuitting) return;
+    event.preventDefault();
+    win.hide();
   });
 }
 
@@ -310,13 +359,43 @@ ipcMain.handle('desk:copy', async function (_event, value) {
   return { ok: true };
 });
 
+ipcMain.handle('desk:notify', async function (_event, payload) {
+  var title = payload && payload.title ? String(payload.title) : 'Zona IT Desk';
+  var body = payload && payload.body ? String(payload.body) : '';
+  if (Notification.isSupported()) {
+    var notification = new Notification({ title: title, body: body, silent: false });
+    notification.on('click', function () {
+      showMainWindow();
+    });
+    notification.show();
+  }
+  if (mainWindow && !mainWindow.isFocused()) {
+    mainWindow.flashFrame(true);
+    setTimeout(function () {
+      if (mainWindow) mainWindow.flashFrame(false);
+    }, 5000);
+  }
+  return { ok: true };
+});
+
+ipcMain.handle('desk:set-unread-count', async function (_event, count) {
+  ensureTray();
+  updateTrayTooltip(Number(count || 0));
+  return { ok: true };
+});
+
 app.whenReady().then(() => {
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    else showMainWindow();
   });
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  if (process.platform !== 'darwin' && isQuitting) app.quit();
+});
+
+app.on('before-quit', function () {
+  isQuitting = true;
 });

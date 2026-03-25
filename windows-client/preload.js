@@ -16,5 +16,11 @@ contextBridge.exposeInMainWorld('zonaDeskBridge', {
   },
   copyText: function (value) {
     return ipcRenderer.invoke('desk:copy', value);
+  },
+  notify: function (payload) {
+    return ipcRenderer.invoke('desk:notify', payload || {});
+  },
+  setUnreadCount: function (count) {
+    return ipcRenderer.invoke('desk:set-unread-count', Number(count || 0));
   }
 });
