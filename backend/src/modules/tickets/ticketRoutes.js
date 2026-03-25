@@ -48,6 +48,7 @@ const remoteSessionCreateSchema = z.object({
   accessMode: z.enum(['interactive', 'unattended']).default('interactive'),
   deviceLabel: z.string().min(1).max(120).optional(),
   remoteClientId: z.string().min(1).max(120).optional(),
+  remotePassword: z.string().min(4).max(64).optional(),
   deviceName: z.string().min(1).max(255).optional(),
   localIp: z.string().min(1).max(120).optional(),
   publicIp: z.string().min(1).max(120).optional(),
@@ -58,6 +59,7 @@ const remoteSessionCreateSchema = z.object({
 const remoteDeviceSyncSchema = z.object({
   deviceLabel: z.string().min(1).max(120).optional(),
   remoteClientId: z.string().min(1).max(120).optional(),
+  remotePassword: z.string().min(4).max(64).optional(),
   deviceName: z.string().min(1).max(255).optional(),
   localIp: z.string().min(1).max(120).optional(),
   publicIp: z.string().min(1).max(120).optional(),

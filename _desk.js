@@ -18,9 +18,11 @@
     unreadConversations: {},
     lastTicketSignatures: {},
     lastConversationSignatures: {},
+    remotePasswords: {},
     desktopRemote: {
       installed: false,
       clientId: '',
+      password: '',
       busy: false
     }
   };
@@ -29,6 +31,7 @@
   var USER_KEY = 'zit_desk_user';
   var UNREAD_TICKETS_KEY = 'zit_desk_unread_tickets';
   var UNREAD_CONVERSATIONS_KEY = 'zit_desk_unread_conversations';
+  var REMOTE_PASSWORDS_KEY = 'zit_desk_remote_passwords';
   var IS_DESKTOP_RUNTIME = !!(window.zonaDeskEnv && window.zonaDeskEnv.platform === 'windows-electron');
   var DESK_BRIDGE = window.zonaDeskBridge || null;
   var utf8Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { fatal: false }) : null;
@@ -177,6 +180,31 @@
     return state.selectedTicket && state.selectedTicket.remote_runtime ? state.selectedTicket.remote_runtime : null;
   }
 
+  function randomRemotePassword() {
+    return Math.random().toString(36).slice(2, 6) + Math.random().toString(36).slice(2, 6);
+  }
+
+  function ticketRemotePassword(ticket) {
+    if (!ticket) return '';
+    var device = ticket.remote_devices && ticket.remote_devices.length ? ticket.remote_devices[0] : null;
+    if (device && device.remote_password) return String(device.remote_password).trim();
+    if (state.remotePasswords[ticket.id]) return String(state.remotePasswords[ticket.id]).trim();
+    var generated = randomRemotePassword();
+    state.remotePasswords[ticket.id] = generated;
+    saveSession();
+    return generated;
+  }
+
+  function remoteOptionsForTicket(ticket) {
+    var runtime = ticket && ticket.remote_runtime ? ticket.remote_runtime : remoteRuntime();
+    return {
+      host: runtime && runtime.server_host ? runtime.server_host : '',
+      key: runtime && runtime.server_key ? runtime.server_key : '',
+      configString: runtime && runtime.server_config ? runtime.server_config : '',
+      password: ticketRemotePassword(ticket || state.selectedTicket)
+    };
+  }
+
   function hasDesktopBridge() {
     return !!(IS_DESKTOP_RUNTIME && DESK_BRIDGE);
   }
@@ -231,9 +259,11 @@
       var info = await DESK_BRIDGE.getRustDeskStatus();
       state.desktopRemote.installed = !!(info && info.installed);
       state.desktopRemote.clientId = info && info.clientId ? String(info.clientId).trim() : '';
+      state.desktopRemote.password = info && info.password ? String(info.password).trim() : '';
     } catch (error) {
       state.desktopRemote.installed = false;
       state.desktopRemote.clientId = '';
+      state.desktopRemote.password = '';
     } finally {
       state.desktopRemote.busy = false;
     }
@@ -249,21 +279,24 @@
     }
   }
 
-  async function syncCurrentDeviceInfo() {
+  async function syncCurrentDeviceInfo(remotePassword) {
     if (!state.selectedTicketId) return;
     var systemInfo = await getDesktopSystemInfo();
     var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
-    if (!systemInfo && !localClientId) return;
+    var password = remotePassword || state.desktopRemote.password || ticketRemotePassword(state.selectedTicket);
+    if (!systemInfo && !localClientId && !password) return;
+    var payload = {
+      deviceLabel: 'Рабочее место клиента',
+      remoteClientId: localClientId || '',
+      deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
+      localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
+      publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
+      gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
+    };
+    if (password) payload.remotePassword = password;
     await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-device', {
       method: 'POST',
-      body: JSON.stringify({
-        deviceLabel: 'Рабочее место клиента',
-        remoteClientId: localClientId || '',
-        deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
-        localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
-        publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
-        gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
-      })
+      body: JSON.stringify(payload)
     });
   }
 
@@ -283,6 +316,7 @@
     localStorage.setItem(USER_KEY, JSON.stringify(state.user || null));
     localStorage.setItem(UNREAD_TICKETS_KEY, JSON.stringify(state.unreadTickets || {}));
     localStorage.setItem(UNREAD_CONVERSATIONS_KEY, JSON.stringify(state.unreadConversations || {}));
+    localStorage.setItem(REMOTE_PASSWORDS_KEY, JSON.stringify(state.remotePasswords || {}));
   }
 
   function restoreSession() {
@@ -290,6 +324,7 @@
     try { state.user = JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch (error) { state.user = null; }
     try { state.unreadTickets = JSON.parse(localStorage.getItem(UNREAD_TICKETS_KEY) || '{}') || {}; } catch (error) { state.unreadTickets = {}; }
     try { state.unreadConversations = JSON.parse(localStorage.getItem(UNREAD_CONVERSATIONS_KEY) || '{}') || {}; } catch (error) { state.unreadConversations = {}; }
+    try { state.remotePasswords = JSON.parse(localStorage.getItem(REMOTE_PASSWORDS_KEY) || '{}') || {}; } catch (error) { state.remotePasswords = {}; }
   }
 
   function clearSession() {
@@ -310,10 +345,12 @@
     state.unreadConversations = {};
     state.lastTicketSignatures = {};
     state.lastConversationSignatures = {};
+    state.remotePasswords = {};
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(UNREAD_TICKETS_KEY);
     localStorage.removeItem(UNREAD_CONVERSATIONS_KEY);
+    localStorage.removeItem(REMOTE_PASSWORDS_KEY);
   }
 
   async function refreshCurrentUser() {
@@ -512,6 +549,45 @@
     return state.selectedTicket.remote_devices[0];
   }
 
+  async function ensureRemoteSupportReady(options) {
+    var settings = options || {};
+    if (!hasDesktopBridge() || canManageRemoteDesk() || !state.selectedTicketId || !state.selectedTicket) return;
+    var runtime = remoteRuntime();
+    if (!runtime || !runtime.enabled) return;
+
+    var remoteOptions = remoteOptionsForTicket(state.selectedTicket);
+    try {
+      await DESK_BRIDGE.installRustDesk(remoteOptions);
+      await refreshDesktopRemoteState();
+      await syncCurrentDeviceInfo(remoteOptions.password);
+      await fetchTickets();
+      await selectTicket(state.selectedTicketId, true);
+
+      if (settings.createSession && !latestRemoteSession()) {
+        var systemInfo = await getDesktopSystemInfo();
+        var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
+        var sessionPayload = {
+          accessMode: 'interactive',
+          deviceLabel: 'Рабочее место клиента',
+          remoteClientId: localClientId || '',
+          remotePassword: remoteOptions.password
+        };
+        if (systemInfo && systemInfo.deviceName) sessionPayload.deviceName = systemInfo.deviceName;
+        if (systemInfo && systemInfo.localIp) sessionPayload.localIp = systemInfo.localIp;
+        if (systemInfo && systemInfo.publicIp) sessionPayload.publicIp = systemInfo.publicIp;
+        if (systemInfo && systemInfo.gatewayIp) sessionPayload.gatewayIp = systemInfo.gatewayIp;
+        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
+          method: 'POST',
+          body: JSON.stringify(sessionPayload)
+        });
+        await fetchTickets();
+        await selectTicket(state.selectedTicketId, true);
+      }
+    } catch (error) {
+      if (!settings.background) throw error;
+    }
+  }
+
   function syncQuickStatusPanel() {
     var wrap = $('deskQuickStatusWrap');
     var select = $('deskQuickStatus');
@@ -539,8 +615,82 @@
     var device = latestRemoteDevice();
     var runtime = remoteRuntime();
     var canManage = canManageRemoteDesk();
-    var canRequest = !!state.user;
     var parts = [];
+
+    if (runtime && runtime.enabled) {
+      parts.push(
+        '<div class="remote-card">' +
+          '<strong>Сервер подключения</strong>' +
+          '<div class="remote-row"><span>Хост</span><span>' + escapeHtml(runtime.server_host || 'не задан') + '</span></div>' +
+          '<div class="remote-note">' + escapeHtml(canManage
+            ? 'Тикет уже считается запросом помощи. Для подключения используйте ID и пароль клиента ниже.'
+            : (state.desktopRemote.installed
+              ? 'Модуль удаленной помощи готовится автоматически в фоне.'
+              : 'Модуль удаленной помощи автоматически подготавливается после входа и создания тикета.')) + '</div>' +
+        '</div>'
+      );
+    }
+
+    if (device && canManage) {
+      var deviceRows = [
+        '<div class="remote-row"><span>ID</span><span>' + escapeHtml(device.remote_client_id || 'еще не передан') + '</span></div>',
+        '<div class="remote-row"><span>Пароль</span><span>' + escapeHtml(device.remote_password || 'еще не задан') + '</span></div>',
+        '<div class="remote-row"><span>Доступ</span><span>' + escapeHtml(device.unattended_enabled ? 'постоянный' : 'по запросу') + '</span></div>'
+      ];
+      deviceRows.push(
+        '<div class="remote-inline-actions">' +
+          (device.remote_client_id ? '<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID</button>' : '') +
+          (device.remote_password ? '<button class="btn btn-ghost" type="button" data-remote-action="copy-device-password">Скопировать пароль</button>' : '') +
+        '</div>'
+      );
+      parts.push(
+        '<div class="remote-card">' +
+          '<strong>' + escapeHtml(device.label || 'Устройство клиента') + '</strong>' +
+          deviceRows.join('') +
+        '</div>'
+      );
+      if (device.device_name || device.local_ip || device.public_ip || device.gateway_ip) {
+        parts.push(
+          '<div class="remote-card">' +
+            '<strong>Данные ПК клиента</strong>' +
+            '<div class="remote-row"><span>Имя ПК</span><span>' + escapeHtml(device.device_name || 'не определено') + '</span></div>' +
+            '<div class="remote-row"><span>IP локальный</span><span>' + escapeHtml(device.local_ip || 'не определен') + '</span></div>' +
+            '<div class="remote-row"><span>IP внешний</span><span>' + escapeHtml(device.public_ip || 'не определен') + '</span></div>' +
+            '<div class="remote-row"><span>Шлюз</span><span>' + escapeHtml(device.gateway_ip || 'не определен') + '</span></div>' +
+          '</div>'
+        );
+      }
+    } else if (device) {
+      parts.push('<div class="remote-card"><strong>Удаленная помощь</strong><div class="remote-note">Данные этого устройства уже переданы инженеру. Подключение выполняется со стороны поддержки.</div></div>');
+    } else {
+      parts.push('<div class="remote-card"><strong>Сессий пока нет</strong><div class="remote-note">После создания тикета клиентский модуль готовится автоматически.</div></div>');
+    }
+
+    if (session) {
+      parts.push(
+        '<div class="remote-card">' +
+          '<strong>Последняя сессия</strong>' +
+          '<div class="remote-row"><span>Режим</span><span>' + escapeHtml(session.access_mode === 'unattended' ? 'постоянный' : 'разовый') + '</span></div>' +
+          '<div class="remote-row"><span>Статус</span><span>' + escapeHtml(remoteSessionStatusLabel(session.status)) + '</span></div>' +
+          '<div class="remote-row"><span>Код</span><span>' + escapeHtml(session.join_code || '?') + '</span></div>' +
+          '<div class="remote-row"><span>Инженер</span><span>' + escapeHtml(session.engineer_name || 'не назначен') + '</span></div>' +
+        '</div>'
+      );
+    }
+
+    var buttons = [];
+    if (canManage && device && device.remote_client_id) {
+      buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect">Подключиться</button>');
+    }
+
+    parts.push('<div class="remote-actions">' + buttons.join('') + '</div>');
+    panel.innerHTML = parts.join('');
+    Array.prototype.forEach.call(panel.querySelectorAll('[data-remote-action]'), function (button) {
+      button.addEventListener('click', function () {
+        handleRemoteAction(button.getAttribute('data-remote-action'));
+      });
+    });
+    return;
 
     if (runtime && runtime.enabled) {
       parts.push(
@@ -891,6 +1041,7 @@
       state.selectedTicketUnreadCount = Number(state.unreadTickets[ticketId] || 0);
       markTicketRead(ticketId);
       renderSelectedTicket();
+      if (!canManageRemoteDesk()) ensureRemoteSupportReady({ createSession: false, background: true });
     } catch (error) {
       if (!silent) {
         state.selectedTicket = null;
@@ -980,6 +1131,7 @@
       state.mode = 'tickets';
       renderList();
       await selectTicket(data.ticket.id);
+      await ensureRemoteSupportReady({ createSession: true });
     } catch (error) {
       showError('deskModalError', error.message);
     }
@@ -1039,80 +1191,48 @@
       var currentSession = latestRemoteSession();
       var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
 
-      if (action === 'request') {
-        var systemInfo = await getDesktopSystemInfo();
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
-          method: 'POST',
-          body: JSON.stringify({
+      if (action === 'connect') {
+        if (!currentDevice || !currentDevice.remote_client_id) return;
+        if (!currentSession) {
+          var systemInfo = await getDesktopSystemInfo();
+          var createPayload = {
             accessMode: 'interactive',
-            deviceLabel: 'Рабочее место клиента',
-            remoteClientId: localClientId,
-            deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
-            localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
-            publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
-            gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
-          })
-        });
-      } else if (action === 'unattended') {
-        var unattendedSystemInfo = await getDesktopSystemInfo();
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
-          method: 'POST',
-          body: JSON.stringify({
-            accessMode: 'unattended',
-            deviceLabel: 'Рабочее место клиента',
-            remoteClientId: localClientId,
-            deviceName: unattendedSystemInfo && unattendedSystemInfo.deviceName ? unattendedSystemInfo.deviceName : '',
-            localIp: unattendedSystemInfo && unattendedSystemInfo.localIp ? unattendedSystemInfo.localIp : '',
-            publicIp: unattendedSystemInfo && unattendedSystemInfo.publicIp ? unattendedSystemInfo.publicIp : '',
-            gatewayIp: unattendedSystemInfo && unattendedSystemInfo.gatewayIp ? unattendedSystemInfo.gatewayIp : ''
-          })
-        });
-        } else if (action === 'connect') {
-          if (!currentSession) return;
+            deviceLabel: currentDevice.label || 'Рабочее место клиента',
+            remoteClientId: currentDevice.remote_client_id || localClientId || '',
+            remotePassword: currentDevice.remote_password || ticketRemotePassword(state.selectedTicket)
+          };
+          if (systemInfo && systemInfo.deviceName) createPayload.deviceName = systemInfo.deviceName;
+          if (systemInfo && systemInfo.localIp) createPayload.localIp = systemInfo.localIp;
+          if (systemInfo && systemInfo.publicIp) createPayload.publicIp = systemInfo.publicIp;
+          if (systemInfo && systemInfo.gatewayIp) createPayload.gatewayIp = systemInfo.gatewayIp;
+          await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
+            method: 'POST',
+            body: JSON.stringify(createPayload)
+          });
+          await fetchTickets();
+          await selectTicket(state.selectedTicketId, true);
+          currentSession = latestRemoteSession();
+          currentDevice = latestRemoteDevice();
+        }
+        if (currentSession) {
           await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
             method: 'PATCH',
             body: JSON.stringify({ status: 'active' })
           });
-          if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
-          if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
-            await DESK_BRIDGE.launchRustDesk({
-              host: runtime && runtime.server_host,
-              key: runtime && runtime.server_key,
-              configString: runtime && runtime.server_config,
-              peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
-            });
-          }
-        } else if (action === 'finish') {
-        if (!currentSession) return;
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'ended', endedReason: 'Сеанс завершен инженером' })
-        });
-      } else if (action === 'disable-unattended') {
-        if (!currentSession) return;
-        await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
-          method: 'PATCH',
-          body: JSON.stringify({ unattendedEnabled: false })
-        });
-      } else if (action === 'launch-rustdesk') {
-        if (!hasDesktopBridge()) return;
-        if (!canManage) {
-          await syncCurrentDeviceInfo();
         }
-        var remoteOptions = {
-          host: runtime && runtime.server_host,
-          key: runtime && runtime.server_key,
-          configString: runtime && runtime.server_config
-        };
-        if (state.desktopRemote.installed) await DESK_BRIDGE.launchRustDesk(remoteOptions);
-        else await DESK_BRIDGE.installRustDesk(remoteOptions);
-        await refreshDesktopRemoteState();
-      } else if (action === 'copy-host') {
-        if (runtime && runtime.server_host) await copyDeskText(runtime.server_host);
-      } else if (action === 'copy-key') {
-        if (runtime && runtime.server_key) await copyDeskText(runtime.server_key);
+        if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
+          await DESK_BRIDGE.launchRustDesk({
+            host: runtime && runtime.server_host,
+            key: runtime && runtime.server_key,
+            configString: runtime && runtime.server_config,
+            password: currentDevice && currentDevice.remote_password ? currentDevice.remote_password : ticketRemotePassword(state.selectedTicket),
+            peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
+          });
+        }
       } else if (action === 'copy-device-id') {
         if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
+      } else if (action === 'copy-device-password') {
+        if (currentDevice && currentDevice.remote_password) await copyDeskText(currentDevice.remote_password);
       }
 
         await fetchTickets();
@@ -1150,13 +1270,18 @@
   async function bootDesk() {
     if (!state.token || !state.user) return renderAuthState(false);
     await refreshCurrentUser();
+    await refreshDesktopRemoteState();
     renderAuthState(true);
     $('deskUserName').textContent = state.user.fullName || state.user.email || 'Пользователь';
     $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', roleLabel()].join(' • ');
     await fetchTickets();
     if (hasLiveChatAccess()) await fetchConversations();
     renderList();
-    renderSelectedEntity();
+    if (state.mode === 'tickets' && state.tickets.length) {
+      await selectTicket(state.selectedTicketId || state.tickets[0].id, true);
+    } else {
+      renderSelectedEntity();
+    }
     startPolling();
   }
 

@@ -54,8 +54,10 @@ export async function createApp() {
     ensureRemoteDeviceColumn('local_ip', 'ALTER TABLE remote_devices ADD COLUMN local_ip TEXT');
     ensureRemoteDeviceColumn('public_ip', 'ALTER TABLE remote_devices ADD COLUMN public_ip TEXT');
     ensureRemoteDeviceColumn('gateway_ip', 'ALTER TABLE remote_devices ADD COLUMN gateway_ip TEXT');
+    ensureRemoteDeviceColumn('remote_password', 'ALTER TABLE remote_devices ADD COLUMN remote_password TEXT');
   } else {
     await execSchema(`
+      ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS remote_password TEXT;
       ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS device_name TEXT;
       ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS local_ip TEXT;
       ALTER TABLE remote_devices ADD COLUMN IF NOT EXISTS public_ip TEXT;

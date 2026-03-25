@@ -148,6 +148,7 @@ CREATE TABLE IF NOT EXISTS remote_devices (
   label TEXT NOT NULL,
   platform TEXT NOT NULL DEFAULT 'windows',
   remote_client_id TEXT,
+  remote_password TEXT,
   device_name TEXT,
   local_ip TEXT,
   public_ip TEXT,
