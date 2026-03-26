@@ -1326,6 +1326,24 @@
       alert(String(message));
     }
   }
+  async function bootDesk() {
+    if (!state.token || !state.user) return renderAuthState(false);
+    await refreshCurrentUser();
+    await refreshDesktopRemoteState();
+    renderAuthState(true);
+    $('deskUserName').textContent = state.user.fullName || state.user.email || 'Пользователь';
+    $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', roleLabel()].join(' • ');
+    await fetchTickets();
+    if (hasLiveChatAccess()) await fetchConversations();
+    renderList();
+    if (state.mode === 'tickets' && state.tickets.length) {
+      await selectTicket(state.selectedTicketId || state.tickets[0].id, true);
+    } else {
+      renderSelectedEntity();
+    }
+    startPolling();
+  }
+
   function bindEvents() {
     $('deskLoginBtn').addEventListener('click', login);
     $('deskPassword').addEventListener('keydown', function (event) {
