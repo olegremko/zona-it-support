@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   var state = {
     token: '',
     user: null,
@@ -41,7 +41,7 @@
 
   function demojibake(value) {
     if (typeof value !== 'string' || !value) return value;
-    if (!/[РСЃ]/.test(value)) return value;
+    if (!/[Р РЎРѓ]/.test(value)) return value;
     try {
       if (!utf8Decoder) return value;
       var bytes = new Uint8Array(value.length);
@@ -49,7 +49,7 @@
         bytes[i] = value.charCodeAt(i) & 255;
       }
       var fixed = utf8Decoder.decode(bytes);
-      return /[А-Яа-яЁё]/.test(fixed) ? fixed : value;
+      return /[\u0400-\u04FF]/.test(fixed) ? fixed : value;
     } catch (error) {
       return value;
     }
@@ -90,12 +90,12 @@
   }
 
   function formatDeskError(error, fallback) {
-    if (!error) return fallback || 'Произошла ошибка.';
+    if (!error) return fallback || 'РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°.';
     if (typeof error === 'string') return error;
     if (error.message && typeof error.message === 'string') return error.message;
     if (error.error && typeof error.error === 'string') return error.error;
     if (error.error && typeof error.error === 'object') return formatDeskError(error.error, fallback);
-    if (error.code && typeof error.code === 'string' && error.syscall) return 'РћС€РёР±РєР° ' + error.code + ' РїСЂРё ' + error.syscall + '.';
+    if (error.code && typeof error.code === 'string' && error.syscall) return 'Р С›РЎв‚¬Р С‘Р В±Р С”Р В° ' + error.code + ' Р С—РЎР‚Р С‘ ' + error.syscall + '.';
     try {
       return JSON.stringify(error, function (_key, value) {
         if (value instanceof Error) {
@@ -114,7 +114,7 @@
   }
 
   function formatDate(value) {
-    if (!value) return '—';
+    if (!value) return 'вЂ”';
     try {
       return new Intl.DateTimeFormat('ru-RU', {
         day: '2-digit',
@@ -128,28 +128,28 @@
   }
 
   function relativeDate(value) {
-    if (!value) return '—';
+    if (!value) return 'вЂ”';
     var now = Date.now();
     var then = new Date(value).getTime();
     var diffMinutes = Math.round((then - now) / 60000);
     var abs = Math.abs(diffMinutes);
-    if (abs < 1) return 'только что';
-    if (abs < 60) return diffMinutes < 0 ? abs + ' мин назад' : 'через ' + abs + ' мин';
+    if (abs < 1) return 'С‚РѕР»СЊРєРѕ С‡С‚Рѕ';
+    if (abs < 60) return diffMinutes < 0 ? abs + ' РјРёРЅ РЅР°Р·Р°Рґ' : 'С‡РµСЂРµР· ' + abs + ' РјРёРЅ';
     var diffHours = Math.round(diffMinutes / 60);
-    if (Math.abs(diffHours) < 24) return diffHours < 0 ? Math.abs(diffHours) + ' ч назад' : 'через ' + diffHours + ' ч';
+    if (Math.abs(diffHours) < 24) return diffHours < 0 ? Math.abs(diffHours) + ' С‡ РЅР°Р·Р°Рґ' : 'С‡РµСЂРµР· ' + diffHours + ' С‡';
     return formatDate(value);
   }
 
   function statusLabel(code) {
-    return ({ open: 'Открыт', progress: 'В работе', done: 'Решен', closed: 'Закрыт' }[code] || code || '—');
+    return ({ open: 'РћС‚РєСЂС‹С‚', progress: 'Р’ СЂР°Р±РѕС‚Рµ', done: 'Р РµС€РµРЅ', closed: 'Р—Р°РєСЂС‹С‚' }[code] || code || 'вЂ”');
   }
 
   function priorityLabel(code) {
-    return ({ low: 'Низкий', normal: 'Средний', high: 'Высокий', critical: 'Критичный' }[code] || code || '—');
+    return ({ low: 'РќРёР·РєРёР№', normal: 'РЎСЂРµРґРЅРёР№', high: 'Р’С‹СЃРѕРєРёР№', critical: 'РљСЂРёС‚РёС‡РЅС‹Р№' }[code] || code || 'вЂ”');
   }
 
   function conversationStatusLabel(code) {
-    return ({ new: 'Новый', active: 'Активный', closed: 'Закрыт' }[code] || code || '—');
+    return ({ new: 'РќРѕРІС‹Р№', active: 'РђРєС‚РёРІРЅС‹Р№', closed: 'Р—Р°РєСЂС‹С‚' }[code] || code || 'вЂ”');
   }
 
   function ticketMessageSignature(ticket) {
@@ -166,11 +166,11 @@
 
   function remoteSessionStatusLabel(code) {
     return ({
-      requested: 'Ожидает',
-      ready: 'Готово',
-      active: 'Подключено',
-      ended: 'Завершена',
-      cancelled: 'Отменена'
+      requested: 'РћР¶РёРґР°РµС‚',
+      ready: 'Р“РѕС‚РѕРІРѕ',
+      active: 'РџРѕРґРєР»СЋС‡РµРЅРѕ',
+      ended: 'Р—Р°РІРµСЂС€РµРЅР°',
+      cancelled: 'РћС‚РјРµРЅРµРЅР°'
     }[code] || code || '?');
   }
 
@@ -232,12 +232,12 @@
   function roleLabel() {
     if (!state.user) return 'client_user';
     return ({
-      client_user: 'Клиент',
-      client_admin: 'Руководитель компании',
-      support_agent: 'Инженер поддержки',
-      support_lead: 'Руководитель поддержки',
-      platform_admin: 'Администратор платформы'
-    }[state.user.role] || state.user.role || 'Клиент');
+      client_user: 'РљР»РёРµРЅС‚',
+      client_admin: 'Р СѓРєРѕРІРѕРґРёС‚РµР»СЊ РєРѕРјРїР°РЅРёРё',
+      support_agent: 'РРЅР¶РµРЅРµСЂ РїРѕРґРґРµСЂР¶РєРё',
+      support_lead: 'Р СѓРєРѕРІРѕРґРёС‚РµР»СЊ РїРѕРґРґРµСЂР¶РєРё',
+      platform_admin: 'РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ РїР»Р°С‚С„РѕСЂРјС‹'
+    }[state.user.role] || state.user.role || 'РљР»РёРµРЅС‚');
   }
 
   function authHeaders() {
@@ -354,7 +354,7 @@
     var password = remotePassword || state.desktopRemote.password || ticketRemotePassword(state.selectedTicket);
     if (!systemInfo && !localClientId && !password) return;
     var payload = {
-      deviceLabel: 'Рабочее место клиента',
+      deviceLabel: 'Р Р°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ РєР»РёРµРЅС‚Р°',
       remoteClientId: localClientId || '',
       deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
       localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
@@ -375,7 +375,7 @@
     var response = await fetch(path, request);
     var data = null;
     try { data = await response.json(); } catch (error) { data = null; }
-    if (!response.ok) throw new Error(data && data.error ? data.error : 'Ошибка запроса');
+    if (!response.ok) throw new Error(data && data.error ? data.error : 'РћС€РёР±РєР° Р·Р°РїСЂРѕСЃР°');
     return data;
   }
 
@@ -456,7 +456,7 @@
     $('deskEmail').disabled = true;
     $('deskPassword').disabled = true;
     $('deskLoginBtn').disabled = true;
-    $('deskLoginBtn').textContent = 'Доступно только в Windows';
+    $('deskLoginBtn').textContent = 'Р”РѕСЃС‚СѓРїРЅРѕ С‚РѕР»СЊРєРѕ РІ Windows';
   }
 
   function closeAllCustomSelects(exceptSelectId) {
@@ -474,7 +474,7 @@
       btn.type = 'button';
       btn.className = 'desk-select-option' + (option.value === selectedValue ? ' active' : '');
       btn.disabled = !!option.disabled;
-      btn.innerHTML = '<span>' + escapeHtml(option.textContent || '') + '</span><span class="desk-select-check">✓</span>';
+      btn.innerHTML = '<span>' + escapeHtml(option.textContent || '') + '</span><span class="desk-select-check">вњ“</span>';
       btn.addEventListener('click', function (event) {
         event.preventDefault();
         if (option.disabled) return;
@@ -499,7 +499,7 @@
     var trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'desk-select-trigger';
-    trigger.innerHTML = '<span class="desk-select-label"></span><span class="desk-select-caret">▾</span>';
+    trigger.innerHTML = '<span class="desk-select-label"></span><span class="desk-select-caret">в–ѕ</span>';
     var menu = document.createElement('div');
     menu.className = 'desk-select-menu';
     wrapper.appendChild(trigger);
@@ -531,11 +531,11 @@
 
   function ticketPreview(ticket) {
     var message = ticket.messages && ticket.messages.length ? ticket.messages[ticket.messages.length - 1].body : ticket.description;
-    return message || 'Без сообщений';
+    return message || 'Р‘РµР· СЃРѕРѕР±С‰РµРЅРёР№';
   }
 
   function conversationPreview(conversation) {
-    return conversation.lastMessagePreview || 'Диалог еще не начат';
+    return conversation.lastMessagePreview || 'Р”РёР°Р»РѕРі РµС‰Рµ РЅРµ РЅР°С‡Р°С‚';
   }
 
   function renderModeControls() {
@@ -551,7 +551,7 @@
     refreshCustomSelect('deskStatusFilter');
     refreshCustomSelect('deskSortFilter');
     refreshCustomSelect('deskCompanyFilter');
-    $('deskTicketSearch').placeholder = isChatMode ? 'Поиск по живым чатам...' : 'Поиск по тикетам...';
+    $('deskTicketSearch').placeholder = isChatMode ? 'РџРѕРёСЃРє РїРѕ Р¶РёРІС‹Рј С‡Р°С‚Р°Рј...' : 'РџРѕРёСЃРє РїРѕ С‚РёРєРµС‚Р°Рј...';
   }
 
   function canEditSelectedTicketStatus() {
@@ -594,7 +594,7 @@
 
     var remoteCard = document.createElement('div');
     remoteCard.className = 'aside-card';
-    remoteCard.innerHTML = '<h3>Удаленная помощь</h3><div id="deskRemotePanel" class="history"><div class="empty" style="padding:0">Выберите тикет, чтобы запросить или запустить удаленную помощь.</div></div>';
+    remoteCard.innerHTML = '<h3>РЈРґР°Р»РµРЅРЅР°СЏ РїРѕРјРѕС‰СЊ</h3><div id="deskRemotePanel" class="history"><div class="empty" style="padding:0">Р’С‹Р±РµСЂРёС‚Рµ С‚РёРєРµС‚, С‡С‚РѕР±С‹ Р·Р°РїСЂРѕСЃРёС‚СЊ РёР»Рё Р·Р°РїСѓСЃС‚РёС‚СЊ СѓРґР°Р»РµРЅРЅСѓСЋ РїРѕРјРѕС‰СЊ.</div></div>';
     historyAsideCard.parentNode.insertBefore(remoteCard, historyAsideCard);
     return $('deskRemotePanel');
   }
@@ -636,7 +636,7 @@
         var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
         var sessionPayload = {
           accessMode: 'interactive',
-          deviceLabel: 'Рабочее место клиента',
+          deviceLabel: 'Р Р°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ РєР»РёРµРЅС‚Р°',
           remoteClientId: localClientId || '',
           remotePassword: remoteOptions.password
         };
@@ -688,67 +688,67 @@
     if (runtime && runtime.enabled) {
       parts.push(
         '<div class="remote-card">' +
-          '<strong>Сервер подключения</strong>' +
-          '<div class="remote-row"><span>Хост</span><span>' + escapeHtml(runtime.server_host || 'не задан') + '</span></div>' +
+          '<strong>РЎРµСЂРІРµСЂ РїРѕРґРєР»СЋС‡РµРЅРёСЏ</strong>' +
+          '<div class="remote-row"><span>РҐРѕСЃС‚</span><span>' + escapeHtml(runtime.server_host || 'РЅРµ Р·Р°РґР°РЅ') + '</span></div>' +
           '<div class="remote-note">' + escapeHtml(canManage
-            ? 'Тикет уже считается запросом помощи. Для подключения используйте ID и пароль клиента ниже.'
+            ? 'РўРёРєРµС‚ СѓР¶Рµ СЃС‡РёС‚Р°РµС‚СЃСЏ Р·Р°РїСЂРѕСЃРѕРј РїРѕРјРѕС‰Рё. Р”Р»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РёСЃРїРѕР»СЊР·СѓР№С‚Рµ ID Рё РїР°СЂРѕР»СЊ РєР»РёРµРЅС‚Р° РЅРёР¶Рµ.'
             : (state.desktopRemote.installed
-              ? 'Модуль удаленной помощи готовится автоматически в фоне.'
-              : 'Модуль удаленной помощи автоматически подготавливается после входа и создания тикета.')) + '</div>' +
+              ? 'РњРѕРґСѓР»СЊ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРјРѕС‰Рё РіРѕС‚РѕРІРёС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІ С„РѕРЅРµ.'
+              : 'РњРѕРґСѓР»СЊ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРјРѕС‰Рё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРѕРґРіРѕС‚Р°РІР»РёРІР°РµС‚СЃСЏ РїРѕСЃР»Рµ РІС…РѕРґР° Рё СЃРѕР·РґР°РЅРёСЏ С‚РёРєРµС‚Р°.')) + '</div>' +
         '</div>'
       );
     }
 
     if (device && canManage) {
       var deviceRows = [
-        '<div class="remote-row"><span>ID</span><span>' + escapeHtml(device.remote_client_id || 'еще не передан') + '</span></div>',
-        '<div class="remote-row"><span>Пароль</span><span>' + escapeHtml(device.remote_password || 'еще не задан') + '</span></div>',
-        '<div class="remote-row"><span>Доступ</span><span>' + escapeHtml(device.unattended_enabled ? 'постоянный' : 'по запросу') + '</span></div>'
+        '<div class="remote-row"><span>ID</span><span>' + escapeHtml(device.remote_client_id || 'РµС‰Рµ РЅРµ РїРµСЂРµРґР°РЅ') + '</span></div>',
+        '<div class="remote-row"><span>РџР°СЂРѕР»СЊ</span><span>' + escapeHtml(device.remote_password || 'РµС‰Рµ РЅРµ Р·Р°РґР°РЅ') + '</span></div>',
+        '<div class="remote-row"><span>Р”РѕСЃС‚СѓРї</span><span>' + escapeHtml(device.unattended_enabled ? 'РїРѕСЃС‚РѕСЏРЅРЅС‹Р№' : 'РїРѕ Р·Р°РїСЂРѕСЃСѓ') + '</span></div>'
       ];
       deviceRows.push(
         '<div class="remote-inline-actions">' +
-          (device.remote_client_id ? '<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID</button>' : '') +
-          (device.remote_password ? '<button class="btn btn-ghost" type="button" data-remote-action="copy-device-password">Скопировать пароль</button>' : '') +
+          (device.remote_client_id ? '<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ ID</button>' : '') +
+          (device.remote_password ? '<button class="btn btn-ghost" type="button" data-remote-action="copy-device-password">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ РїР°СЂРѕР»СЊ</button>' : '') +
         '</div>'
       );
       parts.push(
         '<div class="remote-card">' +
-          '<strong>' + escapeHtml(device.label || 'Устройство клиента') + '</strong>' +
+          '<strong>' + escapeHtml(device.label || 'РЈСЃС‚СЂРѕР№СЃС‚РІРѕ РєР»РёРµРЅС‚Р°') + '</strong>' +
           deviceRows.join('') +
         '</div>'
       );
       if (device.device_name || device.local_ip || device.public_ip || device.gateway_ip) {
         parts.push(
           '<div class="remote-card">' +
-            '<strong>Данные ПК клиента</strong>' +
-            '<div class="remote-row"><span>Имя ПК</span><span>' + escapeHtml(device.device_name || 'не определено') + '</span></div>' +
-            '<div class="remote-row"><span>IP локальный</span><span>' + escapeHtml(device.local_ip || 'не определен') + '</span></div>' +
-            '<div class="remote-row"><span>IP внешний</span><span>' + escapeHtml(device.public_ip || 'не определен') + '</span></div>' +
-            '<div class="remote-row"><span>Шлюз</span><span>' + escapeHtml(device.gateway_ip || 'не определен') + '</span></div>' +
+            '<strong>Р”Р°РЅРЅС‹Рµ РџРљ РєР»РёРµРЅС‚Р°</strong>' +
+            '<div class="remote-row"><span>РРјСЏ РџРљ</span><span>' + escapeHtml(device.device_name || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ') + '</span></div>' +
+            '<div class="remote-row"><span>IP Р»РѕРєР°Р»СЊРЅС‹Р№</span><span>' + escapeHtml(device.local_ip || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅ') + '</span></div>' +
+            '<div class="remote-row"><span>IP РІРЅРµС€РЅРёР№</span><span>' + escapeHtml(device.public_ip || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅ') + '</span></div>' +
+            '<div class="remote-row"><span>РЁР»СЋР·</span><span>' + escapeHtml(device.gateway_ip || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅ') + '</span></div>' +
           '</div>'
         );
       }
     } else if (device) {
-      parts.push('<div class="remote-card"><strong>Удаленная помощь</strong><div class="remote-note">Данные этого устройства уже переданы инженеру. Подключение выполняется со стороны поддержки.</div></div>');
+      parts.push('<div class="remote-card"><strong>РЈРґР°Р»РµРЅРЅР°СЏ РїРѕРјРѕС‰СЊ</strong><div class="remote-note">Р”Р°РЅРЅС‹Рµ СЌС‚РѕРіРѕ СѓСЃС‚СЂРѕР№СЃС‚РІР° СѓР¶Рµ РїРµСЂРµРґР°РЅС‹ РёРЅР¶РµРЅРµСЂСѓ. РџРѕРґРєР»СЋС‡РµРЅРёРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ СЃРѕ СЃС‚РѕСЂРѕРЅС‹ РїРѕРґРґРµСЂР¶РєРё.</div></div>');
     } else {
-      parts.push('<div class="remote-card"><strong>Сессий пока нет</strong><div class="remote-note">После создания тикета клиентский модуль готовится автоматически.</div></div>');
+      parts.push('<div class="remote-card"><strong>РЎРµСЃСЃРёР№ РїРѕРєР° РЅРµС‚</strong><div class="remote-note">РџРѕСЃР»Рµ СЃРѕР·РґР°РЅРёСЏ С‚РёРєРµС‚Р° РєР»РёРµРЅС‚СЃРєРёР№ РјРѕРґСѓР»СЊ РіРѕС‚РѕРІРёС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё.</div></div>');
     }
 
     if (session) {
       parts.push(
         '<div class="remote-card">' +
-          '<strong>Последняя сессия</strong>' +
-          '<div class="remote-row"><span>Режим</span><span>' + escapeHtml(session.access_mode === 'unattended' ? 'постоянный' : 'разовый') + '</span></div>' +
-          '<div class="remote-row"><span>Статус</span><span>' + escapeHtml(remoteSessionStatusLabel(session.status)) + '</span></div>' +
-          '<div class="remote-row"><span>Код</span><span>' + escapeHtml(session.join_code || '?') + '</span></div>' +
-          '<div class="remote-row"><span>Инженер</span><span>' + escapeHtml(session.engineer_name || 'не назначен') + '</span></div>' +
+          '<strong>РџРѕСЃР»РµРґРЅСЏСЏ СЃРµСЃСЃРёСЏ</strong>' +
+          '<div class="remote-row"><span>Р РµР¶РёРј</span><span>' + escapeHtml(session.access_mode === 'unattended' ? 'РїРѕСЃС‚РѕСЏРЅРЅС‹Р№' : 'СЂР°Р·РѕРІС‹Р№') + '</span></div>' +
+          '<div class="remote-row"><span>РЎС‚Р°С‚СѓСЃ</span><span>' + escapeHtml(remoteSessionStatusLabel(session.status)) + '</span></div>' +
+          '<div class="remote-row"><span>РљРѕРґ</span><span>' + escapeHtml(session.join_code || '?') + '</span></div>' +
+          '<div class="remote-row"><span>РРЅР¶РµРЅРµСЂ</span><span>' + escapeHtml(session.engineer_name || 'РЅРµ РЅР°Р·РЅР°С‡РµРЅ') + '</span></div>' +
         '</div>'
       );
     }
 
     var buttons = [];
     if (canManage && device && device.remote_client_id) {
-      buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect">Подключиться</button>');
+      buttons.push('<button class="btn btn-primary" type="button" data-remote-action="connect">РџРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ</button>');
     }
 
     parts.push('<div class="remote-actions">' + buttons.join('') + '</div>');
@@ -763,14 +763,14 @@
     if (runtime && runtime.enabled) {
       parts.push(
         '<div class="remote-card">' +
-          '<strong>Сервер подключения</strong>' +
-          '<div class="remote-row"><span>Хост</span><span>' + escapeHtml(runtime.server_host || 'не задан') + '</span></div>' +
-          '<div class="remote-row"><span>Ключ</span><span>' + escapeHtml(runtime.server_key ? (String(runtime.server_key).slice(0, 14) + '...') : 'не задан') + '</span></div>' +
+          '<strong>РЎРµСЂРІРµСЂ РїРѕРґРєР»СЋС‡РµРЅРёСЏ</strong>' +
+          '<div class="remote-row"><span>РҐРѕСЃС‚</span><span>' + escapeHtml(runtime.server_host || 'РЅРµ Р·Р°РґР°РЅ') + '</span></div>' +
+          '<div class="remote-row"><span>РљР»СЋС‡</span><span>' + escapeHtml(runtime.server_key ? (String(runtime.server_key).slice(0, 14) + '...') : 'РЅРµ Р·Р°РґР°РЅ') + '</span></div>' +
           '<div class="remote-note">' + escapeHtml(state.desktopRemote.installed
             ? (state.desktopRemote.clientId
-              ? 'Модуль удаленной помощи готов. ID этого ПК: ' + state.desktopRemote.clientId
-              : 'Модуль удаленной помощи загружен, но ID пока не прочитан. Нажмите «Открыть модуль».')
-            : 'Для удаленной помощи нужен встроенный модуль. Его можно загрузить и открыть прямо из клиента.') + '</div>' +
+              ? 'РњРѕРґСѓР»СЊ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРјРѕС‰Рё РіРѕС‚РѕРІ. ID СЌС‚РѕРіРѕ РџРљ: ' + state.desktopRemote.clientId
+              : 'РњРѕРґСѓР»СЊ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРјРѕС‰Рё Р·Р°РіСЂСѓР¶РµРЅ, РЅРѕ ID РїРѕРєР° РЅРµ РїСЂРѕС‡РёС‚Р°РЅ. РќР°Р¶РјРёС‚Рµ В«РћС‚РєСЂС‹С‚СЊ РјРѕРґСѓР»СЊВ».')
+            : 'Р”Р»СЏ СѓРґР°Р»РµРЅРЅРѕР№ РїРѕРјРѕС‰Рё РЅСѓР¶РµРЅ РІСЃС‚СЂРѕРµРЅРЅС‹Р№ РјРѕРґСѓР»СЊ. Р•РіРѕ РјРѕР¶РЅРѕ Р·Р°РіСЂСѓР·РёС‚СЊ Рё РѕС‚РєСЂС‹С‚СЊ РїСЂСЏРјРѕ РёР· РєР»РёРµРЅС‚Р°.') + '</div>' +
         '</div>'
       );
     }
@@ -786,11 +786,11 @@
       if (canManage && (device.device_name || device.local_ip || device.public_ip || device.gateway_ip)) {
         parts.push(
           '<div class="remote-card">' +
-            '<strong>Данные ПК клиента</strong>' +
-            '<div class="remote-row"><span>Имя ПК</span><span>' + escapeHtml(device.device_name || 'не определено') + '</span></div>' +
-            '<div class="remote-row"><span>IP локальный</span><span>' + escapeHtml(device.local_ip || 'не определен') + '</span></div>' +
-            '<div class="remote-row"><span>IP внешний</span><span>' + escapeHtml(device.public_ip || 'не определен') + '</span></div>' +
-            '<div class="remote-row"><span>Шлюз</span><span>' + escapeHtml(device.gateway_ip || 'не определен') + '</span></div>' +
+            '<strong>Р”Р°РЅРЅС‹Рµ РџРљ РєР»РёРµРЅС‚Р°</strong>' +
+            '<div class="remote-row"><span>РРјСЏ РџРљ</span><span>' + escapeHtml(device.device_name || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅРѕ') + '</span></div>' +
+            '<div class="remote-row"><span>IP Р»РѕРєР°Р»СЊРЅС‹Р№</span><span>' + escapeHtml(device.local_ip || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅ') + '</span></div>' +
+            '<div class="remote-row"><span>IP РІРЅРµС€РЅРёР№</span><span>' + escapeHtml(device.public_ip || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅ') + '</span></div>' +
+            '<div class="remote-row"><span>РЁР»СЋР·</span><span>' + escapeHtml(device.gateway_ip || 'РЅРµ РѕРїСЂРµРґРµР»РµРЅ') + '</span></div>' +
           '</div>'
         );
       }
@@ -823,10 +823,10 @@
         buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="disable-unattended">\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0434\u043e\u0441\u0442\u0443\u043f</button>');
       }
       if (runtime && runtime.enabled && hasDesktopBridge()) {
-        buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'Открыть модуль' : 'Подготовить модуль') + '</button>');
-        buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-host">Скопировать хост</button>');
-        if (runtime.server_key) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-key">Скопировать ключ</button>');
-        if (device && device.remote_client_id) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">Скопировать ID ПК</button>');
+        buttons.push('<button class="btn btn-secondary" type="button" data-remote-action="launch-rustdesk">' + (state.desktopRemote.installed ? 'РћС‚РєСЂС‹С‚СЊ РјРѕРґСѓР»СЊ' : 'РџРѕРґРіРѕС‚РѕРІРёС‚СЊ РјРѕРґСѓР»СЊ') + '</button>');
+        buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-host">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ С…РѕСЃС‚</button>');
+        if (runtime.server_key) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-key">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ РєР»СЋС‡</button>');
+        if (device && device.remote_client_id) buttons.push('<button class="btn btn-ghost" type="button" data-remote-action="copy-device-id">РЎРєРѕРїРёСЂРѕРІР°С‚СЊ ID РџРљ</button>');
       }
 
     parts.push('<div class="remote-actions">' + buttons.join('') + '</div>');
@@ -842,18 +842,18 @@
     var title = document.querySelector('.sidebar-title h2');
     var sub = document.querySelector('.sidebar-sub');
     if (state.mode === 'livechat') {
-      title.textContent = 'Живые чаты';
-      if (sub) sub.textContent = 'Очередь обращений с сайта для superuser и поддержки: новые диалоги, ответы и быстрый переход в задачу.';
+      title.textContent = 'Р–РёРІС‹Рµ С‡Р°С‚С‹';
+      if (sub) sub.textContent = 'РћС‡РµСЂРµРґСЊ РѕР±СЂР°С‰РµРЅРёР№ СЃ СЃР°Р№С‚Р° РґР»СЏ superuser Рё РїРѕРґРґРµСЂР¶РєРё: РЅРѕРІС‹Рµ РґРёР°Р»РѕРіРё, РѕС‚РІРµС‚С‹ Рё Р±С‹СЃС‚СЂС‹Р№ РїРµСЂРµС…РѕРґ РІ Р·Р°РґР°С‡Сѓ.';
     } else {
-      title.textContent = hasPermission('ticket.view.all') || (state.user && state.user.isGlobalAdmin) ? 'Все тикеты' : 'Мои тикеты';
-      if (sub) sub.textContent = 'Легкий рабочий режим: список заявок, переписка по задаче и быстрые обновления без полного портала.';
+      title.textContent = hasPermission('ticket.view.all') || (state.user && state.user.isGlobalAdmin) ? 'Р’СЃРµ С‚РёРєРµС‚С‹' : 'РњРѕРё С‚РёРєРµС‚С‹';
+      if (sub) sub.textContent = 'Р›РµРіРєРёР№ СЂР°Р±РѕС‡РёР№ СЂРµР¶РёРј: СЃРїРёСЃРѕРє Р·Р°СЏРІРѕРє, РїРµСЂРµРїРёСЃРєР° РїРѕ Р·Р°РґР°С‡Рµ Рё Р±С‹СЃС‚СЂС‹Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ Р±РµР· РїРѕР»РЅРѕРіРѕ РїРѕСЂС‚Р°Р»Р°.';
     }
   }
 
   function renderTicketList() {
     var container = $('deskTicketList');
     if (!state.filteredTickets.length) {
-      container.innerHTML = '<div class="empty">Пока нет тикетов. Создайте первую заявку и ведите диалог по задаче как в чате.</div>';
+      container.innerHTML = '<div class="empty">РџРѕРєР° РЅРµС‚ С‚РёРєРµС‚РѕРІ. РЎРѕР·РґР°Р№С‚Рµ РїРµСЂРІСѓСЋ Р·Р°СЏРІРєСѓ Рё РІРµРґРёС‚Рµ РґРёР°Р»РѕРі РїРѕ Р·Р°РґР°С‡Рµ РєР°Рє РІ С‡Р°С‚Рµ.</div>';
       return;
     }
     container.innerHTML = state.filteredTickets.map(function (ticket) {
@@ -861,7 +861,7 @@
       return '<div class="ticket-card' + (ticket.id === state.selectedTicketId ? ' active' : '') + (unreadCount ? ' unread' : '') + '" data-ticket-id="' + escapeHtml(ticket.id) + '">' +
         '<div class="ticket-top"><div class="ticket-top-main">' + (unreadCount ? '<span class="ticket-unread-dot"></span>' : '') + '<div class="ticket-no">#' + escapeHtml(ticket.number) + '</div></div><div style="display:flex;align-items:center;gap:6px">' + (unreadCount ? '<div class="ticket-unread-badge">' + escapeHtml(unreadCount) + '</div>' : '') + '<div class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</div></div></div>' +
         '<div class="ticket-subject">' + escapeHtml(ticket.subject) + '</div>' +
-        (showCompanyContext() ? '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(ticket.company_name || 'Без компании') + (ticket.created_by_name ? ' • ' + escapeHtml(ticket.created_by_name) : '') + '</div>' : '') +
+        (showCompanyContext() ? '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(ticket.company_name || 'Р‘РµР· РєРѕРјРїР°РЅРёРё') + (ticket.created_by_name ? ' вЂў ' + escapeHtml(ticket.created_by_name) : '') + '</div>' : '') +
         '<div class="ticket-preview">' + escapeHtml(ticketPreview(ticket)) + '</div>' +
         '<div class="ticket-meta"><div class="pill ' + escapeHtml(ticket.priority) + '">' + escapeHtml(priorityLabel(ticket.priority)) + '</div><div class="pill normal">' + escapeHtml(relativeDate(ticket.updated_at)) + '</div></div>' +
       '</div>';
@@ -874,15 +874,15 @@
   function renderConversationList() {
     var container = $('deskTicketList');
     if (!state.filteredConversations.length) {
-      container.innerHTML = '<div class="empty">Сейчас нет активных живых чатов. Новые обращения с сайта появятся здесь автоматически.</div>';
+      container.innerHTML = '<div class="empty">РЎРµР№С‡Р°СЃ РЅРµС‚ Р°РєС‚РёРІРЅС‹С… Р¶РёРІС‹С… С‡Р°С‚РѕРІ. РќРѕРІС‹Рµ РѕР±СЂР°С‰РµРЅРёСЏ СЃ СЃР°Р№С‚Р° РїРѕСЏРІСЏС‚СЃСЏ Р·РґРµСЃСЊ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё.</div>';
       return;
     }
     container.innerHTML = state.filteredConversations.map(function (conversation) {
       var unreadCount = Number(state.unreadConversations[conversation.id] || 0);
       return '<div class="ticket-card' + (conversation.id === state.selectedConversationId ? ' active' : '') + (unreadCount ? ' unread' : '') + '" data-conversation-id="' + escapeHtml(conversation.id) + '">' +
         '<div class="ticket-top"><div class="ticket-top-main">' + (unreadCount ? '<span class="ticket-unread-dot"></span>' : '') + '<div class="ticket-no">' + escapeHtml(conversationStatusLabel(conversation.status)) + '</div></div><div style="display:flex;align-items:center;gap:6px">' + (unreadCount ? '<div class="ticket-unread-badge">' + escapeHtml(unreadCount) + '</div>' : '') + '<div class="pill ' + escapeHtml(conversation.status === 'closed' ? 'closed' : conversation.status === 'new' ? 'high' : 'progress') + '">' + escapeHtml(relativeDate(conversation.lastMessageAt || conversation.updatedAt)) + '</div></div></div>' +
-        '<div class="ticket-subject">' + escapeHtml(conversation.visitorName || 'Посетитель') + '</div>' +
-        '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(conversation.assignedUserName || 'Без исполнителя') + (conversation.ticketId ? ' • тикет связан' : '') + '</div>' +
+        '<div class="ticket-subject">' + escapeHtml(conversation.visitorName || 'РџРѕСЃРµС‚РёС‚РµР»СЊ') + '</div>' +
+        '<div class="ticket-no" style="margin-top:6px">' + escapeHtml(conversation.assignedUserName || 'Р‘РµР· РёСЃРїРѕР»РЅРёС‚РµР»СЏ') + (conversation.ticketId ? ' вЂў С‚РёРєРµС‚ СЃРІСЏР·Р°РЅ' : '') + '</div>' +
         '<div class="ticket-preview">' + escapeHtml(conversationPreview(conversation)) + '</div>' +
       '</div>';
     }).join('');
@@ -898,11 +898,11 @@
     var sendBtn = $('deskSendBtn');
     var composer = $('deskComposer');
     if (!state.selectedTicket) {
-      $('deskThreadTitle').textContent = 'Выберите тикет';
-      $('deskThreadMeta').textContent = 'Откройте заявку слева или создайте новую.';
-      stream.innerHTML = '<div class="empty">Здесь появится переписка по выбранному тикету. Клиент видит только свои доступные тикеты, а поддержка и superuser — общую очередь.</div>';
-      facts.innerHTML = '<div class="kv-row"><span>Статус</span><span>—</span></div><div class="kv-row"><span>Приоритет</span><span>—</span></div><div class="kv-row"><span>Исполнитель</span><span>—</span></div><div class="kv-row"><span>Создан</span><span>—</span></div><div class="kv-row"><span>Обновлен</span><span>—</span></div>';
-      history.innerHTML = '<div class="empty" style="padding:0">История появится после выбора тикета.</div>';
+      $('deskThreadTitle').textContent = 'Р’С‹Р±РµСЂРёС‚Рµ С‚РёРєРµС‚';
+      $('deskThreadMeta').textContent = 'РћС‚РєСЂРѕР№С‚Рµ Р·Р°СЏРІРєСѓ СЃР»РµРІР° РёР»Рё СЃРѕР·РґР°Р№С‚Рµ РЅРѕРІСѓСЋ.';
+      stream.innerHTML = '<div class="empty">Р—РґРµСЃСЊ РїРѕСЏРІРёС‚СЃСЏ РїРµСЂРµРїРёСЃРєР° РїРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ С‚РёРєРµС‚Сѓ. РљР»РёРµРЅС‚ РІРёРґРёС‚ С‚РѕР»СЊРєРѕ СЃРІРѕРё РґРѕСЃС‚СѓРїРЅС‹Рµ С‚РёРєРµС‚С‹, Р° РїРѕРґРґРµСЂР¶РєР° Рё superuser вЂ” РѕР±С‰СѓСЋ РѕС‡РµСЂРµРґСЊ.</div>';
+      facts.innerHTML = '<div class="kv-row"><span>РЎС‚Р°С‚СѓСЃ</span><span>вЂ”</span></div><div class="kv-row"><span>РџСЂРёРѕСЂРёС‚РµС‚</span><span>вЂ”</span></div><div class="kv-row"><span>РСЃРїРѕР»РЅРёС‚РµР»СЊ</span><span>вЂ”</span></div><div class="kv-row"><span>РЎРѕР·РґР°РЅ</span><span>вЂ”</span></div><div class="kv-row"><span>РћР±РЅРѕРІР»РµРЅ</span><span>вЂ”</span></div>';
+      history.innerHTML = '<div class="empty" style="padding:0">РСЃС‚РѕСЂРёСЏ РїРѕСЏРІРёС‚СЃСЏ РїРѕСЃР»Рµ РІС‹Р±РѕСЂР° С‚РёРєРµС‚Р°.</div>';
       composer.disabled = true;
       sendBtn.disabled = true;
       syncQuickStatusPanel();
@@ -910,27 +910,27 @@
       return;
     }
     var ticket = state.selectedTicket;
-      $('deskThreadTitle').textContent = '#' + ticket.number + ' • ' + ticket.subject;
-      $('deskThreadMeta').textContent = 'Статус: ' + statusLabel(ticket.status) + ' • Приоритет: ' + priorityLabel(ticket.priority);
+      $('deskThreadTitle').textContent = '#' + ticket.number + ' вЂў ' + ticket.subject;
+      $('deskThreadMeta').textContent = 'РЎС‚Р°С‚СѓСЃ: ' + statusLabel(ticket.status) + ' вЂў РџСЂРёРѕСЂРёС‚РµС‚: ' + priorityLabel(ticket.priority);
       stream.innerHTML = (ticket.messages || []).map(function (message) {
         if (message.message_type === 'system' || message.message_type === 'internal_note') {
-          var systemAuthor = message.author_name || 'Система';
-          return '<div class="message-row system"><div class="system-event"><div class="system-event-meta"><span>' + escapeHtml(systemAuthor) + ' • ' + escapeHtml(formatDate(message.created_at)) + '</span></div><div class="system-event-body">' + escapeHtml(message.body) + '</div></div></div>';
+          var systemAuthor = message.author_name || 'РЎРёСЃС‚РµРјР°';
+          return '<div class="message-row system"><div class="system-event"><div class="system-event-meta"><span>' + escapeHtml(systemAuthor) + ' вЂў ' + escapeHtml(formatDate(message.created_at)) + '</span></div><div class="system-event-body">' + escapeHtml(message.body) + '</div></div></div>';
         }
         var kind = messageBelongsToViewerSide(message) ? 'me' : 'other';
-        var author = message.author_name || (kind === 'me' ? 'Вы' : 'Поддержка');
+        var author = message.author_name || (kind === 'me' ? 'Р’С‹' : 'РџРѕРґРґРµСЂР¶РєР°');
         return '<div class="message-row ' + kind + '"><div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.created_at)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div></div>';
-      }).join('') || '<div class="empty">В этом тикете пока нет сообщений.</div>';
+      }).join('') || '<div class="empty">Р’ СЌС‚РѕРј С‚РёРєРµС‚Рµ РїРѕРєР° РЅРµС‚ СЃРѕРѕР±С‰РµРЅРёР№.</div>';
     stream.scrollTop = stream.scrollHeight;
     facts.innerHTML =
-      '<div class="kv-row"><span>Статус</span><span><span class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</span></span></div>' +
-      '<div class="kv-row"><span>Приоритет</span><span><span class="pill ' + escapeHtml(ticket.priority) + '">' + escapeHtml(priorityLabel(ticket.priority)) + '</span></span></div>' +
-      '<div class="kv-row"><span>Исполнитель</span><span>' + escapeHtml(ticket.assignee_name || 'Не назначен') + '</span></div>' +
-      '<div class="kv-row"><span>Создан</span><span>' + escapeHtml(formatDate(ticket.created_at)) + '</span></div>' +
-      '<div class="kv-row"><span>Обновлен</span><span>' + escapeHtml(relativeDate(ticket.updated_at)) + '</span></div>';
+      '<div class="kv-row"><span>РЎС‚Р°С‚СѓСЃ</span><span><span class="pill ' + escapeHtml(ticket.status) + '">' + escapeHtml(statusLabel(ticket.status)) + '</span></span></div>' +
+      '<div class="kv-row"><span>РџСЂРёРѕСЂРёС‚РµС‚</span><span><span class="pill ' + escapeHtml(ticket.priority) + '">' + escapeHtml(priorityLabel(ticket.priority)) + '</span></span></div>' +
+      '<div class="kv-row"><span>РСЃРїРѕР»РЅРёС‚РµР»СЊ</span><span>' + escapeHtml(ticket.assignee_name || 'РќРµ РЅР°Р·РЅР°С‡РµРЅ') + '</span></div>' +
+      '<div class="kv-row"><span>РЎРѕР·РґР°РЅ</span><span>' + escapeHtml(formatDate(ticket.created_at)) + '</span></div>' +
+      '<div class="kv-row"><span>РћР±РЅРѕРІР»РµРЅ</span><span>' + escapeHtml(relativeDate(ticket.updated_at)) + '</span></div>';
     history.innerHTML = (ticket.history || []).length ? ticket.history.slice(0, 8).map(function (item) {
       return '<div class="history-item"><strong>' + escapeHtml(formatDate(item.created_at)) + '</strong><div>' + escapeHtml(item.body) + '</div></div>';
-    }).join('') : '<div class="empty" style="padding:0">История по тикету пока пуста.</div>';
+    }).join('') : '<div class="empty" style="padding:0">РСЃС‚РѕСЂРёСЏ РїРѕ С‚РёРєРµС‚Сѓ РїРѕРєР° РїСѓСЃС‚Р°.</div>';
     composer.disabled = false;
     sendBtn.disabled = false;
     syncQuickStatusPanel();
@@ -944,11 +944,11 @@
     var sendBtn = $('deskSendBtn');
     var composer = $('deskComposer');
     if (!state.selectedConversation) {
-      $('deskThreadTitle').textContent = 'Выберите чат';
-      $('deskThreadMeta').textContent = 'Откройте диалог слева, чтобы ответить посетителю.';
-      stream.innerHTML = '<div class="empty">Здесь появится переписка по живому чату с сайта.</div>';
-      facts.innerHTML = '<div class="kv-row"><span>Статус</span><span>—</span></div><div class="kv-row"><span>Посетитель</span><span>—</span></div><div class="kv-row"><span>Исполнитель</span><span>—</span></div><div class="kv-row"><span>Связанный тикет</span><span>—</span></div><div class="kv-row"><span>Обновлен</span><span>—</span></div>';
-      history.innerHTML = '<div class="empty" style="padding:0">История диалога появится после выбора чата.</div>';
+      $('deskThreadTitle').textContent = 'Р’С‹Р±РµСЂРёС‚Рµ С‡Р°С‚';
+      $('deskThreadMeta').textContent = 'РћС‚РєСЂРѕР№С‚Рµ РґРёР°Р»РѕРі СЃР»РµРІР°, С‡С‚РѕР±С‹ РѕС‚РІРµС‚РёС‚СЊ РїРѕСЃРµС‚РёС‚РµР»СЋ.';
+      stream.innerHTML = '<div class="empty">Р—РґРµСЃСЊ РїРѕСЏРІРёС‚СЃСЏ РїРµСЂРµРїРёСЃРєР° РїРѕ Р¶РёРІРѕРјСѓ С‡Р°С‚Сѓ СЃ СЃР°Р№С‚Р°.</div>';
+      facts.innerHTML = '<div class="kv-row"><span>РЎС‚Р°С‚СѓСЃ</span><span>вЂ”</span></div><div class="kv-row"><span>РџРѕСЃРµС‚РёС‚РµР»СЊ</span><span>вЂ”</span></div><div class="kv-row"><span>РСЃРїРѕР»РЅРёС‚РµР»СЊ</span><span>вЂ”</span></div><div class="kv-row"><span>РЎРІСЏР·Р°РЅРЅС‹Р№ С‚РёРєРµС‚</span><span>вЂ”</span></div><div class="kv-row"><span>РћР±РЅРѕРІР»РµРЅ</span><span>вЂ”</span></div>';
+      history.innerHTML = '<div class="empty" style="padding:0">РСЃС‚РѕСЂРёСЏ РґРёР°Р»РѕРіР° РїРѕСЏРІРёС‚СЃСЏ РїРѕСЃР»Рµ РІС‹Р±РѕСЂР° С‡Р°С‚Р°.</div>';
       composer.disabled = true;
       sendBtn.disabled = true;
       syncQuickStatusPanel();
@@ -956,23 +956,23 @@
       return;
     }
     var conversation = state.selectedConversation;
-    $('deskThreadTitle').textContent = conversation.visitorName || 'Посетитель сайта';
-    $('deskThreadMeta').textContent = 'Статус: ' + conversationStatusLabel(conversation.status) + (conversation.ticketId ? ' • связан с тикетом' : '');
+    $('deskThreadTitle').textContent = conversation.visitorName || 'РџРѕСЃРµС‚РёС‚РµР»СЊ СЃР°Р№С‚Р°';
+    $('deskThreadMeta').textContent = 'РЎС‚Р°С‚СѓСЃ: ' + conversationStatusLabel(conversation.status) + (conversation.ticketId ? ' вЂў СЃРІСЏР·Р°РЅ СЃ С‚РёРєРµС‚РѕРј' : '');
     stream.innerHTML = (conversation.messages || []).map(function (message) {
       var kind = message.authorType === 'operator' ? 'me' : 'other';
-      var author = message.authorName || (message.authorType === 'operator' ? 'Поддержка' : 'Посетитель');
+      var author = message.authorName || (message.authorType === 'operator' ? 'РџРѕРґРґРµСЂР¶РєР°' : 'РџРѕСЃРµС‚РёС‚РµР»СЊ');
       return '<div class="message-row ' + kind + '"><div class="bubble ' + kind + '"><div class="bubble-meta"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(formatDate(message.createdAt)) + '</span></div><div>' + escapeHtml(message.body) + '</div></div></div>';
-    }).join('') || '<div class="empty">В этом чате пока нет сообщений.</div>';
+    }).join('') || '<div class="empty">Р’ СЌС‚РѕРј С‡Р°С‚Рµ РїРѕРєР° РЅРµС‚ СЃРѕРѕР±С‰РµРЅРёР№.</div>';
     stream.scrollTop = stream.scrollHeight;
     facts.innerHTML =
-      '<div class="kv-row"><span>Статус</span><span><span class="pill ' + escapeHtml(conversation.status === 'closed' ? 'closed' : conversation.status === 'new' ? 'high' : 'progress') + '">' + escapeHtml(conversationStatusLabel(conversation.status)) + '</span></span></div>' +
-      '<div class="kv-row"><span>Посетитель</span><span>' + escapeHtml(conversation.visitorName || '—') + '</span></div>' +
-      '<div class="kv-row"><span>Исполнитель</span><span>' + escapeHtml(conversation.assignedUserName || 'Не назначен') + '</span></div>' +
-      '<div class="kv-row"><span>Связанный тикет</span><span>' + escapeHtml(conversation.ticketId || 'Нет') + '</span></div>' +
-      '<div class="kv-row"><span>Обновлен</span><span>' + escapeHtml(relativeDate(conversation.updatedAt)) + '</span></div>';
+      '<div class="kv-row"><span>РЎС‚Р°С‚СѓСЃ</span><span><span class="pill ' + escapeHtml(conversation.status === 'closed' ? 'closed' : conversation.status === 'new' ? 'high' : 'progress') + '">' + escapeHtml(conversationStatusLabel(conversation.status)) + '</span></span></div>' +
+      '<div class="kv-row"><span>РџРѕСЃРµС‚РёС‚РµР»СЊ</span><span>' + escapeHtml(conversation.visitorName || 'вЂ”') + '</span></div>' +
+      '<div class="kv-row"><span>РСЃРїРѕР»РЅРёС‚РµР»СЊ</span><span>' + escapeHtml(conversation.assignedUserName || 'РќРµ РЅР°Р·РЅР°С‡РµРЅ') + '</span></div>' +
+      '<div class="kv-row"><span>РЎРІСЏР·Р°РЅРЅС‹Р№ С‚РёРєРµС‚</span><span>' + escapeHtml(conversation.ticketId || 'РќРµС‚') + '</span></div>' +
+      '<div class="kv-row"><span>РћР±РЅРѕРІР»РµРЅ</span><span>' + escapeHtml(relativeDate(conversation.updatedAt)) + '</span></div>';
     history.innerHTML = (conversation.messages || []).length ? conversation.messages.slice(-8).reverse().map(function (message) {
-      return '<div class="history-item"><strong>' + escapeHtml(formatDate(message.createdAt)) + '</strong><div>' + escapeHtml((message.authorName || 'Участник') + ': ' + message.body) + '</div></div>';
-    }).join('') : '<div class="empty" style="padding:0">История по чату пока пуста.</div>';
+      return '<div class="history-item"><strong>' + escapeHtml(formatDate(message.createdAt)) + '</strong><div>' + escapeHtml((message.authorName || 'РЈС‡Р°СЃС‚РЅРёРє') + ': ' + message.body) + '</div></div>';
+    }).join('') : '<div class="empty" style="padding:0">РСЃС‚РѕСЂРёСЏ РїРѕ С‡Р°С‚Сѓ РїРѕРєР° РїСѓСЃС‚Р°.</div>';
     composer.disabled = false;
     sendBtn.disabled = false;
     syncQuickStatusPanel();
@@ -1038,13 +1038,13 @@
     var select = $('deskCompanyFilter');
     if (!showCompanyContext() || state.mode === 'livechat') {
       select.classList.add('hidden');
-      select.innerHTML = '<option value="">Все компании</option>';
+      select.innerHTML = '<option value="">Р’СЃРµ РєРѕРјРїР°РЅРёРё</option>';
       refreshCustomSelect(select);
       return;
     }
     var current = select.value;
-    var companies = Array.from(new Set(state.tickets.map(function (ticket) { return ticket.company_name || 'Без компании'; }))).sort();
-    select.innerHTML = '<option value="">Все компании</option>' + companies.map(function (company) {
+    var companies = Array.from(new Set(state.tickets.map(function (ticket) { return ticket.company_name || 'Р‘РµР· РєРѕРјРїР°РЅРёРё'; }))).sort();
+    select.innerHTML = '<option value="">Р’СЃРµ РєРѕРјРїР°РЅРёРё</option>' + companies.map(function (company) {
       return '<option value="' + escapeHtml(company) + '">' + escapeHtml(company) + '</option>';
     }).join('');
     if (companies.indexOf(current) >= 0) select.value = current;
@@ -1067,7 +1067,7 @@
       var selectedNow = state.mode === 'tickets' && String(state.selectedTicketId || '') === String(ticket.id || '');
       if (prevSignature && prevSignature !== signature && fromOtherSide && !selectedNow) {
         state.unreadTickets[ticket.id] = Number(state.unreadTickets[ticket.id] || 0) + 1;
-        notifyDesk('Новый ответ по тикету #' + ticket.number, (ticket.subject || '').slice(0, 120));
+        notifyDesk('РќРѕРІС‹Р№ РѕС‚РІРµС‚ РїРѕ С‚РёРєРµС‚Сѓ #' + ticket.number, (ticket.subject || '').slice(0, 120));
       }
       state.lastTicketSignatures[ticket.id] = signature;
     });
@@ -1091,7 +1091,7 @@
       var selectedNow = state.mode === 'livechat' && String(state.selectedConversationId || '') === String(conversation.id || '');
       if (prevSignature && prevSignature !== signature && !selectedNow) {
         state.unreadConversations[conversation.id] = Number(state.unreadConversations[conversation.id] || 0) + 1;
-        notifyDesk('Новый чат сайта', ((conversation.visitorName || 'Посетитель') + ': ' + (conversation.lastMessagePreview || '')).slice(0, 140));
+        notifyDesk('РќРѕРІС‹Р№ С‡Р°С‚ СЃР°Р№С‚Р°', ((conversation.visitorName || 'РџРѕСЃРµС‚РёС‚РµР»СЊ') + ': ' + (conversation.lastMessagePreview || '')).slice(0, 140));
       }
       state.lastConversationSignatures[conversation.id] = signature;
     });
@@ -1147,7 +1147,7 @@
     clearErrors();
     var email = $('deskEmail').value.trim();
     var password = $('deskPassword').value;
-    if (!email || !password) return showError('deskAuthError', 'Введите email и пароль.');
+    if (!email || !password) return showError('deskAuthError', 'Р’РІРµРґРёС‚Рµ email Рё РїР°СЂРѕР»СЊ.');
     try {
       var data = await api('/api/auth/login', {
         method: 'POST',
@@ -1183,7 +1183,7 @@
     var subject = $('deskTicketSubject').value.trim();
     var description = $('deskTicketDescription').value.trim();
     var priority = $('deskTicketPriority').value;
-    if (subject.length < 3 || description.length < 3) return showError('deskModalError', 'Заполните тему и первое сообщение.');
+    if (subject.length < 3 || description.length < 3) return showError('deskModalError', 'Р—Р°РїРѕР»РЅРёС‚Рµ С‚РµРјСѓ Рё РїРµСЂРІРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ.');
     try {
       var data = await api('/api/tickets', {
         method: 'POST',
@@ -1260,7 +1260,13 @@
       var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
 
       if (action === 'connect') {
-        if (!currentDevice || !currentDevice.remote_client_id) return;
+        if (!currentDevice || !currentDevice.remote_client_id) {
+          throw new Error('Не найден ID клиента для удаленного подключения.');
+        }
+        if (!hasDesktopBridge() || !DESK_BRIDGE.launchRustDesk) {
+          throw new Error('Модуль удаленной помощи недоступен в текущем приложении.');
+        }
+
         if (!currentSession) {
           var systemInfo = await getDesktopSystemInfo();
           var createPayload = {
@@ -1273,32 +1279,36 @@
           if (systemInfo && systemInfo.localIp) createPayload.localIp = systemInfo.localIp;
           if (systemInfo && systemInfo.publicIp) createPayload.publicIp = systemInfo.publicIp;
           if (systemInfo && systemInfo.gatewayIp) createPayload.gatewayIp = systemInfo.gatewayIp;
+
           await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
             method: 'POST',
             body: JSON.stringify(createPayload)
           });
+
           await fetchTickets();
           await selectTicket(state.selectedTicketId, true);
           currentSession = latestRemoteSession();
           currentDevice = latestRemoteDevice();
         }
+
         if (currentSession) {
           await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
             method: 'PATCH',
             body: JSON.stringify({ status: 'active' })
           });
         }
-        if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
-          var launchResult = await DESK_BRIDGE.launchRustDesk({
-            host: runtime && runtime.server_host,
-            key: runtime && runtime.server_key,
-            configString: runtime && runtime.server_config,
-            password: currentDevice && currentDevice.remote_password ? currentDevice.remote_password : ticketRemotePassword(state.selectedTicket),
-            peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
-          });
-          if (launchResult && launchResult.launched === false) {
-            throw new Error(formatDeskError(launchResult, 'Не удалось запустить модуль удаленной помощи.'));
-          }
+
+        var launchResult = await DESK_BRIDGE.launchRustDesk({
+          host: runtime && runtime.server_host,
+          key: runtime && runtime.server_key,
+          configString: runtime && runtime.server_config,
+          password: currentDevice && currentDevice.remote_password ? currentDevice.remote_password : ticketRemotePassword(state.selectedTicket),
+          peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
+        });
+
+        if (!launchResult || launchResult.launched !== true) {
+          var launchError = launchResult && launchResult.error ? launchResult.error : launchResult;
+          throw new Error(formatDeskError(launchError, 'Не удалось запустить модуль удаленной помощи.'));
         }
       } else if (action === 'copy-device-id') {
         if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
@@ -1306,64 +1316,16 @@
         if (currentDevice && currentDevice.remote_password) await copyDeskText(currentDevice.remote_password);
       }
 
-        await fetchTickets();
-        await selectTicket(state.selectedTicketId, true);
-      } catch (error) {
-        alert(formatDeskError(error, 'Не удалось выполнить действие удаленной помощи.'));
+      await fetchTickets();
+      await selectTicket(state.selectedTicketId, true);
+    } catch (error) {
+      var message = formatDeskError(error, 'Не удалось выполнить действие удаленной помощи.');
+      if (!message || message === '{}' || message === '[object Object]') {
+        message = 'Не удалось запустить модуль удаленной помощи. Закройте RustDesk и повторите попытку.';
       }
-    }
-
-  function stopPolling() {
-    if (state.pollTimer) {
-      clearInterval(state.pollTimer);
-      state.pollTimer = null;
+      alert(String(message));
     }
   }
-
-  function startPolling() {
-    stopPolling();
-    state.pollTimer = setInterval(async function () {
-      if (!state.token) return;
-      try {
-        await fetchTickets();
-        if (hasLiveChatAccess()) await fetchConversations();
-      } catch (error) {}
-    }, 12000);
-  }
-
-  function setMode(mode) {
-    state.mode = mode;
-    $('deskComposer').value = '';
-    renderList();
-    renderSelectedEntity();
-  }
-
-  async function bootDesk() {
-    if (!state.token || !state.user) return renderAuthState(false);
-    await refreshCurrentUser();
-    await refreshDesktopRemoteState();
-    renderAuthState(true);
-    $('deskUserName').textContent = state.user.fullName || state.user.email || 'Пользователь';
-    $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', roleLabel()].join(' • ');
-    await fetchTickets();
-    if (hasLiveChatAccess()) await fetchConversations();
-    renderList();
-    if (state.mode === 'tickets' && state.tickets.length) {
-      await selectTicket(state.selectedTicketId || state.tickets[0].id, true);
-    } else {
-      renderSelectedEntity();
-    }
-    startPolling();
-  }
-
-  function logout() {
-    stopPolling();
-    clearSession();
-    $('deskPassword').value = '';
-    $('deskComposer').value = '';
-    renderAuthState(false);
-  }
-
   function bindEvents() {
     $('deskLoginBtn').addEventListener('click', login);
     $('deskPassword').addEventListener('keydown', function (event) {
