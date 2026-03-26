@@ -6,7 +6,7 @@ const https = require('https');
 const { execFile, spawn } = require('child_process');
 
 const APP_MODEL_ID = 'ZonaITDesk';
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.31';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.32';
 app.setName('Zona IT Desk');
 app.setAppUserModelId(APP_MODEL_ID);
 app.commandLine.appendSwitch('disable-http-cache');
@@ -57,17 +57,8 @@ function managedRustDeskDir() {
   return path.join(app.getPath('userData'), 'runtime', 'rustdesk');
 }
 
-function sanitizeRustDeskFileValue(value) {
-  return String(value || '')
-    .replace(/[<>:"/\\|?*]/g, '')
-    .trim();
-}
-
 function managedRustDeskFileName(options) {
-  const host = sanitizeRustDeskFileValue(options && options.host ? options.host : '');
-  const key = sanitizeRustDeskFileValue(options && options.key ? options.key : '');
-  if (host && key) return `rustdesk-host=${host},key=${key},.exe`;
-  return 'rustdesk.exe';
+  return 'zona-it-rustdesk.exe';
 }
 
 function managedRustDeskExecutable(options) {
@@ -75,7 +66,7 @@ function managedRustDeskExecutable(options) {
 }
 
 function managedRustDeskInstaller(options) {
-  return path.join(managedRustDeskDir(), 'rustdesk-installer-' + managedRustDeskFileName(options));
+  return path.join(managedRustDeskDir(), 'zona-it-rustdesk-installer.exe');
 }
 
 function rustDeskCandidates(options) {
@@ -182,6 +173,21 @@ async function startRustDeskProcess(executable, args) {
   }
 
   try {
+    var argumentLiteral = '[' + launchArgs.map(function (part) {
+      return "'" + String(part || '').replace(/'/g, "''") + "'";
+    }).join(',') + ']';
+    await execFileAsync('powershell.exe', [
+      '-NoProfile',
+      '-ExecutionPolicy', 'Bypass',
+      '-Command',
+      "Start-Process -FilePath '" + String(executable).replace(/'/g, "''") + "' -ArgumentList " + argumentLiteral
+    ], { windowsHide: true });
+    return { launched: true, fallback: 'powershell' };
+  } catch (fallbackError) {
+    lastError = fallbackError || lastError;
+  }
+
+  try {
     var escapedPath = '"' + String(executable).replace(/"/g, '""') + '"';
     var escapedArgs = launchArgs.map(function (part) {
       return '"' + String(part || '').replace(/"/g, '""') + '"';
@@ -192,9 +198,9 @@ async function startRustDeskProcess(executable, args) {
       windowsHide: true
     });
     cmdChild.unref();
-    return { launched: true, fallback: true };
-  } catch (fallbackError) {
-    lastError = fallbackError || lastError;
+    return { launched: true, fallback: 'cmd' };
+  } catch (cmdFallbackError) {
+    lastError = cmdFallbackError || lastError;
   }
 
   throw lastError || new Error('Unable to start RustDesk runtime');
