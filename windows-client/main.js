@@ -6,7 +6,7 @@ const https = require('https');
 const { execFile, spawn } = require('child_process');
 
 const APP_MODEL_ID = 'ZonaITDesk';
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.23';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.24';
 app.setName('Zona IT Desk');
 app.setAppUserModelId(APP_MODEL_ID);
 app.commandLine.appendSwitch('disable-http-cache');
@@ -119,6 +119,19 @@ function execFileAsync(file, args) {
       resolve({ stdout: stdout || '', stderr: stderr || '' });
     });
   });
+}
+
+function serializeError(error, fallbackMessage) {
+  if (!error) return fallbackMessage || 'Unknown error';
+  if (typeof error === 'string') return error;
+  if (error.message && typeof error.message === 'string') return error.message;
+  if (error.error && typeof error.error === 'string') return error.error;
+  if (error.code && typeof error.code === 'string') return error.code;
+  try {
+    return JSON.stringify(error);
+  } catch (_jsonError) {
+    return fallbackMessage || String(error);
+  }
 }
 
 function buildRustDeskConfigString(options) {
@@ -454,11 +467,27 @@ ipcMain.handle('rustdesk:status', async function () {
 });
 
 ipcMain.handle('rustdesk:launch', async function (_event, options) {
-  return await launchRustDesk(options || {});
+  try {
+    return await launchRustDesk(options || {});
+  } catch (error) {
+    return {
+      launched: false,
+      installed: false,
+      error: serializeError(error, 'Не удалось запустить модуль удаленной помощи.')
+    };
+  }
 });
 
 ipcMain.handle('rustdesk:install', async function (_event, options) {
-  return await installRustDesk(options || {});
+  try {
+    return await installRustDesk(options || {});
+  } catch (error) {
+    return {
+      started: false,
+      installed: false,
+      error: serializeError(error, 'Не удалось подготовить модуль удаленной помощи.')
+    };
+  }
 });
 
 ipcMain.handle('desk:copy', async function (_event, value) {

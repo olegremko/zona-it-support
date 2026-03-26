@@ -89,6 +89,18 @@
       .replace(/'/g, '&#39;');
   }
 
+  function formatDeskError(error, fallback) {
+    if (!error) return fallback || 'Произошла ошибка.';
+    if (typeof error === 'string') return error;
+    if (error.message && typeof error.message === 'string') return error.message;
+    if (error.error && typeof error.error === 'string') return error.error;
+    try {
+      return JSON.stringify(error);
+    } catch (_jsonError) {
+      return fallback || String(error);
+    }
+  }
+
   function formatDate(value) {
     if (!value) return '—';
     try {
@@ -1231,13 +1243,16 @@
           });
         }
         if (hasDesktopBridge() && DESK_BRIDGE.launchRustDesk) {
-          await DESK_BRIDGE.launchRustDesk({
+          var launchResult = await DESK_BRIDGE.launchRustDesk({
             host: runtime && runtime.server_host,
             key: runtime && runtime.server_key,
             configString: runtime && runtime.server_config,
             password: currentDevice && currentDevice.remote_password ? currentDevice.remote_password : ticketRemotePassword(state.selectedTicket),
             peerId: currentDevice && currentDevice.remote_client_id ? currentDevice.remote_client_id : ''
           });
+          if (launchResult && launchResult.launched === false) {
+            throw new Error(formatDeskError(launchResult, 'Не удалось запустить модуль удаленной помощи.'));
+          }
         }
       } else if (action === 'copy-device-id') {
         if (currentDevice && currentDevice.remote_client_id) await copyDeskText(currentDevice.remote_client_id);
@@ -1248,7 +1263,7 @@
         await fetchTickets();
         await selectTicket(state.selectedTicketId, true);
       } catch (error) {
-        alert(error && error.message ? error.message : 'Не удалось выполнить действие удаленной помощи.');
+        alert(formatDeskError(error, 'Не удалось выполнить действие удаленной помощи.'));
       }
     }
 
