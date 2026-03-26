@@ -166,12 +166,19 @@
     return !!(state.user && state.user.permissions && state.user.permissions.indexOf(code) >= 0);
   }
 
+  function isSupportRole() {
+    return !!(state.user && (
+      String(state.user.role || '').indexOf('support_') === 0 ||
+      String(state.user.role || '') === 'platform_admin'
+    ));
+  }
+
   function hasLiveChatAccess() {
-    return !!(state.user && (state.user.isGlobalAdmin || hasPermission('livechat.reply')));
+    return !!(state.user && (state.user.isGlobalAdmin || hasPermission('livechat.reply') || isSupportRole()));
   }
 
   function showCompanyContext() {
-    return !!(state.user && (state.user.isGlobalAdmin || hasPermission('ticket.view.all')));
+    return !!(state.user && (state.user.isGlobalAdmin || hasPermission('ticket.view.all') || isSupportRole()));
   }
 
   function roleLabel() {
@@ -378,9 +385,11 @@
         fullName: data.user.full_name || data.user.fullName || (state.user && state.user.fullName) || '',
         companyId: data.user.company_id || data.user.companyId || null,
         companyName: data.user.company_name || data.user.companyName || '',
-        role: data.user.role_code || data.user.role || '',
-        isGlobalAdmin: Boolean(data.user.is_global_admin || data.user.isGlobalAdmin),
-        permissions: data.user.permissions || []
+        role: data.user.role_code || data.user.role || (state.user && state.user.role) || '',
+        isGlobalAdmin: data.user.is_global_admin === undefined && data.user.isGlobalAdmin === undefined
+          ? Boolean(state.user && state.user.isGlobalAdmin)
+          : Boolean(data.user.is_global_admin || data.user.isGlobalAdmin),
+        permissions: data.user.permissions || (state.user && state.user.permissions) || []
       };
       saveSession();
       return true;
