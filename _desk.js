@@ -94,8 +94,20 @@
     if (typeof error === 'string') return error;
     if (error.message && typeof error.message === 'string') return error.message;
     if (error.error && typeof error.error === 'string') return error.error;
+    if (error.error && typeof error.error === 'object') return formatDeskError(error.error, fallback);
+    if (error.code && typeof error.code === 'string' && error.syscall) return 'РћС€РёР±РєР° ' + error.code + ' РїСЂРё ' + error.syscall + '.';
     try {
-      return JSON.stringify(error);
+      return JSON.stringify(error, function (_key, value) {
+        if (value instanceof Error) {
+          return {
+            message: value.message,
+            code: value.code,
+            syscall: value.syscall,
+            path: value.path
+          };
+        }
+        return value;
+      });
     } catch (_jsonError) {
       return fallback || String(error);
     }

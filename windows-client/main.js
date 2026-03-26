@@ -6,7 +6,7 @@ const https = require('https');
 const { execFile, spawn } = require('child_process');
 
 const APP_MODEL_ID = 'ZonaITDesk';
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.26';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.27';
 app.setName('Zona IT Desk');
 app.setAppUserModelId(APP_MODEL_ID);
 app.commandLine.appendSwitch('disable-http-cache');
@@ -126,9 +126,20 @@ function serializeError(error, fallbackMessage) {
   if (typeof error === 'string') return error;
   if (error.message && typeof error.message === 'string') return error.message;
   if (error.error && typeof error.error === 'string') return error.error;
+  if (error.error && typeof error.error === 'object') return serializeError(error.error, fallbackMessage);
   if (error.code && typeof error.code === 'string') return error.code;
   try {
-    return JSON.stringify(error);
+    return JSON.stringify(error, function (_key, value) {
+      if (value instanceof Error) {
+        return {
+          message: value.message,
+          code: value.code,
+          syscall: value.syscall,
+          path: value.path
+        };
+      }
+      return value;
+    });
   } catch (_jsonError) {
     return fallbackMessage || String(error);
   }
