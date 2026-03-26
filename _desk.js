@@ -325,6 +325,17 @@
     }
   }
 
+  async function warmRemoteRuntime(ticket) {
+    if (!hasDesktopBridge() || canManageRemoteDesk() || !DESK_BRIDGE.installRustDesk) return;
+    var runtimeSource = ticket || state.selectedTicket;
+    var runtime = runtimeSource && runtimeSource.remote_runtime ? runtimeSource.remote_runtime : remoteRuntime();
+    if (!runtime || !runtime.enabled || state.desktopRemote.busy) return;
+    try {
+      await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket(runtimeSource || state.selectedTicket));
+    } catch (error) {}
+    await refreshDesktopRemoteState();
+  }
+
   async function getDesktopSystemInfo() {
     if (!hasDesktopBridge() || !DESK_BRIDGE.getSystemInfo) return null;
     try {
@@ -1171,8 +1182,9 @@
     var subject = $('deskTicketSubject').value.trim();
     var description = $('deskTicketDescription').value.trim();
     var priority = $('deskTicketPriority').value;
-    if (subject.length < 3 || description.length < 3) return showError('deskModalError', 'Заполните тему и первое сообщение.');
+    if (subject.length < 3 || description.length < 3) return showError('deskModalError', '????????? ???? ? ?????? ?????????.');
     try {
+      await warmRemoteRuntime();
       var data = await api('/api/tickets', {
         method: 'POST',
         body: JSON.stringify({
@@ -1187,6 +1199,7 @@
       state.mode = 'tickets';
       renderList();
       await selectTicket(data.ticket.id);
+      await warmRemoteRuntime(state.selectedTicket);
       await ensureRemoteSupportReady({ createSession: true });
     } catch (error) {
       showError('deskModalError', error.message);
@@ -1339,9 +1352,13 @@
     if (!state.token || !state.user) return renderAuthState(false);
     await refreshCurrentUser();
     await refreshDesktopRemoteState();
+    if (!canManageRemoteDesk()) {
+      await warmRemoteRuntime();
+      await refreshDesktopRemoteState();
+    }
     renderAuthState(true);
-    $('deskUserName').textContent = state.user.fullName || state.user.email || 'Пользователь';
-    $('deskUserMeta').textContent = [state.user.companyName || 'Без компании', roleLabel()].join(' • ');
+    $('deskUserName').textContent = state.user.fullName || state.user.email || '????????????';
+    $('deskUserMeta').textContent = [state.user.companyName || '??? ????????', roleLabel()].join(' ? ');
     await fetchTickets();
     if (hasLiveChatAccess()) await fetchConversations();
     renderList();
