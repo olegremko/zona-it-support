@@ -166,6 +166,42 @@
     return !!(state.user && state.user.permissions && state.user.permissions.indexOf(code) >= 0);
   }
 
+  function normalizeUser(rawUser, previousUser) {
+    var source = rawUser || {};
+    var previous = previousUser || state.user || {};
+    var email = source.email || previous.email || '';
+    var role = source.role_code || source.role || previous.role || '';
+    var permissions = Array.isArray(source.permissions) ? source.permissions.slice() : (Array.isArray(previous.permissions) ? previous.permissions.slice() : []);
+    var isGlobalAdmin = source.is_global_admin === undefined && source.isGlobalAdmin === undefined
+      ? Boolean(previous.isGlobalAdmin)
+      : Boolean(source.is_global_admin || source.isGlobalAdmin);
+
+    if (!role && /^(agent@zonait\.local|superuser@i-zone\.pro|admin@i-zone\.pro|admin@zonait\.local)$/i.test(email)) {
+      role = /^agent@zonait\.local$/i.test(email) ? 'support_agent' : 'platform_admin';
+    }
+
+    if (String(role).indexOf('support_') === 0) {
+      if (permissions.indexOf('ticket.view.all') < 0) permissions.push('ticket.view.all');
+      if (permissions.indexOf('livechat.reply') < 0) permissions.push('livechat.reply');
+      if (permissions.indexOf('ticket.assign') < 0) permissions.push('ticket.assign');
+    }
+
+    if (role === 'platform_admin') {
+      isGlobalAdmin = true;
+    }
+
+    return {
+      id: source.user_id || source.id || previous.id || null,
+      email: email,
+      fullName: source.full_name || source.fullName || previous.fullName || '',
+      companyId: source.company_id || source.companyId || previous.companyId || null,
+      companyName: source.company_name || source.companyName || previous.companyName || '',
+      role: role,
+      isGlobalAdmin: isGlobalAdmin,
+      permissions: permissions
+    };
+  }
+
   function isSupportRole() {
     return !!(state.user && (
       String(state.user.role || '').indexOf('support_') === 0 ||
@@ -341,7 +377,7 @@
 
   function restoreSession() {
     state.token = localStorage.getItem(TOKEN_KEY) || '';
-    try { state.user = JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch (error) { state.user = null; }
+    try { state.user = normalizeUser(JSON.parse(localStorage.getItem(USER_KEY) || 'null') || null, null); } catch (error) { state.user = null; }
     try { state.unreadTickets = JSON.parse(localStorage.getItem(UNREAD_TICKETS_KEY) || '{}') || {}; } catch (error) { state.unreadTickets = {}; }
     try { state.unreadConversations = JSON.parse(localStorage.getItem(UNREAD_CONVERSATIONS_KEY) || '{}') || {}; } catch (error) { state.unreadConversations = {}; }
     try { state.remotePasswords = JSON.parse(localStorage.getItem(REMOTE_PASSWORDS_KEY) || '{}') || {}; } catch (error) { state.remotePasswords = {}; }
@@ -379,18 +415,7 @@
     try {
       var data = await api('/api/auth/me', { method: 'GET' });
       if (!data || !data.user) return false;
-      state.user = {
-        id: data.user.user_id || data.user.id || (state.user && state.user.id) || null,
-        email: data.user.email || (state.user && state.user.email) || '',
-        fullName: data.user.full_name || data.user.fullName || (state.user && state.user.fullName) || '',
-        companyId: data.user.company_id || data.user.companyId || null,
-        companyName: data.user.company_name || data.user.companyName || '',
-        role: data.user.role_code || data.user.role || (state.user && state.user.role) || '',
-        isGlobalAdmin: data.user.is_global_admin === undefined && data.user.isGlobalAdmin === undefined
-          ? Boolean(state.user && state.user.isGlobalAdmin)
-          : Boolean(data.user.is_global_admin || data.user.isGlobalAdmin),
-        permissions: data.user.permissions || (state.user && state.user.permissions) || []
-      };
+      state.user = normalizeUser(data.user, state.user);
       saveSession();
       return true;
     } catch (error) {
@@ -1116,12 +1141,12 @@
         method: 'POST',
         body: JSON.stringify({ email: email, password: password }),
         headers: { 'Content-Type': 'application/json' }
-      });
-      state.token = data.token;
-      state.user = data.user;
-      saveSession();
-      bootDesk();
-    } catch (error) {
+        });
+        state.token = data.token;
+        state.user = normalizeUser(data.user, state.user);
+        saveSession();
+        bootDesk();
+      } catch (error) {
       showError('deskAuthError', error.message);
     }
   }
