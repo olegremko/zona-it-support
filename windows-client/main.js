@@ -6,7 +6,7 @@ const https = require('https');
 const { execFile, spawn } = require('child_process');
 
 const APP_MODEL_ID = 'ZonaITDesk';
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.34';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.35';
 app.setName('Zona IT Desk');
 app.setAppUserModelId(APP_MODEL_ID);
 app.commandLine.appendSwitch('disable-http-cache');
@@ -425,13 +425,6 @@ async function installRustDesk(options) {
 
     const configResult = await applyRustDeskConfig(executable, options);
     const passwordResult = await applyRustDeskPassword(executable, options);
-    let launchError = null;
-    try {
-      await startRustDeskProcess(executable, []);
-      await sleep(1200);
-    } catch (error) {
-      launchError = error?.message || String(error || '');
-    }
     return {
       started: true,
       installed: true,
@@ -442,8 +435,7 @@ async function installRustDesk(options) {
       configured: !!configResult.applied,
       configError: configResult.error || null,
       passwordApplied: !!passwordResult.applied,
-      passwordError: passwordResult.error || null,
-      launchError: launchError
+      passwordError: passwordResult.error || null
     };
   } catch (error) {
     return { started: false, installed: false, error: error.message };

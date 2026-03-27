@@ -1206,8 +1206,7 @@
       state.mode = 'tickets';
       renderList();
       await selectTicket(data.ticket.id);
-      await warmRemoteRuntime(state.selectedTicket);
-      await ensureRemoteSupportReady({ createSession: true });
+      await ensureRemoteSupportReady({ createSession: true, force: true });
     } catch (error) {
       showError('deskModalError', error.message);
     }
