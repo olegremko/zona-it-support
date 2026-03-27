@@ -1115,7 +1115,6 @@
       state.selectedTicketUnreadCount = Number(state.unreadTickets[ticketId] || 0);
       markTicketRead(ticketId);
       renderSelectedTicket();
-      if (!canManageRemoteDesk()) ensureRemoteSupportReady({ createSession: false, background: true });
     } catch (error) {
       if (!silent) {
         state.selectedTicket = null;
@@ -1206,7 +1205,10 @@
       state.mode = 'tickets';
       renderList();
       await selectTicket(data.ticket.id);
-      await ensureRemoteSupportReady({ createSession: true, force: true });
+      await syncCurrentDeviceInfo(ticketRemotePassword(state.selectedTicket));
+      await fetchTickets();
+      await selectTicket(data.ticket.id, true);
+      await ensureRemoteSupportReady({ createSession: false, force: true });
     } catch (error) {
       showError('deskModalError', error.message);
     }
