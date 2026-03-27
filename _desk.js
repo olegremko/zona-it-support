@@ -613,7 +613,7 @@
     if (!hasDesktopBridge() || canManageRemoteDesk() || !state.selectedTicketId || !state.selectedTicket) return;
     var runtime = remoteRuntime();
     if (!runtime || !runtime.enabled) return;
-    if (state.desktopRemote.busy) return;
+    if (state.desktopRemote.busy && !settings.force) return;
 
     var ticketId = state.selectedTicketId;
     var remoteOptions = remoteOptionsForTicket(state.selectedTicket);
@@ -647,6 +647,13 @@
           method: 'POST',
           body: JSON.stringify(sessionPayload)
         });
+        await fetchTickets();
+        await selectTicket(ticketId, true);
+      }
+      if (!latestRemoteDevice() && !settings.background) {
+        await sleep(1200);
+        await refreshDesktopRemoteState();
+        await syncCurrentDeviceInfo(remoteOptions.password);
         await fetchTickets();
         await selectTicket(ticketId, true);
       }
@@ -1266,27 +1273,6 @@
         }
         if (!hasDesktopBridge() || !DESK_BRIDGE.launchRustDesk) {
           throw new Error('?????? ????????? ?????? ?????????? ? ??????? ??????????.');
-        }
-        if (!currentSession) {
-          var systemInfo = await getDesktopSystemInfo();
-          var createPayload = {
-            accessMode: 'interactive',
-            deviceLabel: currentDevice.label || '??????? ????? ???????',
-            remoteClientId: currentDevice.remote_client_id || localClientId || '',
-            remotePassword: currentDevice.remote_password || ticketRemotePassword(state.selectedTicket)
-          };
-          if (systemInfo && systemInfo.deviceName) createPayload.deviceName = systemInfo.deviceName;
-          if (systemInfo && systemInfo.localIp) createPayload.localIp = systemInfo.localIp;
-          if (systemInfo && systemInfo.publicIp) createPayload.publicIp = systemInfo.publicIp;
-          if (systemInfo && systemInfo.gatewayIp) createPayload.gatewayIp = systemInfo.gatewayIp;
-          await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions', {
-            method: 'POST',
-            body: JSON.stringify(createPayload)
-          });
-          await fetchTickets();
-          await selectTicket(state.selectedTicketId, true);
-          currentSession = latestRemoteSession();
-          currentDevice = latestRemoteDevice();
         }
         if (currentSession) {
           await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-sessions/' + encodeURIComponent(currentSession.id), {
