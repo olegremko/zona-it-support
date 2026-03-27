@@ -382,7 +382,7 @@
     var response = await fetch(path, request);
     var data = null;
     try { data = await response.json(); } catch (error) { data = null; }
-    if (!response.ok) throw new Error(data && data.error ? data.error : 'Ошибка запроса');
+    if (!response.ok) throw new Error(formatDeskError(data && (data.error || data.details || data), '?????? ???????')); 
     return data;
   }
 
@@ -1198,26 +1198,29 @@
     var subject = $('deskTicketSubject').value.trim();
     var description = $('deskTicketDescription').value.trim();
     var priority = $('deskTicketPriority').value;
-    if (subject.length < 3 || description.length < 3) return showError('deskModalError', '????????? ???? ? ?????? ?????????.');
+    if (subject.length < 3 || description.length < 3) return showError('deskModalError', '??????? ???? ? ?????? ?????????.');
     try {
       var provisionalPassword = randomRemotePassword();
-      var runtime = remoteRuntime();
-      if (runtime && runtime.enabled && hasDesktopBridge() && DESK_BRIDGE.installRustDesk) {
-        try {
-          await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] }, provisionalPassword));
-        } catch (_warmError) {}
-      }
-      await refreshDesktopRemoteState();
-      var systemInfo = await getDesktopSystemInfo();
       var remoteDevicePayload = {
-        deviceLabel: 'Рабочее место клиента',
-        remotePassword: (state.desktopRemote && state.desktopRemote.password) ? state.desktopRemote.password : provisionalPassword
+        deviceLabel: '??????? ????? ???????',
+        remotePassword: provisionalPassword
       };
-      if (state.desktopRemote && state.desktopRemote.clientId) remoteDevicePayload.remoteClientId = state.desktopRemote.clientId;
-      if (systemInfo && systemInfo.deviceName) remoteDevicePayload.deviceName = systemInfo.deviceName;
-      if (systemInfo && systemInfo.localIp) remoteDevicePayload.localIp = systemInfo.localIp;
-      if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
-      if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
+      try {
+        var runtime = remoteRuntime();
+        if (runtime && runtime.enabled && hasDesktopBridge() && DESK_BRIDGE.installRustDesk) {
+          try {
+            await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] }, provisionalPassword));
+          } catch (_warmError) {}
+        }
+        await refreshDesktopRemoteState();
+        var systemInfo = await getDesktopSystemInfo();
+        if (state.desktopRemote && state.desktopRemote.password) remoteDevicePayload.remotePassword = state.desktopRemote.password;
+        if (state.desktopRemote && state.desktopRemote.clientId) remoteDevicePayload.remoteClientId = state.desktopRemote.clientId;
+        if (systemInfo && systemInfo.deviceName) remoteDevicePayload.deviceName = systemInfo.deviceName;
+        if (systemInfo && systemInfo.localIp) remoteDevicePayload.localIp = systemInfo.localIp;
+        if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
+        if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
+      } catch (_remoteBootstrapError) {}
       var data = await api('/api/tickets', {
         method: 'POST',
         body: JSON.stringify({
@@ -1247,7 +1250,7 @@
         } catch (_ignoreSelectionError) {}
       }
     } catch (error) {
-      showError('deskModalError', formatDeskError(error, 'Не удалось создать тикет.'));
+      showError('deskModalError', formatDeskError(error, '?? ??????? ??????? ?????.'));
     }
   }
 
