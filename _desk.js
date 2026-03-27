@@ -1235,12 +1235,19 @@
       state.mode = 'tickets';
       renderList();
       await selectTicket(data.ticket.id);
-      await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
-      await fetchTickets();
-      await selectTicket(data.ticket.id, true);
-      await ensureRemoteSupportReady({ createSession: false, force: true });
+      try {
+        await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
+        await fetchTickets();
+        await selectTicket(data.ticket.id, true);
+        await ensureRemoteSupportReady({ createSession: false, force: true });
+      } catch (_postCreateSyncError) {
+        try {
+          await fetchTickets();
+          await selectTicket(data.ticket.id, true);
+        } catch (_ignoreSelectionError) {}
+      }
     } catch (error) {
-      showError('deskModalError', error.message);
+      showError('deskModalError', formatDeskError(error, 'Не удалось создать тикет.'));
     }
   }
 
