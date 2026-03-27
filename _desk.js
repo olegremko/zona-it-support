@@ -20,6 +20,7 @@
     lastConversationSignatures: {},
     remotePasswords: {},
     remotePreparedTickets: {},
+    remoteRuntimeDefault: null,
     desktopRemote: {
       installed: false,
       clientId: '',
@@ -232,8 +233,10 @@
     return state.token ? { Authorization: 'Bearer ' + state.token } : {};
   }
 
-  function remoteRuntime() {
-    return state.selectedTicket && state.selectedTicket.remote_runtime ? state.selectedTicket.remote_runtime : null;
+  function remoteRuntime(ticket) {
+    if (ticket && ticket.remote_runtime) return ticket.remote_runtime;
+    if (state.selectedTicket && state.selectedTicket.remote_runtime) return state.selectedTicket.remote_runtime;
+    return state.remoteRuntimeDefault || null;
   }
 
   function randomRemotePassword() {
@@ -251,13 +254,13 @@
     return generated;
   }
 
-  function remoteOptionsForTicket(ticket) {
-    var runtime = ticket && ticket.remote_runtime ? ticket.remote_runtime : remoteRuntime();
+  function remoteOptionsForTicket(ticket, passwordOverride) {
+    var runtime = remoteRuntime(ticket);
     return {
       host: runtime && runtime.server_host ? runtime.server_host : '',
       key: runtime && runtime.server_key ? runtime.server_key : '',
       configString: runtime && runtime.server_config ? runtime.server_config : '',
-      password: ticketRemotePassword(ticket || state.selectedTicket)
+      password: passwordOverride || ticketRemotePassword(ticket || state.selectedTicket)
     };
   }
 
@@ -328,7 +331,7 @@
   async function warmRemoteRuntime(ticket) {
     if (!hasDesktopBridge() || canManageRemoteDesk() || !DESK_BRIDGE.installRustDesk) return;
     var runtimeSource = ticket || state.selectedTicket;
-    var runtime = runtimeSource && runtimeSource.remote_runtime ? runtimeSource.remote_runtime : remoteRuntime();
+    var runtime = remoteRuntime(runtimeSource);
     if (!runtime || !runtime.enabled || state.desktopRemote.busy) return;
     try {
       await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket(runtimeSource || state.selectedTicket));
@@ -346,11 +349,11 @@
     }
   }
 
-  async function syncCurrentDeviceInfo(remotePassword) {
-    if (!state.selectedTicketId) return;
+  async function syncDeviceInfoForTicket(ticketId, ticket, remotePassword) {
+    if (!ticketId) return;
     var systemInfo = await getDesktopSystemInfo();
     var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
-    var password = remotePassword || state.desktopRemote.password || ticketRemotePassword(state.selectedTicket);
+    var password = remotePassword || state.desktopRemote.password || ticketRemotePassword(ticket || state.selectedTicket);
     if (!systemInfo && !localClientId && !password) return;
     var payload = {
       deviceLabel: 'Рабочее место клиента',
@@ -361,10 +364,15 @@
       gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
     };
     if (password) payload.remotePassword = password;
-    await api('/api/tickets/' + encodeURIComponent(state.selectedTicketId) + '/remote-device', {
+    await api('/api/tickets/' + encodeURIComponent(ticketId) + '/remote-device', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
+  }
+
+  async function syncCurrentDeviceInfo(remotePassword) {
+    if (!state.selectedTicketId) return;
+    await syncDeviceInfoForTicket(state.selectedTicketId, state.selectedTicket, remotePassword);
   }
 
   async function api(path, options) {
@@ -1065,6 +1073,8 @@
     });
     var data = await api('/api/tickets');
     state.tickets = data.tickets || [];
+    var runtimeTicket = state.tickets.find(function (ticket) { return !!ticket.remote_runtime; });
+    state.remoteRuntimeDefault = runtimeTicket && runtimeTicket.remote_runtime ? runtimeTicket.remote_runtime : state.remoteRuntimeDefault;
     state.tickets.forEach(function (ticket) {
       var signature = ticketMessageSignature(ticket);
       var prevSignature = previous[ticket.id] || state.lastTicketSignatures[ticket.id];
@@ -1190,22 +1200,42 @@
     var priority = $('deskTicketPriority').value;
     if (subject.length < 3 || description.length < 3) return showError('deskModalError', '????????? ???? ? ?????? ?????????.');
     try {
-      await warmRemoteRuntime();
+      var provisionalPassword = randomRemotePassword();
+      var runtime = remoteRuntime();
+      if (runtime && runtime.enabled && hasDesktopBridge() && DESK_BRIDGE.installRustDesk) {
+        try {
+          await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] }, provisionalPassword));
+        } catch (_warmError) {}
+      }
+      await refreshDesktopRemoteState();
+      var systemInfo = await getDesktopSystemInfo();
+      var remoteDevicePayload = {
+        deviceLabel: 'Рабочее место клиента',
+        remotePassword: (state.desktopRemote && state.desktopRemote.password) ? state.desktopRemote.password : provisionalPassword
+      };
+      if (state.desktopRemote && state.desktopRemote.clientId) remoteDevicePayload.remoteClientId = state.desktopRemote.clientId;
+      if (systemInfo && systemInfo.deviceName) remoteDevicePayload.deviceName = systemInfo.deviceName;
+      if (systemInfo && systemInfo.localIp) remoteDevicePayload.localIp = systemInfo.localIp;
+      if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
+      if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
       var data = await api('/api/tickets', {
         method: 'POST',
         body: JSON.stringify({
           subject: subject,
           description: description,
           priority: priority,
-          category: 'Desktop Desk'
+          category: 'Desktop Desk',
+          remoteDevice: remoteDevicePayload
         })
       });
+      state.remotePasswords[data.ticket.id] = remoteDevicePayload.remotePassword;
+      saveSession();
       closeModal();
       await fetchTickets();
       state.mode = 'tickets';
       renderList();
       await selectTicket(data.ticket.id);
-      await syncCurrentDeviceInfo(ticketRemotePassword(state.selectedTicket));
+      await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
       await fetchTickets();
       await selectTicket(data.ticket.id, true);
       await ensureRemoteSupportReady({ createSession: false, force: true });

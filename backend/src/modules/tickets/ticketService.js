@@ -529,6 +529,17 @@ export async function createTicket(context, input) {
     );
   });
 
+  if (input.remoteDevice && Object.keys(input.remoteDevice).length > 0) {
+    await upsertRemoteDevice({
+      id: ticketId,
+      company_id: context.company_id,
+      created_by_user_id: context.id
+    }, context, {
+      ...input.remoteDevice,
+      accessMode: 'interactive'
+    }, now);
+  }
+
   await addSystemTicketEvent(ticketId, context.id, 'Тикет создан', now);
 
   return await getTicketById(ticketId, context);

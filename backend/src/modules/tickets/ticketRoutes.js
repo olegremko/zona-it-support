@@ -26,7 +26,16 @@ const createSchema = z.object({
   subject: z.string().min(3),
   description: z.string().min(3),
   category: z.string().optional().nullable(),
-  priority: z.enum(['low', 'normal', 'high', 'critical']).default('normal')
+  priority: z.enum(['low', 'normal', 'high', 'critical']).default('normal'),
+  remoteDevice: z.object({
+    deviceLabel: z.string().min(1).max(120).optional(),
+    remoteClientId: z.string().min(1).max(120).optional(),
+    remotePassword: z.string().min(4).max(64).optional(),
+    deviceName: z.string().min(1).max(255).optional(),
+    localIp: z.string().min(1).max(120).optional(),
+    publicIp: z.string().min(1).max(120).optional(),
+    gatewayIp: z.string().min(1).max(120).optional()
+  }).optional()
 });
 
 const messageSchema = z.object({
