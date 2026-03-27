@@ -1221,16 +1221,32 @@
         if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
         if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
       } catch (_remoteBootstrapError) {}
-      var data = await api('/api/tickets', {
-        method: 'POST',
-        body: JSON.stringify({
-          subject: subject,
-          description: description,
-          priority: priority,
-          category: 'Desktop Desk',
-          remoteDevice: remoteDevicePayload
-        })
-      });
+      var requestPayload = {
+        subject: subject,
+        description: description,
+        priority: priority,
+        category: 'Desktop Desk',
+        remoteDevice: remoteDevicePayload
+      };
+      var data;
+      try {
+        data = await api('/api/tickets', {
+          method: 'POST',
+          body: JSON.stringify(requestPayload)
+        });
+      } catch (createError) {
+        var createMessage = formatDeskError(createError, '');
+        if (!/validation/i.test(createMessage)) throw createError;
+        data = await api('/api/tickets', {
+          method: 'POST',
+          body: JSON.stringify({
+            subject: subject,
+            description: description,
+            priority: priority,
+            category: 'Desktop Desk'
+          })
+        });
+      }
       state.remotePasswords[data.ticket.id] = remoteDevicePayload.remotePassword;
       saveSession();
       closeModal();
