@@ -723,6 +723,34 @@ export async function createRemoteSession(ticketId, context, input) {
   const status = accessMode === 'unattended' ? 'ready' : 'requested';
   const joinCode = input.joinCode?.trim() || generateJoinCode();
   const remoteClientId = input.remoteClientId?.trim() || null;
+  const sessionParams = env.dbClient === 'postgres'
+    ? [
+        sessionId,
+        ticket.id,
+        ticket.company_id,
+        deviceId,
+        context.id,
+        canManageRemote(context) ? context.id : null,
+        accessMode,
+        status,
+        joinCode,
+        remoteClientId,
+        now
+      ]
+    : [
+        sessionId,
+        ticket.id,
+        ticket.company_id,
+        deviceId,
+        context.id,
+        canManageRemote(context) ? context.id : null,
+        accessMode,
+        status,
+        joinCode,
+        remoteClientId,
+        now,
+        now
+      ];
 
   await execute(
     sql(
@@ -731,7 +759,7 @@ export async function createRemoteSession(ticketId, context, input) {
           id, ticket_id, company_id, device_id, requested_by_user_id, engineer_user_id,
           access_mode, status, join_code, remote_client_id, created_at, updated_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11)
       `,
       `
         INSERT INTO remote_sessions (
@@ -741,20 +769,7 @@ export async function createRemoteSession(ticketId, context, input) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `
     ),
-    [
-      sessionId,
-      ticket.id,
-      ticket.company_id,
-      deviceId,
-      context.id,
-      canManageRemote(context) ? context.id : null,
-      accessMode,
-      status,
-      joinCode,
-      remoteClientId,
-      now,
-      now
-    ]
+    sessionParams
   );
 
   if (accessMode === 'unattended') {
