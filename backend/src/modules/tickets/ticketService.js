@@ -235,6 +235,9 @@ async function upsertRemoteDevice(ticket, context, input, createdAt) {
   }
 
   if (existing) {
+    const updateParams = env.dbClient === 'postgres'
+      ? [label, remoteClientId, remotePassword, deviceName, localIp, publicIp, gatewayIp, input.accessMode === 'unattended', createdAt, createdAt, existing.id]
+      : [label, remoteClientId, remotePassword, deviceName, localIp, publicIp, gatewayIp, input.accessMode === 'unattended', remotePassword, createdAt, createdAt, existing.id];
     await execute(
       sql(
         `
@@ -268,7 +271,7 @@ async function upsertRemoteDevice(ticket, context, input, createdAt) {
           WHERE id = ?
         `
       ),
-      [label, remoteClientId, remotePassword, deviceName, localIp, publicIp, gatewayIp, input.accessMode === 'unattended', remotePassword, createdAt, createdAt, existing.id]
+      updateParams
     );
     return existing.id;
   }
