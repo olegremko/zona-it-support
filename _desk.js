@@ -654,18 +654,24 @@
 
     var ticketId = state.selectedTicketId;
     var remoteOptions = remoteOptionsForTicket(state.selectedTicket);
-    try {
-      var lastPreparedAt = Number(state.remotePreparedTickets[ticketId] || 0);
-      var preparedRecently = lastPreparedAt && (Date.now() - lastPreparedAt) < 300000;
-      var shouldPrepareRuntime = !!settings.force || !!settings.createSession || (!state.desktopRemote.installed && !preparedRecently) || !state.remotePreparedTickets[ticketId];
-      if (shouldPrepareRuntime) {
-        await DESK_BRIDGE.installRustDesk(remoteOptions);
-      }
-      await refreshDesktopRemoteState();
-      await syncCurrentDeviceInfo(remoteOptions.password);
-      state.remotePreparedTickets[ticketId] = Date.now();
-      await fetchTickets();
-      await selectTicket(ticketId, true);
+      try {
+        var lastPreparedAt = Number(state.remotePreparedTickets[ticketId] || 0);
+        var preparedRecently = lastPreparedAt && (Date.now() - lastPreparedAt) < 300000;
+        var shouldPrepareRuntime = !!settings.force || !!settings.createSession || (!state.desktopRemote.installed && !preparedRecently) || !state.remotePreparedTickets[ticketId];
+        if (shouldPrepareRuntime) {
+          try {
+            await DESK_BRIDGE.installRustDesk(remoteOptions);
+          } catch (_installRuntimeError) {}
+        }
+        try {
+          await refreshDesktopRemoteState();
+        } catch (_refreshRuntimeError) {}
+        try {
+          await syncCurrentDeviceInfo(remoteOptions.password);
+        } catch (_syncDeviceInfoError) {}
+        state.remotePreparedTickets[ticketId] = Date.now();
+        await fetchTickets();
+        await selectTicket(ticketId, true);
 
       if (settings.createSession && !latestRemoteSession()) {
         var systemInfo = await getDesktopSystemInfo();

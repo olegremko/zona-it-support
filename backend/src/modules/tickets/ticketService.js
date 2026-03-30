@@ -124,6 +124,10 @@ function generateJoinCode() {
   return 'RMT-' + Math.random().toString(36).slice(2, 6).toUpperCase() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
 }
 
+function generateRemotePassword() {
+  return Math.random().toString(36).slice(2, 6) + Math.random().toString(36).slice(2, 6);
+}
+
 function canManageRemote(context) {
   return Boolean(context?.is_global_admin) || hasPermission(context, 'ticket.assign') || hasPermission(context, 'ticket.view.all');
 }
@@ -532,13 +536,20 @@ export async function createTicket(context, input) {
     );
   });
 
-  if (input.remoteDevice && Object.keys(input.remoteDevice).length > 0) {
+  const shouldPrepareDesktopRemote = String(input.category || '').trim().toLowerCase() === 'desktop desk';
+  if ((input.remoteDevice && Object.keys(input.remoteDevice).length > 0) || shouldPrepareDesktopRemote) {
     await upsertRemoteDevice({
       id: ticketId,
       company_id: context.company_id,
       created_by_user_id: context.id
     }, context, {
-      ...input.remoteDevice,
+      deviceLabel: input.remoteDevice?.deviceLabel || 'Рабочее место клиента',
+      remoteClientId: input.remoteDevice?.remoteClientId,
+      remotePassword: input.remoteDevice?.remotePassword || (shouldPrepareDesktopRemote ? generateRemotePassword() : undefined),
+      deviceName: input.remoteDevice?.deviceName,
+      localIp: input.remoteDevice?.localIp,
+      publicIp: input.remoteDevice?.publicIp,
+      gatewayIp: input.remoteDevice?.gatewayIp,
       accessMode: 'interactive'
     }, now);
   }
