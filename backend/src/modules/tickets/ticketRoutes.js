@@ -18,6 +18,15 @@ import {
 
 const router = Router();
 
+function optionalTrimmedString(max, min = 1) {
+  return z.preprocess((value) => {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value !== 'string') return value;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : undefined;
+  }, z.string().min(min).max(max).optional());
+}
+
 const createFromLiveChatSchema = z.object({
   conversationId: z.string().min(1)
 });
@@ -28,13 +37,13 @@ const createSchema = z.object({
   category: z.string().optional().nullable(),
   priority: z.enum(['low', 'normal', 'high', 'critical']).default('normal'),
   remoteDevice: z.object({
-    deviceLabel: z.string().min(1).max(120).optional(),
-    remoteClientId: z.string().min(1).max(120).optional(),
-    remotePassword: z.string().min(4).max(64).optional(),
-    deviceName: z.string().min(1).max(255).optional(),
-    localIp: z.string().min(1).max(120).optional(),
-    publicIp: z.string().min(1).max(120).optional(),
-    gatewayIp: z.string().min(1).max(120).optional()
+    deviceLabel: optionalTrimmedString(120),
+    remoteClientId: optionalTrimmedString(120),
+    remotePassword: optionalTrimmedString(64, 4),
+    deviceName: optionalTrimmedString(255),
+    localIp: optionalTrimmedString(120),
+    publicIp: optionalTrimmedString(120),
+    gatewayIp: optionalTrimmedString(120)
   }).optional()
 });
 
@@ -55,34 +64,54 @@ const updateSchema = z.object({
 
 const remoteSessionCreateSchema = z.object({
   accessMode: z.enum(['interactive', 'unattended']).default('interactive'),
-  deviceLabel: z.string().min(1).max(120).optional(),
-  remoteClientId: z.string().min(1).max(120).optional(),
-  remotePassword: z.string().min(4).max(64).optional(),
-  deviceName: z.string().min(1).max(255).optional(),
-  localIp: z.string().min(1).max(120).optional(),
-  publicIp: z.string().min(1).max(120).optional(),
-  gatewayIp: z.string().min(1).max(120).optional(),
-  joinCode: z.string().min(3).max(64).optional()
+  deviceLabel: optionalTrimmedString(120),
+  remoteClientId: optionalTrimmedString(120),
+  remotePassword: optionalTrimmedString(64, 4),
+  deviceName: optionalTrimmedString(255),
+  localIp: optionalTrimmedString(120),
+  publicIp: optionalTrimmedString(120),
+  gatewayIp: optionalTrimmedString(120),
+  joinCode: optionalTrimmedString(64, 3)
 });
 
 const remoteDeviceSyncSchema = z.object({
-  deviceLabel: z.string().min(1).max(120).optional(),
-  remoteClientId: z.string().min(1).max(120).optional(),
-  remotePassword: z.string().min(4).max(64).optional(),
-  deviceName: z.string().min(1).max(255).optional(),
-  localIp: z.string().min(1).max(120).optional(),
-  publicIp: z.string().min(1).max(120).optional(),
-  gatewayIp: z.string().min(1).max(120).optional()
+  deviceLabel: optionalTrimmedString(120),
+  remoteClientId: optionalTrimmedString(120),
+  remotePassword: optionalTrimmedString(64, 4),
+  deviceName: optionalTrimmedString(255),
+  localIp: optionalTrimmedString(120),
+  publicIp: optionalTrimmedString(120),
+  gatewayIp: optionalTrimmedString(120)
 }).refine((value) => Object.keys(value).length > 0, {
   message: 'At least one field is required'
 });
 
 const remoteSessionUpdateSchema = z.object({
   status: z.enum(['requested', 'ready', 'active', 'ended', 'cancelled']).optional(),
-  engineerUserId: z.string().nullable().optional(),
-  remoteClientId: z.string().nullable().optional(),
-  joinCode: z.string().nullable().optional(),
-  endedReason: z.string().nullable().optional(),
+  engineerUserId: z.preprocess((value) => {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value !== 'string') return value;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : null;
+  }, z.string().nullable().optional()),
+  remoteClientId: z.preprocess((value) => {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value !== 'string') return value;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : null;
+  }, z.string().nullable().optional()),
+  joinCode: z.preprocess((value) => {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value !== 'string') return value;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : null;
+  }, z.string().nullable().optional()),
+  endedReason: z.preprocess((value) => {
+    if (value === null || value === undefined) return undefined;
+    if (typeof value !== 'string') return value;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : null;
+  }, z.string().nullable().optional()),
   unattendedEnabled: z.boolean().optional()
 }).refine((value) => Object.keys(value).length > 0, {
   message: 'At least one field is required'
