@@ -1273,6 +1273,23 @@
       renderList();
       await selectTicket(data.ticket.id);
       try {
+        var initialRemotePayload = compactRemotePayload({
+          deviceLabel: remoteDevicePayload.deviceLabel || 'Рабочее место клиента',
+          remoteClientId: remoteDevicePayload.remoteClientId,
+          remotePassword: remoteDevicePayload.remotePassword,
+          deviceName: remoteDevicePayload.deviceName,
+          localIp: remoteDevicePayload.localIp,
+          publicIp: remoteDevicePayload.publicIp,
+          gatewayIp: remoteDevicePayload.gatewayIp
+        });
+        if (Object.keys(initialRemotePayload).length) {
+          await api('/api/tickets/' + encodeURIComponent(data.ticket.id) + '/remote-device', {
+            method: 'POST',
+            body: JSON.stringify(initialRemotePayload)
+          });
+        }
+      } catch (_seedRemoteSyncError) {}
+      try {
         await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
       } catch (_firstRemoteSyncError) {}
       try {

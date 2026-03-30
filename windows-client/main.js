@@ -6,7 +6,7 @@ const https = require('https');
 const { execFile, spawn } = require('child_process');
 
 const APP_MODEL_ID = 'ZonaITDesk';
-const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.41';
+const DESK_URL = process.env.ZONA_IT_DESK_URL || 'https://i-zone.pro/desk?v=0.1.42';
 app.setName('Zona IT Desk');
 app.setAppUserModelId(APP_MODEL_ID);
 app.commandLine.appendSwitch('disable-http-cache');
