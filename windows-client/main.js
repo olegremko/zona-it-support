@@ -152,17 +152,19 @@ function sleep(ms) {
   });
 }
 
-async function startRustDeskProcess(executable, args) {
+async function startRustDeskProcess(executable, args, options) {
   var launchArgs = Array.isArray(args) ? args : [];
+  var settings = options || {};
+  var showWindow = !!settings.showWindow;
   var lastError = null;
 
   for (var attempt = 0; attempt < 4; attempt += 1) {
     try {
-      var child = spawn(executable, launchArgs, {
-        detached: true,
-        stdio: 'ignore',
-        windowsHide: false
-      });
+        var child = spawn(executable, launchArgs, {
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: !showWindow
+        });
       child.unref();
       return { launched: true };
     } catch (error) {
@@ -180,7 +182,7 @@ async function startRustDeskProcess(executable, args) {
       '-NoProfile',
       '-ExecutionPolicy', 'Bypass',
       '-Command',
-      "Start-Process -FilePath '" + String(executable).replace(/'/g, "''") + "' -ArgumentList " + argumentLiteral
+      "Start-Process -WindowStyle " + (showWindow ? 'Normal' : 'Hidden') + " -FilePath '" + String(executable).replace(/'/g, "''") + "' -ArgumentList " + argumentLiteral
     ], { windowsHide: true });
     return { launched: true, fallback: 'powershell' };
   } catch (fallbackError) {
@@ -195,7 +197,7 @@ async function startRustDeskProcess(executable, args) {
     var cmdChild = spawn('cmd.exe', ['/d', '/s', '/c', 'start "" ' + escapedPath + (escapedArgs ? ' ' + escapedArgs : '')], {
       detached: true,
       stdio: 'ignore',
-      windowsHide: true
+      windowsHide: !showWindow
     });
     cmdChild.unref();
     return { launched: true, fallback: 'cmd' };
@@ -405,7 +407,7 @@ async function launchRustDesk(options) {
   if (options && options.peerId) {
     launchArgs.push(String(options.peerId));
   }
-  await startRustDeskProcess(executable, launchArgs);
+  await startRustDeskProcess(executable, launchArgs, { showWindow: true });
   return { launched: true, installed: true };
 }
 
@@ -425,17 +427,24 @@ async function installRustDesk(options) {
 
     const configResult = await applyRustDeskConfig(executable, options);
     const passwordResult = await applyRustDeskPassword(executable, options);
+    try {
+      await startRustDeskProcess(executable, [], { showWindow: false });
+      await sleep(2400);
+    } catch (_runtimeStartError) {}
+    const status = await getRustDeskStatus();
     return {
       started: true,
       installed: true,
       executable: executable,
-      managed: false,
+      managed: !!status.managed,
       serviceInstalled: false,
       serviceError: null,
       configured: !!configResult.applied,
       configError: configResult.error || null,
       passwordApplied: !!passwordResult.applied,
-      passwordError: passwordResult.error || null
+      passwordError: passwordResult.error || null,
+      clientId: status.clientId || '',
+      password: status.password || (options && options.password ? String(options.password).trim() : '')
     };
   } catch (error) {
     return { started: false, installed: false, error: error.message };

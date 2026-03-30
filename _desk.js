@@ -20,6 +20,7 @@
     lastConversationSignatures: {},
     remotePasswords: {},
     remotePreparedTickets: {},
+    remotePreparingTickets: {},
     remoteRuntimeDefault: null,
     desktopRemote: {
       installed: false,
@@ -354,6 +355,10 @@
       await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket(runtimeSource || state.selectedTicket));
     } catch (error) {}
     await refreshDesktopRemoteState();
+    if (state.desktopRemote.installed && !state.desktopRemote.clientId) {
+      await sleep(2200);
+      await refreshDesktopRemoteState();
+    }
   }
 
   async function getDesktopSystemInfo() {
@@ -653,7 +658,9 @@
     if (state.desktopRemote.busy && !settings.force) return;
 
     var ticketId = state.selectedTicketId;
+    if (state.remotePreparingTickets[ticketId] && !settings.force) return;
     var remoteOptions = remoteOptionsForTicket(state.selectedTicket);
+      state.remotePreparingTickets[ticketId] = true;
       try {
         var lastPreparedAt = Number(state.remotePreparedTickets[ticketId] || 0);
         var preparedRecently = lastPreparedAt && (Date.now() - lastPreparedAt) < 300000;
@@ -671,7 +678,9 @@
         } catch (_syncDeviceInfoError) {}
         state.remotePreparedTickets[ticketId] = Date.now();
         await fetchTickets();
-        await selectTicket(ticketId, true);
+        if (String(state.selectedTicketId || '') === String(ticketId)) {
+          await selectTicket(ticketId, true);
+        }
 
       if (settings.createSession && !latestRemoteSession()) {
         var systemInfo = await getDesktopSystemInfo();
@@ -691,7 +700,9 @@
           body: JSON.stringify(sessionPayload)
         });
         await fetchTickets();
-        await selectTicket(ticketId, true);
+        if (String(state.selectedTicketId || '') === String(ticketId)) {
+          await selectTicket(ticketId, true);
+        }
       }
         var currentDevice = latestRemoteDevice();
         if (remoteDeviceNeedsSync(currentDevice)) {
@@ -699,10 +710,14 @@
           await refreshDesktopRemoteState();
           await syncCurrentDeviceInfo(remoteOptions.password);
           await fetchTickets();
-          await selectTicket(ticketId, true);
+          if (String(state.selectedTicketId || '') === String(ticketId)) {
+            await selectTicket(ticketId, true);
+          }
         }
       } catch (error) {
         if (!settings.background) throw error;
+      } finally {
+        delete state.remotePreparingTickets[ticketId];
       }
     }
 
