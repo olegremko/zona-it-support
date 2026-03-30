@@ -633,6 +633,18 @@
     return state.selectedTicket.remote_devices[0];
   }
 
+  function remoteDeviceNeedsSync(device) {
+    if (!device) return true;
+    return !(
+      device.remote_client_id &&
+      device.remote_password &&
+      device.device_name &&
+      device.local_ip &&
+      device.public_ip &&
+      device.gateway_ip
+    );
+  }
+
   async function ensureRemoteSupportReady(options) {
     var settings = options || {};
     if (!hasDesktopBridge() || canManageRemoteDesk() || !state.selectedTicketId || !state.selectedTicket) return;
@@ -675,17 +687,18 @@
         await fetchTickets();
         await selectTicket(ticketId, true);
       }
-      if (!latestRemoteDevice() && !settings.background) {
-        await sleep(1200);
-        await refreshDesktopRemoteState();
-        await syncCurrentDeviceInfo(remoteOptions.password);
-        await fetchTickets();
-        await selectTicket(ticketId, true);
+        var currentDevice = latestRemoteDevice();
+        if (remoteDeviceNeedsSync(currentDevice)) {
+          await sleep(settings.background ? 1600 : 1200);
+          await refreshDesktopRemoteState();
+          await syncCurrentDeviceInfo(remoteOptions.password);
+          await fetchTickets();
+          await selectTicket(ticketId, true);
+        }
+      } catch (error) {
+        if (!settings.background) throw error;
       }
-    } catch (error) {
-      if (!settings.background) throw error;
     }
-  }
 
   function syncQuickStatusPanel() {
     var wrap = $('deskQuickStatusWrap');
@@ -1142,6 +1155,9 @@
       state.selectedTicketUnreadCount = Number(state.unreadTickets[ticketId] || 0);
       markTicketRead(ticketId);
       renderSelectedTicket();
+      if (!canManageRemoteDesk() && remoteRuntime(state.selectedTicket) && remoteRuntime(state.selectedTicket).enabled && remoteDeviceNeedsSync(latestRemoteDevice())) {
+        ensureRemoteSupportReady({ createSession: false, background: true }).catch(function () {});
+      }
     } catch (error) {
       if (!silent) {
         state.selectedTicket = null;
@@ -1466,6 +1482,9 @@
     renderList();
     if (state.mode === 'tickets' && state.tickets.length) {
       await selectTicket(state.selectedTicketId || state.tickets[0].id, true);
+      if (!canManageRemoteDesk() && state.selectedTicket && remoteRuntime(state.selectedTicket) && remoteRuntime(state.selectedTicket).enabled && remoteDeviceNeedsSync(latestRemoteDevice())) {
+        ensureRemoteSupportReady({ createSession: false, background: true, force: true }).catch(function () {});
+      }
     } else {
       renderSelectedEntity();
     }
