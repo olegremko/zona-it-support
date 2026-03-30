@@ -1267,6 +1267,23 @@
       }
       state.remotePasswords[data.ticket.id] = remoteDevicePayload.remotePassword;
       saveSession();
+      try {
+        var immediateRemotePayload = compactRemotePayload({
+          deviceLabel: remoteDevicePayload.deviceLabel || 'Рабочее место клиента',
+          remoteClientId: remoteDevicePayload.remoteClientId,
+          remotePassword: remoteDevicePayload.remotePassword,
+          deviceName: remoteDevicePayload.deviceName,
+          localIp: remoteDevicePayload.localIp,
+          publicIp: remoteDevicePayload.publicIp,
+          gatewayIp: remoteDevicePayload.gatewayIp
+        });
+        if (Object.keys(immediateRemotePayload).length) {
+          await api('/api/tickets/' + encodeURIComponent(data.ticket.id) + '/remote-device', {
+            method: 'POST',
+            body: JSON.stringify(immediateRemotePayload)
+          });
+        }
+      } catch (_immediateRemoteSeedError) {}
       closeModal();
       await fetchTickets();
       state.mode = 'tickets';
