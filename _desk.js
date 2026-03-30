@@ -264,6 +264,23 @@
     };
   }
 
+  function compactRemotePayload(payload) {
+    var source = payload || {};
+    var result = {};
+    Object.keys(source).forEach(function (key) {
+      var value = source[key];
+      if (value === undefined || value === null) return;
+      if (typeof value === 'string') {
+        var trimmed = value.trim();
+        if (!trimmed) return;
+        result[key] = trimmed;
+        return;
+      }
+      result[key] = value;
+    });
+    return result;
+  }
+
   function hasDesktopBridge() {
     return !!(IS_DESKTOP_RUNTIME && DESK_BRIDGE);
   }
@@ -1221,13 +1238,14 @@
         if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
         if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
       } catch (_remoteBootstrapError) {}
+      remoteDevicePayload = compactRemotePayload(remoteDevicePayload);
       var requestPayload = {
         subject: subject,
         description: description,
         priority: priority,
-        category: 'Desktop Desk',
-        remoteDevice: remoteDevicePayload
+        category: 'Desktop Desk'
       };
+      if (Object.keys(remoteDevicePayload).length) requestPayload.remoteDevice = remoteDevicePayload;
       var data;
       try {
         data = await api('/api/tickets', {
@@ -1256,10 +1274,17 @@
       await selectTicket(data.ticket.id);
       try {
         await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
+      } catch (_firstRemoteSyncError) {}
+      try {
+        await sleep(1200);
+        await refreshDesktopRemoteState();
+        await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
+      } catch (_secondRemoteSyncError) {}
+      try {
         await fetchTickets();
         await selectTicket(data.ticket.id, true);
         await ensureRemoteSupportReady({ createSession: false, force: true });
-      } catch (_postCreateSyncError) {
+        } catch (_postCreateSyncError) {
         try {
           await fetchTickets();
           await selectTicket(data.ticket.id, true);
