@@ -22,6 +22,11 @@
     remotePreparedTickets: {},
     remotePreparingTickets: {},
     remoteRuntimeDefault: null,
+    remoteSnapshot: {
+      clientId: '',
+      password: '',
+      systemInfo: null
+    },
     desktopRemote: {
       installed: false,
       clientId: '',
@@ -35,6 +40,7 @@
   var UNREAD_TICKETS_KEY = 'zit_desk_unread_tickets';
   var UNREAD_CONVERSATIONS_KEY = 'zit_desk_unread_conversations';
   var REMOTE_PASSWORDS_KEY = 'zit_desk_remote_passwords';
+  var REMOTE_SNAPSHOT_KEY = 'zit_desk_remote_snapshot';
   var IS_DESKTOP_RUNTIME = !!(window.zonaDeskEnv && window.zonaDeskEnv.platform === 'windows-electron');
   var DESK_BRIDGE = window.zonaDeskBridge || null;
   var utf8Decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { fatal: false }) : null;
@@ -284,6 +290,61 @@
     return !!(IS_DESKTOP_RUNTIME && DESK_BRIDGE);
   }
 
+  function rememberRemoteSnapshot(partial) {
+    var source = partial || {};
+    var currentInfo = state.remoteSnapshot && state.remoteSnapshot.systemInfo ? state.remoteSnapshot.systemInfo : null;
+    var nextInfo = source.systemInfo ? {
+      deviceName: String(source.systemInfo.deviceName || '').trim(),
+      localIp: String(source.systemInfo.localIp || '').trim(),
+      publicIp: String(source.systemInfo.publicIp || '').trim(),
+      gatewayIp: String(source.systemInfo.gatewayIp || '').trim()
+    } : currentInfo;
+    state.remoteSnapshot = {
+      clientId: String(source.clientId || state.remoteSnapshot.clientId || '').trim(),
+      password: String(source.password || state.remoteSnapshot.password || '').trim(),
+      systemInfo: nextInfo
+    };
+    if (state.remoteSnapshot.clientId) state.desktopRemote.clientId = state.remoteSnapshot.clientId;
+    if (state.remoteSnapshot.password) state.desktopRemote.password = state.remoteSnapshot.password;
+    saveSession();
+    return state.remoteSnapshot;
+  }
+
+  function effectiveRemoteSnapshot() {
+    return {
+      clientId: String(state.desktopRemote.clientId || state.remoteSnapshot.clientId || '').trim(),
+      password: String(state.desktopRemote.password || state.remoteSnapshot.password || '').trim(),
+      systemInfo: state.remoteSnapshot.systemInfo || null
+    };
+  }
+
+  async function fetchRemoteRuntimeDefault() {
+    try {
+      var data = await api('/api/tickets/runtime', { method: 'GET' });
+      if (data && data.remoteRuntime) state.remoteRuntimeDefault = data.remoteRuntime;
+      return state.remoteRuntimeDefault;
+    } catch (_error) {
+      return state.remoteRuntimeDefault;
+    }
+  }
+
+  async function bootstrapDesktopRemoteSnapshot(force) {
+    if (!hasDesktopBridge() || canManageRemoteDesk()) return effectiveRemoteSnapshot();
+    var runtime = state.remoteRuntimeDefault || await fetchRemoteRuntimeDefault();
+    if (!runtime || !runtime.enabled) return effectiveRemoteSnapshot();
+    if (state.desktopRemote.busy && !force) return effectiveRemoteSnapshot();
+    try {
+      var prepared = await prepareDesktopRemoteForTicket({ id: 'desktop-runtime', remote_runtime: runtime, remote_devices: [] });
+      rememberRemoteSnapshot({
+        clientId: prepared && prepared.clientId ? prepared.clientId : '',
+        password: prepared && prepared.password ? prepared.password : '',
+        systemInfo: prepared && prepared.systemInfo ? prepared.systemInfo : null
+      });
+    } catch (_error) {}
+    try { await refreshDesktopRemoteState(); } catch (_error) {}
+    return effectiveRemoteSnapshot();
+  }
+
   function updateUnreadIndicator() {
     var ticketCount = Object.keys(state.unreadTickets || {}).filter(function (id) { return !!state.unreadTickets[id]; }).length;
     var conversationCount = Object.keys(state.unreadConversations || {}).filter(function (id) { return !!state.unreadConversations[id]; }).length;
@@ -335,10 +396,15 @@
       state.desktopRemote.installed = !!(info && info.installed);
       state.desktopRemote.clientId = info && info.clientId ? String(info.clientId).trim() : '';
       state.desktopRemote.password = info && info.password ? String(info.password).trim() : '';
+      rememberRemoteSnapshot({
+        clientId: state.desktopRemote.clientId,
+        password: state.desktopRemote.password,
+        systemInfo: info && info.systemInfo ? info.systemInfo : null
+      });
     } catch (error) {
       state.desktopRemote.installed = false;
-      state.desktopRemote.clientId = '';
-      state.desktopRemote.password = '';
+      state.desktopRemote.clientId = state.remoteSnapshot.clientId || '';
+      state.desktopRemote.password = state.remoteSnapshot.password || '';
     } finally {
       state.desktopRemote.busy = false;
     }
@@ -360,11 +426,17 @@
       state.desktopRemote.installed = !!(prepared && prepared.installed);
       state.desktopRemote.clientId = prepared && prepared.clientId ? String(prepared.clientId).trim() : '';
       state.desktopRemote.password = prepared && prepared.password ? String(prepared.password).trim() : '';
+      rememberRemoteSnapshot({
+        clientId: state.desktopRemote.clientId,
+        password: state.desktopRemote.password,
+        systemInfo: prepared && prepared.systemInfo ? prepared.systemInfo : null
+      });
+      var snapshot = effectiveRemoteSnapshot();
       return {
         installed: !!state.desktopRemote.installed,
-        clientId: state.desktopRemote.clientId || '',
-        password: state.desktopRemote.password || options.password || '',
-        systemInfo: prepared && prepared.systemInfo ? prepared.systemInfo : null
+        clientId: snapshot.clientId || '',
+        password: snapshot.password || options.password || '',
+        systemInfo: snapshot.systemInfo || (prepared && prepared.systemInfo ? prepared.systemInfo : null)
       };
     }
     if (DESK_BRIDGE.installRustDesk) {
@@ -373,11 +445,12 @@
       } catch (_installFallbackError) {}
     }
     await refreshDesktopRemoteState();
+    var fallbackSnapshot = effectiveRemoteSnapshot();
     return {
       installed: !!state.desktopRemote.installed,
-      clientId: state.desktopRemote.clientId || '',
-      password: state.desktopRemote.password || options.password || '',
-      systemInfo: await getDesktopSystemInfo()
+      clientId: fallbackSnapshot.clientId || '',
+      password: fallbackSnapshot.password || options.password || '',
+      systemInfo: fallbackSnapshot.systemInfo || await getDesktopSystemInfo()
     };
   }
 
@@ -403,13 +476,14 @@
 
   async function syncDeviceInfoForTicket(ticketId, ticket, remotePassword) {
     if (!ticketId) return;
-    var systemInfo = await getDesktopSystemInfo();
-    var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
-    var password = state.desktopRemote.password || remotePassword || ticketRemotePassword(ticket || state.selectedTicket);
+    var snapshot = effectiveRemoteSnapshot();
+    var systemInfo = snapshot.systemInfo || await getDesktopSystemInfo();
+    var localClientId = snapshot.clientId || '';
+    var password = snapshot.password || remotePassword || ticketRemotePassword(ticket || state.selectedTicket);
     if (!systemInfo && !localClientId && !password) return;
     var payload = {
       deviceLabel: 'Рабочее место клиента',
-      remoteClientId: localClientId || '',
+      remoteClientId: localClientId,
       deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
       localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
       publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
@@ -444,6 +518,7 @@
     localStorage.setItem(UNREAD_TICKETS_KEY, JSON.stringify(state.unreadTickets || {}));
     localStorage.setItem(UNREAD_CONVERSATIONS_KEY, JSON.stringify(state.unreadConversations || {}));
     localStorage.setItem(REMOTE_PASSWORDS_KEY, JSON.stringify(state.remotePasswords || {}));
+    localStorage.setItem(REMOTE_SNAPSHOT_KEY, JSON.stringify(state.remoteSnapshot || { clientId: '', password: '', systemInfo: null }));
   }
 
   function restoreSession() {
@@ -452,6 +527,7 @@
     try { state.unreadTickets = JSON.parse(localStorage.getItem(UNREAD_TICKETS_KEY) || '{}') || {}; } catch (error) { state.unreadTickets = {}; }
     try { state.unreadConversations = JSON.parse(localStorage.getItem(UNREAD_CONVERSATIONS_KEY) || '{}') || {}; } catch (error) { state.unreadConversations = {}; }
     try { state.remotePasswords = JSON.parse(localStorage.getItem(REMOTE_PASSWORDS_KEY) || '{}') || {}; } catch (error) { state.remotePasswords = {}; }
+    try { state.remoteSnapshot = JSON.parse(localStorage.getItem(REMOTE_SNAPSHOT_KEY) || '{"clientId":"","password":"","systemInfo":null}') || { clientId: '', password: '', systemInfo: null }; } catch (error) { state.remoteSnapshot = { clientId: '', password: '', systemInfo: null }; }
   }
 
   function clearSession() {
@@ -474,11 +550,13 @@
     state.lastConversationSignatures = {};
     state.remotePasswords = {};
     state.remotePreparedTickets = {};
+    state.remoteSnapshot = { clientId: '', password: '', systemInfo: null };
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(UNREAD_TICKETS_KEY);
     localStorage.removeItem(UNREAD_CONVERSATIONS_KEY);
     localStorage.removeItem(REMOTE_PASSWORDS_KEY);
+    localStorage.removeItem(REMOTE_SNAPSHOT_KEY);
   }
 
   async function refreshCurrentUser() {
@@ -1342,10 +1420,10 @@
         deviceLabel: '??????? ????? ???????'
       };
       try {
-        var runtime = remoteRuntime();
+        var runtime = remoteRuntime() || await fetchRemoteRuntimeDefault();
         if (runtime && runtime.enabled && hasDesktopBridge()) {
           try {
-            var preparedRemote = await prepareDesktopRemoteForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] });
+            var preparedRemote = await bootstrapDesktopRemoteSnapshot(true);
             var systemInfo = preparedRemote && preparedRemote.systemInfo ? preparedRemote.systemInfo : null;
             if (preparedRemote && preparedRemote.password) remoteDevicePayload.remotePassword = preparedRemote.password;
             if (preparedRemote && preparedRemote.clientId) remoteDevicePayload.remoteClientId = preparedRemote.clientId;
@@ -1560,6 +1638,9 @@
     state.pollTimer = setInterval(async function () {
       if (!state.token) return;
       try {
+        if (!canManageRemoteDesk()) {
+          await bootstrapDesktopRemoteSnapshot(false);
+        }
         if (!canManageRemoteDesk() && state.mode === 'tickets' && state.selectedTicketId && state.selectedTicket && remoteRuntime(state.selectedTicket) && remoteRuntime(state.selectedTicket).enabled) {
           await refreshDesktopRemoteState();
           if (remoteDeviceNeedsSync(latestRemoteDevice()) || (state.desktopRemote.clientId && latestRemoteDevice() && !latestRemoteDevice().remote_client_id)) {
@@ -1582,10 +1663,10 @@
   async function bootDesk() {
     if (!state.token || !state.user) return renderAuthState(false);
     await refreshCurrentUser();
+    await fetchRemoteRuntimeDefault();
     await refreshDesktopRemoteState();
     if (!canManageRemoteDesk()) {
-      await warmRemoteRuntime();
-      await refreshDesktopRemoteState();
+      await bootstrapDesktopRemoteSnapshot(true);
     }
     renderAuthState(true);
     $('deskUserName').textContent = state.user.fullName || state.user.email || '????????????';

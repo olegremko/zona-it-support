@@ -15,6 +15,70 @@ let tray = null;
 let isQuitting = false;
 let lastRustDeskPassword = '';
 
+function compactSystemInfo(info) {
+  var source = info || {};
+  return {
+    deviceName: String(source.deviceName || '').trim(),
+    localIp: String(source.localIp || '').trim(),
+    publicIp: String(source.publicIp || '').trim(),
+    gatewayIp: String(source.gatewayIp || '').trim()
+  };
+}
+
+function buildManagedRustDeskSnapshot(status, systemInfo, executable) {
+  return {
+    updatedAt: new Date().toISOString(),
+    executable: executable || null,
+    clientId: String(status && status.clientId || '').trim(),
+    password: String(status && status.password || '').trim(),
+    systemInfo: compactSystemInfo(systemInfo)
+  };
+}
+
+function managedRustDeskPasswordFile() {
+  return path.join(managedRustDeskDir(), 'password.txt');
+}
+
+function managedRustDeskSnapshotFile() {
+  return path.join(managedRustDeskDir(), 'snapshot.json');
+}
+
+function readManagedRustDeskPassword() {
+  try {
+    return String(fs.readFileSync(managedRustDeskPasswordFile(), 'utf8') || '').trim();
+  } catch (_error) {
+    return '';
+  }
+}
+
+function writeManagedRustDeskPassword(password) {
+  const value = String(password || '').trim();
+  if (!value) return '';
+  fs.mkdirSync(managedRustDeskDir(), { recursive: true });
+  fs.writeFileSync(managedRustDeskPasswordFile(), value, 'utf8');
+  lastRustDeskPassword = value;
+  return value;
+}
+
+function ensureManagedRustDeskPassword() {
+  return readManagedRustDeskPassword() || writeManagedRustDeskPassword(Math.random().toString(36).slice(2, 6) + Math.random().toString(36).slice(2, 6));
+}
+
+function readManagedRustDeskSnapshot() {
+  try {
+    return JSON.parse(fs.readFileSync(managedRustDeskSnapshotFile(), 'utf8'));
+  } catch (_error) {
+    return null;
+  }
+}
+
+function writeManagedRustDeskSnapshot(snapshot) {
+  try {
+    fs.mkdirSync(managedRustDeskDir(), { recursive: true });
+    fs.writeFileSync(managedRustDeskSnapshotFile(), JSON.stringify(snapshot || {}, null, 2), 'utf8');
+  } catch (_error) {}
+}
+
 function trayIcon() {
   const icon = nativeImage.createFromPath(process.execPath);
   return icon.isEmpty() ? nativeImage.createEmpty() : icon;
@@ -62,6 +126,8 @@ function rustDeskConfigCandidates() {
   return [
     path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'RustDesk', 'config', 'RustDesk2.toml'),
     path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'RustDesk', 'config', 'RustDesk.toml'),
+    path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'RustDesk', 'config', 'RustDesk2.toml'),
+    path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'RustDesk', 'config', 'RustDesk.toml'),
     path.join(managedRustDeskDir(), 'config', 'RustDesk2.toml'),
     path.join(managedRustDeskDir(), 'config', 'RustDesk.toml')
   ];
@@ -81,7 +147,6 @@ function managedRustDeskInstaller(options) {
 
 function rustDeskCandidates(options) {
   return [
-    managedRustDeskExecutable(options),
     path.join(process.env.ProgramFiles || 'C:\\Program Files', 'RustDesk', 'rustdesk.exe'),
     path.join(process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)', 'RustDesk', 'rustdesk.exe'),
     path.join(os.homedir(), 'AppData', 'Local', 'Programs', 'RustDesk', 'RustDesk.exe'),
@@ -247,11 +312,10 @@ async function applyRustDeskConfig(executable, options) {
 }
 
 async function applyRustDeskPassword(executable, options) {
-  const password = options && options.password ? String(options.password).trim() : '';
+  const password = options && options.password ? writeManagedRustDeskPassword(options.password) : readManagedRustDeskPassword();
   if (!password) return { applied: false };
   try {
     await execFileAsync(executable, ['--password', password]);
-    lastRustDeskPassword = password;
     return { applied: true };
   } catch (error) {
     return { applied: false, error: error.message };
@@ -386,9 +450,18 @@ async function latestRustDeskAssetUrl() {
 }
 
 async function getRustDeskStatus() {
-  const executable = findManagedRustDesk() || findRustDesk();
+  const snapshot = readManagedRustDeskSnapshot() || {};
+  const storedPassword = readManagedRustDeskPassword() || lastRustDeskPassword || snapshot.password || '';
+  const executable = findRustDesk() || findManagedRustDesk();
   if (!executable) {
-    return { installed: false, executable: null, clientId: '', password: lastRustDeskPassword || '', managed: false };
+    return {
+      installed: false,
+      executable: null,
+      clientId: String(snapshot.clientId || '').trim(),
+      password: String(storedPassword || '').trim(),
+      managed: false,
+      systemInfo: compactSystemInfo(snapshot.systemInfo)
+    };
   }
 
   async function readStatusOnce() {
@@ -400,46 +473,50 @@ async function getRustDeskStatus() {
       clientId = '';
     }
 
-    let password = '';
-    try {
-      const result = await execFileAsync(executable, ['--password']);
-      password = String(result.stdout || '').trim();
-    } catch (_passwordError) {
-      password = '';
-    }
-
     const configStatus = readRustDeskConfigStatus();
     return {
-      clientId: clientId || configStatus.clientId || '',
-      password: password || configStatus.password || ''
+      clientId: clientId || configStatus.clientId || snapshot.clientId || '',
+      password: storedPassword || configStatus.password || snapshot.password || ''
     };
   }
 
   let status = await readStatusOnce();
-  if (!status.clientId || !status.password) {
+  if (!status.clientId) {
     try {
       await startRustDeskProcess(executable, [], { showWindow: false });
     } catch (_launchError) {}
     for (let attempt = 0; attempt < 8; attempt += 1) {
       await sleep(2000);
       status = await readStatusOnce();
-      if (status.clientId && status.password) break;
+      if (status.clientId) break;
     }
   }
 
-  return {
+  const systemInfo = await getSystemInfo();
+  const resolved = {
     installed: true,
     executable: executable,
-    clientId: status.clientId || '',
-    password: status.password || lastRustDeskPassword || '',
-    managed: path.resolve(executable).startsWith(path.resolve(managedRustDeskDir()))
+    clientId: String(status.clientId || snapshot.clientId || '').trim(),
+    password: String(status.password || storedPassword || '').trim(),
+    managed: path.resolve(executable).startsWith(path.resolve(managedRustDeskDir())),
+    systemInfo: systemInfo || compactSystemInfo(snapshot.systemInfo)
   };
+  writeManagedRustDeskSnapshot(buildManagedRustDeskSnapshot(resolved, resolved.systemInfo, executable));
+
+  return resolved;
 }
 
 async function prepareRustDesk(options) {
-  const installResult = await installRustDesk(options || {});
+  const desiredPassword = options && options.password ? writeManagedRustDeskPassword(options.password) : ensureManagedRustDeskPassword();
+  const installResult = await installRustDesk(Object.assign({}, options || {}, { password: desiredPassword }));
   const status = await getRustDeskStatus(options || {});
-  const systemInfo = await getSystemInfo();
+  const systemInfo = status.systemInfo || await getSystemInfo();
+  writeManagedRustDeskSnapshot(buildManagedRustDeskSnapshot({
+    clientId: status.clientId || '',
+    password: status.password || desiredPassword || '',
+    installed: status.installed,
+    managed: status.managed
+  }, systemInfo, status.executable || installResult.executable || null));
   return {
     started: !!installResult.started,
     installed: !!status.installed,
@@ -450,26 +527,27 @@ async function prepareRustDesk(options) {
     passwordApplied: !!installResult.passwordApplied,
     passwordError: installResult.passwordError || null,
     clientId: status.clientId || '',
-    password: status.password || lastRustDeskPassword || ((options && options.password) ? String(options.password).trim() : ''),
+    password: status.password || desiredPassword || '',
     systemInfo: systemInfo || { deviceName: '', localIp: '', publicIp: '', gatewayIp: '' }
   };
 }
 
 async function launchRustDesk(options) {
-  let executable = findManagedRustDesk(options);
+  const desiredPassword = options && options.password ? writeManagedRustDeskPassword(options.password) : ensureManagedRustDeskPassword();
+  let executable = findRustDesk(options) || findManagedRustDesk(options);
   if (!executable) {
-    const installResult = await installRustDesk(options);
+    const installResult = await installRustDesk(Object.assign({}, options || {}, { password: desiredPassword }));
     if (!installResult.installed) {
       return { launched: false, installed: false, error: installResult.error || 'Не удалось подготовить модуль удаленной помощи.' };
     }
-    executable = findManagedRustDesk(options);
+    executable = findRustDesk(options) || findManagedRustDesk(options);
     if (!executable) {
       return { launched: false, installed: false, error: 'Модуль удаленной помощи установлен, но клиент не найден.' };
     }
   }
 
-  await applyRustDeskConfig(executable, options);
-  await applyRustDeskPassword(executable, options);
+  await applyRustDeskConfig(executable, Object.assign({}, options || {}, { password: desiredPassword }));
+  await applyRustDeskPassword(executable, Object.assign({}, options || {}, { password: desiredPassword }));
   var launchArgs = [];
   if (options && options.peerId) {
     launchArgs.push(String(options.peerId));
@@ -480,38 +558,56 @@ async function launchRustDesk(options) {
 
 async function installRustDesk(options) {
   try {
-    let executable = findManagedRustDesk(options);
+    const desiredPassword = options && options.password ? writeManagedRustDeskPassword(options.password) : ensureManagedRustDeskPassword();
+    let executable = findRustDesk(options);
     if (!executable) {
-      const installerPath = managedRustDeskExecutable(options);
+      const installerPath = managedRustDeskInstaller(options);
       const assetUrl = await latestRustDeskAssetUrl();
       await downloadFile(assetUrl, installerPath);
-      executable = installerPath;
+      try {
+        await execFileAsync(installerPath, ['--silent-install']);
+      } catch (_installError) {}
+      await sleep(8000);
+      executable = findRustDesk(options) || installerPath;
     }
 
     if (!executable) {
       return { started: false, installed: false, error: 'Не удалось подготовить встроенный модуль.' };
     }
 
-    const configResult = await applyRustDeskConfig(executable, options);
-    const passwordResult = await applyRustDeskPassword(executable, options);
+    const configResult = await applyRustDeskConfig(executable, Object.assign({}, options || {}, { password: desiredPassword }));
+    const passwordResult = await applyRustDeskPassword(executable, Object.assign({}, options || {}, { password: desiredPassword }));
+    var serviceResult = { installed: false, error: null };
+    if (findRustDesk(options)) {
+      serviceResult = await installRustDeskService(executable);
+      try {
+        await execFileAsync('sc.exe', ['start', 'RustDesk']);
+      } catch (_startServiceError) {}
+    }
     try {
       await startRustDeskProcess(executable, [], { showWindow: false });
-      await sleep(2400);
+      await sleep(4000);
     } catch (_runtimeStartError) {}
     const status = await getRustDeskStatus();
+    writeManagedRustDeskSnapshot(buildManagedRustDeskSnapshot({
+      clientId: status.clientId || '',
+      password: status.password || desiredPassword || '',
+      installed: status.installed,
+      managed: status.managed
+    }, status.systemInfo || null, executable));
     return {
       started: true,
       installed: true,
       executable: executable,
       managed: !!status.managed,
-      serviceInstalled: false,
-      serviceError: null,
+      serviceInstalled: !!serviceResult.installed,
+      serviceError: serviceResult.error || null,
       configured: !!configResult.applied,
       configError: configResult.error || null,
       passwordApplied: !!passwordResult.applied,
       passwordError: passwordResult.error || null,
       clientId: status.clientId || '',
-      password: status.password || (options && options.password ? String(options.password).trim() : '')
+      password: status.password || desiredPassword || ''
     };
   } catch (error) {
     return { started: false, installed: false, error: error.message };
