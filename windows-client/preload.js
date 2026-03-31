@@ -14,6 +14,9 @@ contextBridge.exposeInMainWorld('zonaDeskBridge', {
   installRustDesk: function (options) {
     return ipcRenderer.invoke('rustdesk:install', options || {});
   },
+  prepareRustDesk: function (options) {
+    return ipcRenderer.invoke('rustdesk:prepare', options || {});
+  },
   copyText: function (value) {
     return ipcRenderer.invoke('desk:copy', value);
   },

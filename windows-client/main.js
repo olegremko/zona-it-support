@@ -13,6 +13,7 @@ app.commandLine.appendSwitch('disable-http-cache');
 let mainWindow = null;
 let tray = null;
 let isQuitting = false;
+let lastRustDeskPassword = '';
 
 function trayIcon() {
   const icon = nativeImage.createFromPath(process.execPath);
@@ -224,6 +225,7 @@ async function applyRustDeskPassword(executable, options) {
   if (!password) return { applied: false };
   try {
     await execFileAsync(executable, ['--password', password]);
+    lastRustDeskPassword = password;
     return { applied: true };
   } catch (error) {
     return { applied: false, error: error.message };
@@ -360,31 +362,66 @@ async function latestRustDeskAssetUrl() {
 async function getRustDeskStatus() {
   const executable = findManagedRustDesk() || findRustDesk();
   if (!executable) {
-    return { installed: false, executable: null, clientId: '', managed: false };
+    return { installed: false, executable: null, clientId: '', password: lastRustDeskPassword || '', managed: false };
   }
 
-  let clientId = '';
-  try {
-    const result = await execFileAsync(executable, ['--get-id']);
-    clientId = String(result.stdout || '').trim();
-  } catch (error) {
-    clientId = '';
+  async function readStatusOnce() {
+    let clientId = '';
+    try {
+      const result = await execFileAsync(executable, ['--get-id']);
+      clientId = String(result.stdout || '').trim();
+    } catch (_idError) {
+      clientId = '';
+    }
+
+    let password = '';
+    try {
+      const result = await execFileAsync(executable, ['--password']);
+      password = String(result.stdout || '').trim();
+    } catch (_passwordError) {
+      password = '';
+    }
+
+    return { clientId, password };
   }
 
-  let password = '';
-  try {
-    const result = await execFileAsync(executable, ['--password']);
-    password = String(result.stdout || '').trim();
-  } catch (error) {
-    password = '';
+  let status = await readStatusOnce();
+  if (!status.clientId || !status.password) {
+    try {
+      await startRustDeskProcess(executable, [], { showWindow: false });
+    } catch (_launchError) {}
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      await sleep(2000);
+      status = await readStatusOnce();
+      if (status.clientId && status.password) break;
+    }
   }
 
   return {
     installed: true,
     executable: executable,
-    clientId: clientId,
-    password: password,
+    clientId: status.clientId || '',
+    password: status.password || lastRustDeskPassword || '',
     managed: path.resolve(executable).startsWith(path.resolve(managedRustDeskDir()))
+  };
+}
+
+async function prepareRustDesk(options) {
+  const installResult = await installRustDesk(options || {});
+  const status = await getRustDeskStatus(options || {});
+  const systemInfo = await getSystemInfo();
+  return {
+    started: !!installResult.started,
+    installed: !!status.installed,
+    executable: status.executable || installResult.executable || null,
+    managed: !!status.managed,
+    configured: !!installResult.configured,
+    configError: installResult.configError || null,
+    passwordApplied: !!installResult.passwordApplied,
+    passwordError: installResult.passwordError || null,
+    clientId: status.clientId || '',
+    password: status.password || lastRustDeskPassword || ((options && options.password) ? String(options.password).trim() : ''),
+    systemInfo: systemInfo || { deviceName: '', localIp: '', publicIp: '', gatewayIp: '' }
   };
 }
 
@@ -511,6 +548,21 @@ ipcMain.handle('rustdesk:install', async function (_event, options) {
     return {
       started: false,
       installed: false,
+      error: serializeError(error, 'Не удалось подготовить модуль удаленной помощи.')
+    };
+  }
+});
+
+ipcMain.handle('rustdesk:prepare', async function (_event, options) {
+  try {
+    return await prepareRustDesk(options || {});
+  } catch (error) {
+    return {
+      started: false,
+      installed: false,
+      clientId: '',
+      password: lastRustDeskPassword || ((options && options.password) ? String(options.password).trim() : ''),
+      systemInfo: { deviceName: '', localIp: '', publicIp: '', gatewayIp: '' },
       error: serializeError(error, 'Не удалось подготовить модуль удаленной помощи.')
     };
   }

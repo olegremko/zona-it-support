@@ -346,19 +346,51 @@
     }
   }
 
+  async function prepareDesktopRemoteForTicket(ticket, passwordOverride) {
+    if (!hasDesktopBridge()) {
+      return {
+        installed: false,
+        clientId: '',
+        password: passwordOverride || '',
+        systemInfo: null
+      };
+    }
+    var runtimeSource = ticket || state.selectedTicket;
+    var options = remoteOptionsForTicket(runtimeSource, passwordOverride);
+    if (DESK_BRIDGE.prepareRustDesk) {
+      var prepared = await DESK_BRIDGE.prepareRustDesk(options);
+      state.desktopRemote.installed = !!(prepared && prepared.installed);
+      state.desktopRemote.clientId = prepared && prepared.clientId ? String(prepared.clientId).trim() : '';
+      state.desktopRemote.password = prepared && prepared.password ? String(prepared.password).trim() : '';
+      return {
+        installed: !!state.desktopRemote.installed,
+        clientId: state.desktopRemote.clientId || '',
+        password: state.desktopRemote.password || options.password || '',
+        systemInfo: prepared && prepared.systemInfo ? prepared.systemInfo : null
+      };
+    }
+    if (DESK_BRIDGE.installRustDesk) {
+      try {
+        await DESK_BRIDGE.installRustDesk(options);
+      } catch (_installFallbackError) {}
+    }
+    await refreshDesktopRemoteState();
+    return {
+      installed: !!state.desktopRemote.installed,
+      clientId: state.desktopRemote.clientId || '',
+      password: state.desktopRemote.password || options.password || '',
+      systemInfo: await getDesktopSystemInfo()
+    };
+  }
+
   async function warmRemoteRuntime(ticket) {
-    if (!hasDesktopBridge() || canManageRemoteDesk() || !DESK_BRIDGE.installRustDesk) return;
+    if (!hasDesktopBridge() || canManageRemoteDesk()) return;
     var runtimeSource = ticket || state.selectedTicket;
     var runtime = remoteRuntime(runtimeSource);
     if (!runtime || !runtime.enabled || state.desktopRemote.busy) return;
     try {
-      await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket(runtimeSource || state.selectedTicket));
+      await prepareDesktopRemoteForTicket(runtimeSource || state.selectedTicket);
     } catch (error) {}
-    await refreshDesktopRemoteState();
-    if (state.desktopRemote.installed && !state.desktopRemote.clientId) {
-      await sleep(2200);
-      await refreshDesktopRemoteState();
-    }
   }
 
   async function getDesktopSystemInfo() {
@@ -664,15 +696,13 @@
       try {
         var lastPreparedAt = Number(state.remotePreparedTickets[ticketId] || 0);
         var preparedRecently = lastPreparedAt && (Date.now() - lastPreparedAt) < 300000;
-        var shouldPrepareRuntime = !!settings.force || !!settings.createSession || (!state.desktopRemote.installed && !preparedRecently) || !state.remotePreparedTickets[ticketId];
+        var shouldPrepareRuntime = !!settings.force || !!settings.createSession || (!state.desktopRemote.installed && !preparedRecently) || !state.remotePreparedTickets[ticketId] || !state.desktopRemote.clientId;
         if (shouldPrepareRuntime) {
           try {
-            await DESK_BRIDGE.installRustDesk(remoteOptions);
+            await prepareDesktopRemoteForTicket(state.selectedTicket, remoteOptions.password);
           } catch (_installRuntimeError) {}
         }
-        try {
-          await refreshDesktopRemoteState();
-        } catch (_refreshRuntimeError) {}
+        try { await refreshDesktopRemoteState(); } catch (_refreshRuntimeError) {}
         try {
           await syncCurrentDeviceInfo(remoteOptions.password);
         } catch (_syncDeviceInfoError) {}
@@ -1261,19 +1291,18 @@
       };
       try {
         var runtime = remoteRuntime();
-        if (runtime && runtime.enabled && hasDesktopBridge() && DESK_BRIDGE.installRustDesk) {
+        if (runtime && runtime.enabled && hasDesktopBridge()) {
           try {
-            await DESK_BRIDGE.installRustDesk(remoteOptionsForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] }, provisionalPassword));
+            var preparedRemote = await prepareDesktopRemoteForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] }, provisionalPassword);
+            var systemInfo = preparedRemote && preparedRemote.systemInfo ? preparedRemote.systemInfo : null;
+            if (preparedRemote && preparedRemote.password) remoteDevicePayload.remotePassword = preparedRemote.password;
+            if (preparedRemote && preparedRemote.clientId) remoteDevicePayload.remoteClientId = preparedRemote.clientId;
+            if (systemInfo && systemInfo.deviceName) remoteDevicePayload.deviceName = systemInfo.deviceName;
+            if (systemInfo && systemInfo.localIp) remoteDevicePayload.localIp = systemInfo.localIp;
+            if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
+            if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
           } catch (_warmError) {}
         }
-        await refreshDesktopRemoteState();
-        var systemInfo = await getDesktopSystemInfo();
-        if (state.desktopRemote && state.desktopRemote.password) remoteDevicePayload.remotePassword = state.desktopRemote.password;
-        if (state.desktopRemote && state.desktopRemote.clientId) remoteDevicePayload.remoteClientId = state.desktopRemote.clientId;
-        if (systemInfo && systemInfo.deviceName) remoteDevicePayload.deviceName = systemInfo.deviceName;
-        if (systemInfo && systemInfo.localIp) remoteDevicePayload.localIp = systemInfo.localIp;
-        if (systemInfo && systemInfo.publicIp) remoteDevicePayload.publicIp = systemInfo.publicIp;
-        if (systemInfo && systemInfo.gatewayIp) remoteDevicePayload.gatewayIp = systemInfo.gatewayIp;
       } catch (_remoteBootstrapError) {}
       remoteDevicePayload = compactRemotePayload(remoteDevicePayload);
       var requestPayload = {
