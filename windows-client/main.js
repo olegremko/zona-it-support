@@ -58,6 +58,15 @@ function managedRustDeskDir() {
   return path.join(app.getPath('userData'), 'runtime', 'rustdesk');
 }
 
+function rustDeskConfigCandidates() {
+  return [
+    path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'RustDesk', 'config', 'RustDesk2.toml'),
+    path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'RustDesk', 'config', 'RustDesk.toml'),
+    path.join(managedRustDeskDir(), 'config', 'RustDesk2.toml'),
+    path.join(managedRustDeskDir(), 'config', 'RustDesk.toml')
+  ];
+}
+
 function managedRustDeskFileName(options) {
   return 'zona-it-rustdesk.exe';
 }
@@ -135,6 +144,23 @@ function serializeError(error, fallbackMessage) {
   } catch (_jsonError) {
     return fallbackMessage || String(error);
   }
+}
+
+function readRustDeskConfigStatus() {
+  for (const candidate of rustDeskConfigCandidates()) {
+    try {
+      if (!fs.existsSync(candidate)) continue;
+      const raw = fs.readFileSync(candidate, 'utf8');
+      const idMatch = raw.match(/^\s*id\s*=\s*["']?([^"'\r\n]+)["']?/m);
+      const passwordMatch = raw.match(/^\s*password\s*=\s*["']?([^"'\r\n]+)["']?/m);
+      return {
+        configPath: candidate,
+        clientId: idMatch ? String(idMatch[1] || '').trim() : '',
+        password: passwordMatch ? String(passwordMatch[1] || '').trim() : ''
+      };
+    } catch (_readError) {}
+  }
+  return { configPath: '', clientId: '', password: '' };
 }
 
 function buildRustDeskConfigString(options) {
@@ -382,7 +408,11 @@ async function getRustDeskStatus() {
       password = '';
     }
 
-    return { clientId, password };
+    const configStatus = readRustDeskConfigStatus();
+    return {
+      clientId: clientId || configStatus.clientId || '',
+      password: password || configStatus.password || ''
+    };
   }
 
   let status = await readStatusOnce();

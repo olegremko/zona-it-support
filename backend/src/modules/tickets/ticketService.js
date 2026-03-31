@@ -545,7 +545,7 @@ export async function createTicket(context, input) {
     }, context, {
       deviceLabel: input.remoteDevice?.deviceLabel || 'Рабочее место клиента',
       remoteClientId: input.remoteDevice?.remoteClientId,
-      remotePassword: input.remoteDevice?.remotePassword || (shouldPrepareDesktopRemote ? generateRemotePassword() : undefined),
+      remotePassword: input.remoteDevice?.remotePassword,
       deviceName: input.remoteDevice?.deviceName,
       localIp: input.remoteDevice?.localIp,
       publicIp: input.remoteDevice?.publicIp,

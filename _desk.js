@@ -249,10 +249,8 @@
     var device = ticket.remote_devices && ticket.remote_devices.length ? ticket.remote_devices[0] : null;
     if (device && device.remote_password) return String(device.remote_password).trim();
     if (state.remotePasswords[ticket.id]) return String(state.remotePasswords[ticket.id]).trim();
-    var generated = randomRemotePassword();
-    state.remotePasswords[ticket.id] = generated;
-    saveSession();
-    return generated;
+    if (state.desktopRemote && state.desktopRemote.password) return String(state.desktopRemote.password).trim();
+    return '';
   }
 
   function remoteOptionsForTicket(ticket, passwordOverride) {
@@ -680,6 +678,56 @@
       device.public_ip &&
       device.gateway_ip
     );
+  }
+
+  function ticketSupportsRemote(ticket) {
+    if (!ticket) return false;
+    return String(ticket.category || '').trim().toLowerCase() === 'desktop desk' || !!(ticket.remote_runtime && ticket.remote_runtime.enabled);
+  }
+
+  async function syncRemoteForTicketId(ticketId, options) {
+    var settings = options || {};
+    if (!hasDesktopBridge() || canManageRemoteDesk() || !ticketId) return null;
+    if (state.remotePreparingTickets[ticketId] && !settings.force) return null;
+
+    state.remotePreparingTickets[ticketId] = true;
+    try {
+      var data = await api('/api/tickets/' + encodeURIComponent(ticketId));
+      var ticket = data && data.ticket ? data.ticket : null;
+      if (!ticket || !ticketSupportsRemote(ticket)) return null;
+
+      var prepared = await prepareDesktopRemoteForTicket(ticket);
+      var systemInfo = prepared && prepared.systemInfo ? prepared.systemInfo : null;
+      var payload = compactRemotePayload({
+        deviceLabel: 'Р Р°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ РєР»РёРµРЅС‚Р°',
+        remoteClientId: prepared && prepared.clientId ? prepared.clientId : '',
+        remotePassword: prepared && prepared.password ? prepared.password : '',
+        deviceName: systemInfo && systemInfo.deviceName ? systemInfo.deviceName : '',
+        localIp: systemInfo && systemInfo.localIp ? systemInfo.localIp : '',
+        publicIp: systemInfo && systemInfo.publicIp ? systemInfo.publicIp : '',
+        gatewayIp: systemInfo && systemInfo.gatewayIp ? systemInfo.gatewayIp : ''
+      });
+
+      if (Object.keys(payload).length) {
+        await api('/api/tickets/' + encodeURIComponent(ticketId) + '/remote-device', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+
+      state.remotePreparedTickets[ticketId] = Date.now();
+      return payload;
+    } finally {
+      delete state.remotePreparingTickets[ticketId];
+    }
+  }
+
+  function latestClientRemoteSyncCandidate() {
+    if (canManageRemoteDesk()) return null;
+    var candidates = state.tickets.filter(function (ticket) {
+      return ticketSupportsRemote(ticket);
+    });
+    return candidates.length ? candidates[0] : null;
   }
 
   async function ensureRemoteSupportReady(options) {
@@ -1172,6 +1220,12 @@
     syncCompanyFilter();
     renderList();
     if (state.selectedTicketId && state.mode === 'tickets') await selectTicket(state.selectedTicketId, true);
+    if (!canManageRemoteDesk()) {
+      var syncCandidate = latestClientRemoteSyncCandidate();
+      if (syncCandidate && (!state.remotePreparedTickets[syncCandidate.id] || remoteDeviceNeedsSync((syncCandidate.remote_devices || [])[0] || null))) {
+        syncRemoteForTicketId(syncCandidate.id, { force: true }).catch(function () {});
+      }
+    }
   }
 
   async function fetchConversations() {
@@ -1284,16 +1338,14 @@
     var priority = $('deskTicketPriority').value;
     if (subject.length < 3 || description.length < 3) return showError('deskModalError', '??????? ???? ? ?????? ?????????.');
     try {
-      var provisionalPassword = randomRemotePassword();
       var remoteDevicePayload = {
-        deviceLabel: '??????? ????? ???????',
-        remotePassword: provisionalPassword
+        deviceLabel: '??????? ????? ???????'
       };
       try {
         var runtime = remoteRuntime();
         if (runtime && runtime.enabled && hasDesktopBridge()) {
           try {
-            var preparedRemote = await prepareDesktopRemoteForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] }, provisionalPassword);
+            var preparedRemote = await prepareDesktopRemoteForTicket({ id: 'new-ticket-runtime', remote_runtime: runtime, remote_devices: [] });
             var systemInfo = preparedRemote && preparedRemote.systemInfo ? preparedRemote.systemInfo : null;
             if (preparedRemote && preparedRemote.password) remoteDevicePayload.remotePassword = preparedRemote.password;
             if (preparedRemote && preparedRemote.clientId) remoteDevicePayload.remoteClientId = preparedRemote.clientId;
@@ -1331,8 +1383,10 @@
           })
         });
       }
-      state.remotePasswords[data.ticket.id] = remoteDevicePayload.remotePassword;
-      saveSession();
+      if (remoteDevicePayload.remotePassword) {
+        state.remotePasswords[data.ticket.id] = remoteDevicePayload.remotePassword;
+        saveSession();
+      }
       try {
         var immediateRemotePayload = compactRemotePayload({
           deviceLabel: remoteDevicePayload.deviceLabel || 'Рабочее место клиента',
@@ -1380,6 +1434,9 @@
         await refreshDesktopRemoteState();
         await syncDeviceInfoForTicket(data.ticket.id, state.selectedTicket || data.ticket, remoteDevicePayload.remotePassword);
       } catch (_secondRemoteSyncError) {}
+      try {
+        await syncRemoteForTicketId(data.ticket.id, { force: true });
+      } catch (_directRemoteSyncError) {}
       try {
         await fetchTickets();
         await selectTicket(data.ticket.id, true);
