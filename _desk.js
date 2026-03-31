@@ -375,7 +375,7 @@
     if (!ticketId) return;
     var systemInfo = await getDesktopSystemInfo();
     var localClientId = state.desktopRemote && state.desktopRemote.clientId ? state.desktopRemote.clientId : null;
-    var password = remotePassword || state.desktopRemote.password || ticketRemotePassword(ticket || state.selectedTicket);
+    var password = state.desktopRemote.password || remotePassword || ticketRemotePassword(ticket || state.selectedTicket);
     if (!systemInfo && !localClientId && !password) return;
     var payload = {
       deviceLabel: 'Рабочее место клиента',
@@ -1474,6 +1474,12 @@
     state.pollTimer = setInterval(async function () {
       if (!state.token) return;
       try {
+        if (!canManageRemoteDesk() && state.mode === 'tickets' && state.selectedTicketId && state.selectedTicket && remoteRuntime(state.selectedTicket) && remoteRuntime(state.selectedTicket).enabled) {
+          await refreshDesktopRemoteState();
+          if (remoteDeviceNeedsSync(latestRemoteDevice()) || (state.desktopRemote.clientId && latestRemoteDevice() && !latestRemoteDevice().remote_client_id)) {
+            await ensureRemoteSupportReady({ createSession: false, background: true });
+          }
+        }
         await fetchTickets();
         if (hasLiveChatAccess()) await fetchConversations();
       } catch (error) {}
