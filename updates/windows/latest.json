@@ -1,0 +1,12 @@
+{
+  "app": "Zona IT Desk",
+  "platform": "windows",
+  "version": "0.1.96",
+  "publishedAt": "2026-04-13T16:04:23.575Z",
+  "notes": "Технический релиз для проверки автообновления Windows-клиента. Функциональных изменений нет.",
+  "url": "https://i-zone.pro/updates/windows/Zona-IT-Desk-0.1.96-setup.exe",
+  "sha256": "b2e1dbf8cb8dafaa100550b079837a1257f145bf1372e476cbb0ff27d18c815e",
+  "size": 78779577,
+  "portableUrl": "https://i-zone.pro/updates/windows/Zona-IT-Desk-0.1.96-portable.exe",
+  "blockmapUrl": "https://i-zone.pro/updates/windows/Zona-IT-Desk-0.1.96-setup.exe.blockmap"
+}

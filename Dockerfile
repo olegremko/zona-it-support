@@ -14,6 +14,7 @@ COPY _main.js /app/_main.js
 COPY _chat.js /app/_chat.js
 COPY _portal.js /app/_portal.js
 COPY _desk.js /app/_desk.js
+COPY updates /app/updates
 
 EXPOSE 4000
 

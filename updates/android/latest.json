@@ -1,0 +1,12 @@
+{
+  "app": "Zona IT Desk",
+  "platform": "android",
+  "packageName": "pro.izone.desk.mobile",
+  "version": "0.1.19",
+  "versionCode": 119,
+  "publishedAt": "2026-04-13T16:02:14.028Z",
+  "notes": "Технический релиз для проверки автообновления Android-клиента. Функциональных изменений нет.",
+  "url": "https://i-zone.pro/updates/android/Zona-IT-Desk-Android-0.1.19-release.apk",
+  "sha256": "a03d4b2063ce035c90fe704a5cc5801bdc17f6a2d125500642d3fcb0b5bacb9f",
+  "size": 3845553
+}
